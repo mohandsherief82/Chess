@@ -1,5 +1,5 @@
 compile:
-	gcc ./Board/main.c ./Pieces/pawn.c -o main.o -Wall
+	gcc ./Board/main.c ./Board/Board.c ./Pieces/pawn.c -o main.o -Wall
 
 run:
 	./main.o
