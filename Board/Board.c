@@ -4,7 +4,7 @@
 void initialize_board(char board[BOARD_SIZE][BOARD_SIZE]){
 
     for(int i =0; i<BOARD_SIZE; i++){
-        for (int j = 0; i < BOARD_SIZE; j++)
+        for (int j = 0; j < BOARD_SIZE; j++)
         {
             board[i][j]= EMPTY_SQUARE;
         }
@@ -27,12 +27,12 @@ void initialize_board(char board[BOARD_SIZE][BOARD_SIZE]){
 
 void display_board(char board[BOARD_SIZE][BOARD_SIZE]){
  
-    printf("\nA B C D E F G H\n");
-    printf("-----------------\n");
+    printf("\n   A B C D E F G H\n");
+    printf("  -----------------\n");
 
 
     for(int i = 0; i < BOARD_SIZE; i++){
-        printf("%d |", BOARD_SIZE -i);
+        printf("%d|", BOARD_SIZE -i);
 
         for(int j =0; j<BOARD_SIZE; j++){
             char piece = board[i][j];
@@ -45,16 +45,17 @@ void display_board(char board[BOARD_SIZE][BOARD_SIZE]){
             }
 
             if (piece != EMPTY_SQUARE){
-                printf("%c", piece);
+                printf(" %c", piece);
             } else {
-                printf("%c", background);
+                printf(" %c", background);
             }
         }
 
-        printf("|%d", BOARD_SIZE -i);
+        printf(" |%d", BOARD_SIZE -i);
+        printf("\n");
     }
 
 
-    printf("-----------------\n");
-    printf("A B C D E F G H\n");
+    printf("  -----------------\n");
+    printf("   A B C D E F G H\n");
 }
