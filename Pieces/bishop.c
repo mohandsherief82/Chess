@@ -8,7 +8,7 @@ Bishop createBishop(int color, int row, char col)
         .symbol = sym,
         .color = color,
         .rowPosition = row,
-        .colPosition = col
+        .colPosition = 'C' + 2 * col + 1
     };
 
     return b;

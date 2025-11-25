@@ -1,6 +1,6 @@
 #include "queen.h"
 
-Queen createQueen(int color, int row, char col)
+Queen createQueen(int color, int row)
 {
     char sym = (color == COLOR_BLACK) ? 'Q' : 'q';
 
@@ -8,7 +8,7 @@ Queen createQueen(int color, int row, char col)
         .symbol = sym,
         .color = color,
         .rowPosition = row,
-        .colPosition = col
+        .colPosition = 'D'
     };
 
     return q;

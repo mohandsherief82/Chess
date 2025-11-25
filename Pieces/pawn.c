@@ -13,9 +13,8 @@ Pawn createPawn(int color, int row, char col)
         .symbol = sym,
         .color = color,
         .rowPosition = row,
-        .colPosition = col,
-        .promoted = false,
-        .promotion = '\0',
+        .colPosition = 'A' + col,
+        .promoted = false
     };
 
     return p;

@@ -5,13 +5,13 @@
 
 typedef struct 
 {
-    const char symbol;
-    const PieceColor color;
+    char symbol;
+    PieceColor color;
     int rowPosition;
     char colPosition;
 
 } Queen;
 
-Queen createQueen(int color, int row, char col);
+Queen createQueen(int color, int row);
 
 #endif

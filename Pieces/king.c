@@ -1,6 +1,6 @@
 #include "king.h"
 
-King createKing(int color, int row, char col)
+King createKing(int color, int row)
 {
     char sym = (color == COLOR_BLACK) ? 'Q' : 'q';
 
@@ -8,7 +8,7 @@ King createKing(int color, int row, char col)
         .symbol = sym,
         .color = color,
         .rowPosition = row,
-        .colPosition = col
+        .colPosition = 'E'
     };
 
     return k;

@@ -7,12 +7,11 @@
 
 typedef struct 
 {
-    const char symbol;
-    const PieceColor color;
+    char symbol;
+    PieceColor color;
     int rowPosition;
     char colPosition;
     bool promoted;
-    const char  promotion;
 } Pawn;
 
 Pawn createPawn(int color, int row, char col);
