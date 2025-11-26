@@ -25,7 +25,12 @@ int main ()
 
     printf("%c %c", player.king.symbol, player.queen.symbol);
 
-    printf("\n");
+    printf("%d\n", sizeof(Knight) == sizeof(Queen));
+
+    free(player.pawns);
+    free(player.rocks);
+    free(player.bishops);
+    free(player.knights);
 
     return 0;
 }

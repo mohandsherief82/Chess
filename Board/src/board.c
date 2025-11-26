@@ -1,58 +1,85 @@
 #include <stdio.h>
+#include <stdlib.h>
+
+#include "../../Pieces/include/player.h"
 #include "../include/board.h"
 
-void initialize_board(char board[BOARD_SIZE][BOARD_SIZE]){
+char** initialize_board()
+{
+    char **board = (char**)malloc(BOARD_SIZE * sizeof(char*));
 
-    for(int i =0; i<BOARD_SIZE; i++){
-        for (int j = 0; j < BOARD_SIZE; j++)
-        {
-            board[i][j]= EMPTY_SQUARE;
-        }
+    // Initialize board with empty cells,
+    // will be overwritten with the first display of the board
+    for(int i = 0; i < BOARD_SIZE; i++)
+    {
+        board[i] = (char*)malloc(BOARD_SIZE * sizeof(char));
+        for (int j = 0; j < BOARD_SIZE; j++) board[i][j]= EMPTY_SQUARE;
     }
 
-    board[0][0] = 'R'; board[0][1] = 'N'; board[0][2] = 'B'; board[0][3] = 'Q';
-    board[0][4] = 'K'; board[0][5] = 'B'; board[0][6] = 'N'; board[0][7] = 'R';
-    for(int i =0; i < BOARD_SIZE; i++){
-        board[1][i]='P';
-    }
-
-    board[7][0] = 'r'; board[7][1] = 'n'; board[7][2] = 'b'; board[7][3] = 'q';
-    board[7][4] = 'k'; board[7][5] = 'b'; board[7][6] = 'n'; board[7][7] = 'r';
-    for(int i =0; i < BOARD_SIZE; i++){
-        board[6][i]='p';
-    }
-
+    return board;
 }
 
 
-void display_board(char board[BOARD_SIZE][BOARD_SIZE]){
- 
+void addPieces(char** board, void* piecesArray, int numPieces, size_t piece_size)
+{
+    // Pointer to the current piece (treated as raw bytes)
+    char* current_piece = (char*)piecesArray;
+
+    for (int i = 0; i < numPieces; i++)
+    {
+        // Get the current piece's address by moving 'i' steps of size 'piece_size'
+        // This is done using pointer arithmetic on the char* pointer.
+        Piece* p = (Piece*)(current_piece + i * piece_size);
+
+        int col = p->colPosition;
+        int row = p->rowPosition;
+
+        if ((col >= 0 && col < 8) && (row >= 0 && row < 8)) board[row][col] = p->symbol;
+    }
+}
+
+
+void addPiece(char** board, void* piece)
+{
+    int col = ((Piece*)piece)->colPosition,
+        row = ((Piece*)piece)->rowPosition;
+
+    if ((col >= 0 && col < 8) && (row >= 0 && row < 8)) board[row][col] = ((Piece*)piece)->symbol;
+}
+
+
+
+void display_board(char** board, Player player1, Player player2)
+{ 
     printf("\n   A B C D E F G H\n");
     printf("  -----------------\n");
 
+    addPieces(board, player1.pawns, NUM_PAWNS, sizeof(Pawn));
+    addPieces(board, player2.pawns, NUM_PAWNS, sizeof(Pawn));
 
-    for(int i = 0; i < BOARD_SIZE; i++){
-        printf("%d|", BOARD_SIZE -i);
+    addPieces(board, player1.rocks, NUM_PIECES, sizeof(Rock));
+    addPieces(board, player2.rocks, NUM_PIECES, sizeof(Rock));
 
-        for(int j =0; j<BOARD_SIZE; j++){
-            char piece = board[i][j];
-            char background;
+    addPieces(board, player1.knights, NUM_PIECES, sizeof(Knight));
+    addPieces(board, player2.knights, NUM_PIECES, sizeof(Knight));
 
-            if ((i + j) % 2 == 0){
-                background = WHITE_SQUARE; 
-            } else {
-                background = BLACK_SQUARE;
-            }
+    addPieces(board, player1.bishops, NUM_PIECES, sizeof(Bishop));
+    addPieces(board, player2.bishops, NUM_PIECES, sizeof(Bishop));
 
-            if (piece != EMPTY_SQUARE){
-                printf(" %c", piece);
-            } else {
-                printf(" %c", background);
-            }
-        }
+    addPiece(board, &player1.queen);
+    addPiece(board, &player2.queen);
 
-        printf(" |%d", BOARD_SIZE -i);
-        printf("\n");
+    addPiece(board, &player1.king);
+    addPiece(board, &player2.king);
+
+
+    for(int i = 0; i < BOARD_SIZE; i++)
+    {
+        printf("%d", BOARD_SIZE -i);
+
+        for (int j = 0; j < BOARD_SIZE; j++) printf("|%c", board[i][j]);
+        
+        printf(" |%d\n", BOARD_SIZE -i);
     }
 
 

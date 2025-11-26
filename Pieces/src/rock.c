@@ -1,7 +1,7 @@
 #include "../include/rock.h"
 #include "../../chessTypes.h"
 
-Rock createRock(PieceColor color, int row, char col)
+Rock createRock(PieceColor color, int row, int col)
 {
     char sym = (color == COLOR_BLACK) ? 'R' : 'r';
 
@@ -9,7 +9,7 @@ Rock createRock(PieceColor color, int row, char col)
         .symbol = sym,
         .color = color,
         .rowPosition = row,
-        .colPosition = 'A'
+        .colPosition = 0 + col * 7
     };
 
     return r;

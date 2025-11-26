@@ -9,11 +9,11 @@ typedef struct
 {
     char symbol;
     PieceColor color;
-    int rowPosition;
-    char colPosition;
-    bool promoted;
+    int rowPosition; // Stores the row value 0 --> 7
+    int colPosition; // Stores the col value 0 --> 7
+    bool promoted; // Promotion flag
 } Pawn;
 
-Pawn createPawn(PieceColor color, int row, char col);
+Pawn createPawn(PieceColor color, int row, int col);
 
 #endif

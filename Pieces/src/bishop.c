@@ -1,7 +1,7 @@
 #include "../include/bishop.h"
 #include "../../chessTypes.h"
 
-Bishop createBishop(PieceColor color, int row, char col)
+Bishop createBishop(PieceColor color, int row, int col)
 {
     char sym = (color == COLOR_BLACK) ? 'B' : 'b';
 
@@ -9,7 +9,7 @@ Bishop createBishop(PieceColor color, int row, char col)
         .symbol = sym,
         .color = color,
         .rowPosition = row,
-        .colPosition = 'C'
+        .colPosition = 2 + 3 * col
     };
 
     return b;
