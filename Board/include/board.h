@@ -6,8 +6,10 @@
 #define WHITE_SQUARE '-'
 #define EMPTY_SQUARE ' '
 
-void initialize_board(char board[BOARD_SIZE][BOARD_SIZE]);
+#include "../../Pieces/include/player.h"
 
-void display_board(char board[BOARD_SIZE][BOARD_SIZE]);
+char** initialize_board();
+
+void display_board(char** board, Player player1, Player player2);
 
 #endif

@@ -1,12 +1,17 @@
-compile:
-	gcc -Wall -g ./Pieces/src/*.c ./Board/src/board.c -o ./Board/bin/main.o
+CC=gcc
+FLAGS=-Wall -g
+
+board: 
+	$(CC) $(FLAGS) ./Pieces/src/*.c ./Board/src/board.c ./Board/main.c -o ./Board/bin/main.o
+
+test_pieces:
+	./Pieces/bin/pieces.o
 
 pieces:
-	gcc -Wall -g ./Pieces/src/*.c ./Pieces/test.c -o ./Pieces/bin/pieces.o
+	$(CC) $(FLAGS) ./Pieces/test.c ./Pieces/src/*.c -o ./Pieces/bin/pieces.o
 
-run:
+run: board
 	./Board/bin/main.o
-	echo
 
 clean:
 	rm -f ./Board/bin/main.o

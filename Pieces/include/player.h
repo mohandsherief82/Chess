@@ -23,6 +23,15 @@ typedef struct
     King king;
 } Player;
 
+// Placeholder struct for adding pieces
+typedef struct
+{
+    char symbol;
+    PieceColor color;
+    int rowPosition; // Stores the row value 0 --> 7
+    int colPosition; // Stores the col value 0 --> 7
+} Piece;
+
 Player createPlayer(PieceColor color);
 
 #endif

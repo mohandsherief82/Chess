@@ -9,7 +9,7 @@ King createKing(PieceColor color, int row)
         .symbol = sym,
         .color = color,
         .rowPosition = row,
-        .colPosition = 'E'
+        .colPosition = 4
     };
 
     return k;
