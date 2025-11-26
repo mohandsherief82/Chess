@@ -1,4 +1,4 @@
-#include "../chessTypes.h"
+#include "../../chessTypes.h"
 
 #ifndef ROCK_H
 #define ROCK_H

@@ -1,4 +1,4 @@
-#include "../chessTypes.h"
+#include "../../chessTypes.h"
 #include <stdbool.h>
 
 // Prevents compiling this file more than once in the main file

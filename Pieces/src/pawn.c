@@ -7,13 +7,13 @@
 // Contains all moves that a pawn can perform
 Pawn createPawn(PieceColor color, int row, char col)
 {
-    char sym = (color ==COLOR_BLACK) ? 'P' : 'p';
+    char sym = (color == COLOR_BLACK) ? 'P' : 'p';
 
     Pawn p = {
         .symbol = sym,
         .color = color,
         .rowPosition = row,
-        .colPosition = 'A' + col,
+        .colPosition = 'A',
         .promoted = false
     };
 

@@ -1,5 +1,8 @@
 compile:
-	gcc -Wall ./Pieces/src/*.c ./Board/src/board.c -o ./Board/bin/main.o
+	gcc -Wall -g ./Pieces/src/*.c ./Board/src/board.c -o ./Board/bin/main.o
+
+pieces:
+	gcc -Wall -g ./Pieces/src/*.c ./Pieces/test.c -o ./Pieces/bin/pieces.o
 
 run:
 	./Board/bin/main.o

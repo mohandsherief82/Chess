@@ -1,4 +1,4 @@
-#include "../chessTypes.h"
+#include "../../chessTypes.h"
 
 #ifndef BISHOP_H
 #define BISHOP_H

@@ -1,4 +1,4 @@
-#include "../chessTypes.h"
+#include "../../chessTypes.h"
 
 #ifndef KNIGHT_H
 #define KNIGHT_H

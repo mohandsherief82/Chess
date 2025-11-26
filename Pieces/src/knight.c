@@ -4,13 +4,13 @@
 
 Knight createKnight(PieceColor color, int row, char col)
 {
-    char sym = (color == COLOR_BLACK) ? 'Q' : 'q';
+    char sym = (color == COLOR_BLACK) ? 'N' : 'n';
 
     Knight n = {
         .symbol = sym,
         .color = color,
         .rowPosition = row,
-        .colPosition = 'B' + 4 * col + 1
+        .colPosition = 'B'
     };
 
     return n;

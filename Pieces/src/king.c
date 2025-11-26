@@ -3,7 +3,7 @@
 
 King createKing(PieceColor color, int row)
 {
-    char sym = (color == COLOR_BLACK) ? 'Q' : 'q';
+    char sym = (color == COLOR_BLACK) ? 'K' : 'k';
 
     King k = {
         .symbol = sym,
