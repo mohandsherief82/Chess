@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "Board.h"
+#include "../include/board.h"
 
 void initialize_board(char board[BOARD_SIZE][BOARD_SIZE]){
 

@@ -1,6 +1,8 @@
-#include "knight.h"
+#include "../include/knight.h"
+#include "../../chessTypes.h"
 
-Knight createKnight(int color, int row, char col)
+
+Knight createKnight(PieceColor color, int row, char col)
 {
     char sym = (color == COLOR_BLACK) ? 'Q' : 'q';
 

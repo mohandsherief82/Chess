@@ -1,7 +1,7 @@
 #include "../chessTypes.h"
 
-#ifndef KING_H
-#define KING_H
+#ifndef ROCK_H
+#define ROCK_H
 
 typedef struct 
 {
@@ -9,8 +9,8 @@ typedef struct
     PieceColor color;
     int rowPosition;
     char colPosition;
-} King;
+} Rock;
 
-King createKing(int color, int row);
+Rock createRock(PieceColor color, int row, char col);
 
 #endif

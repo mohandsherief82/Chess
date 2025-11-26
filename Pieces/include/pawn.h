@@ -14,6 +14,6 @@ typedef struct
     bool promoted;
 } Pawn;
 
-Pawn createPawn(int color, int row, char col);
+Pawn createPawn(PieceColor color, int row, char col);
 
 #endif

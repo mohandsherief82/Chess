@@ -1,7 +1,7 @@
 #include "../chessTypes.h"
 
-#ifndef KNIGHT_H
-#define KNIGHT_H
+#ifndef QUEEN_H
+#define QUEEN_H
 
 typedef struct 
 {
@@ -10,8 +10,8 @@ typedef struct
     int rowPosition;
     char colPosition;
 
-} Knight;
+} Queen;
 
-Knight createKnight(int color, int row, char col);
+Queen createQueen(PieceColor color, int row);
 
 #endif

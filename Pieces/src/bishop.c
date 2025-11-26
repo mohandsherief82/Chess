@@ -1,6 +1,7 @@
-#include "bishop.h"
+#include "../include/bishop.h"
+#include "../../chessTypes.h"
 
-Bishop createBishop(int color, int row, char col)
+Bishop createBishop(PieceColor color, int row, char col)
 {
     char sym = (color == COLOR_BLACK) ? 'Q' : 'q';
 

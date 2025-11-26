@@ -1,6 +1,7 @@
-#include "king.h"
+#include "../include/king.h"
+#include "../../chessTypes.h"
 
-King createKing(int color, int row)
+King createKing(PieceColor color, int row)
 {
     char sym = (color == COLOR_BLACK) ? 'Q' : 'q';
 

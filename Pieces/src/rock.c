@@ -1,6 +1,7 @@
-#include "rock.h"
+#include "../include/rock.h"
+#include "../../chessTypes.h"
 
-Rock createRock(int color, int row, char col)
+Rock createRock(PieceColor color, int row, char col)
 {
     char sym = (color == COLOR_BLACK) ? 'Q' : 'q';
 

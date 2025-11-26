@@ -1,6 +1,7 @@
-#include "queen.h"
+#include "../include/queen.h"
+#include "../../chessTypes.h"
 
-Queen createQueen(int color, int row)
+Queen createQueen(PieceColor color, int row)
 {
     char sym = (color == COLOR_BLACK) ? 'Q' : 'q';
 

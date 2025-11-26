@@ -1,9 +1,9 @@
 compile:
-	gcc ./Board/main.c ./Board/Board.c ./Pieces/pawn.c -o main.o -Wall
+	gcc -Wall ./Pieces/src/*.c ./Board/src/board.c -o ./Board/bin/main.o
 
 run:
-	./main.o
+	./Board/bin/main.o
 	echo
 
 clean:
-	rm -f main 
+	rm -f ./Board/bin/main.o
