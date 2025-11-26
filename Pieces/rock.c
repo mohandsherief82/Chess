@@ -8,7 +8,7 @@ Rock createRock(int color, int row, char col)
         .symbol = sym,
         .color = color,
         .rowPosition = row,
-        .colPosition = col
+        .colPosition = 'A' + 6 * col + 1
     };
 
     return r;

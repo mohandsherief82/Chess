@@ -8,7 +8,7 @@ Knight createKnight(int color, int row, char col)
         .symbol = sym,
         .color = color,
         .rowPosition = row,
-        .colPosition = col
+        .colPosition = 'B' + 4 * col + 1
     };
 
     return n;
