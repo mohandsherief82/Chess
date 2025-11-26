@@ -1,4 +1,4 @@
-#include "../chessTypes.h"
+#include "../../chessTypes.h"
 
 #ifndef KING_H
 #define KING_H
@@ -11,6 +11,6 @@ typedef struct
     char colPosition;
 } King;
 
-King createKing(int color, int row);
+King createKing(PieceColor color, int row);
 
 #endif

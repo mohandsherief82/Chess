@@ -1,4 +1,4 @@
-#include "../chessTypes.h"
+#include "../../chessTypes.h"
 
 #ifndef BISHOP_H
 #define BISHOP_H
@@ -12,6 +12,6 @@ typedef struct
 
 } Bishop;
 
-Bishop createBishop(int color, int row, char col);
+Bishop createBishop(PieceColor color, int row, char col);
 
 #endif

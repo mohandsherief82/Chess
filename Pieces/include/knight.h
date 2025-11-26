@@ -1,4 +1,4 @@
-#include "../chessTypes.h"
+#include "../../chessTypes.h"
 
 #ifndef KNIGHT_H
 #define KNIGHT_H
@@ -12,6 +12,6 @@ typedef struct
 
 } Knight;
 
-Knight createKnight(int color, int row, char col);
+Knight createKnight(PieceColor color, int row, char col);
 
 #endif

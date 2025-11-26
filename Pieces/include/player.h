@@ -4,10 +4,13 @@
 #include "queen.h"
 #include "bishop.h"
 #include "rock.h"
-#include "../chessTypes.h"
+#include "../../chessTypes.h"
 
 #ifndef PLAYER_H
 #define PLAYER_H
+
+#define NUM_PAWNS 8
+#define NUM_PIECES 2
 
 typedef struct
 {

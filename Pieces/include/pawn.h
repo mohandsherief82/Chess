@@ -1,4 +1,4 @@
-#include "../chessTypes.h"
+#include "../../chessTypes.h"
 #include <stdbool.h>
 
 // Prevents compiling this file more than once in the main file
@@ -14,6 +14,6 @@ typedef struct
     bool promoted;
 } Pawn;
 
-Pawn createPawn(int color, int row, char col);
+Pawn createPawn(PieceColor color, int row, char col);
 
 #endif

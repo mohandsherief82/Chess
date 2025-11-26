@@ -1,4 +1,4 @@
-#include "../chessTypes.h"
+#include "../../chessTypes.h"
 
 #ifndef ROCK_H
 #define ROCK_H
@@ -11,6 +11,6 @@ typedef struct
     char colPosition;
 } Rock;
 
-Rock createRock(int color, int row, char col);
+Rock createRock(PieceColor color, int row, char col);
 
 #endif

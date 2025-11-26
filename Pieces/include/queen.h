@@ -1,4 +1,5 @@
-#include "../chessTypes.h"
+#include "../../chessTypes.h"
+
 
 #ifndef QUEEN_H
 #define QUEEN_H
@@ -12,6 +13,6 @@ typedef struct
 
 } Queen;
 
-Queen createQueen(int color, int row);
+Queen createQueen(PieceColor color, int row);
 
 #endif
