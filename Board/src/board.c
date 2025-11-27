@@ -39,7 +39,6 @@ void addPieces(char** board, void* piecesArray, int numPieces, size_t piece_size
 }
 
 
-
 void display_board(char** board, Player player1, Player player2)
 { 
     printf("\t\t\t    A   B   C   D   E   F   G   H \n");
@@ -82,9 +81,21 @@ void display_board(char** board, Player player1, Player player2)
     printf("\t\t\t    A   B   C   D   E   F   G   H \n");
 }
 
+
 void clearScreen()
 {
     printf("\033[2J\033[H");
 
     return;
 }
+
+
+void freeBoard(char** board, Player player1, Player player2)
+{
+    free(board);
+    freePlayer(player1);
+    freePlayer(player2);
+
+    return;
+}
+

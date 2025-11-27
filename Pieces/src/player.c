@@ -43,3 +43,13 @@ Player createPlayer(PieceColor color)
 
     return player;
 }
+
+void freePlayer(Player player)
+{
+    free(player.pawns);
+    free(player.bishops);
+    free(player.knights);
+    free(player.rocks);
+
+    return;
+}
