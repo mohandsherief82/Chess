@@ -14,4 +14,5 @@ run: board
 	./Board/bin/main.o
 
 clean:
-	rm -f ./Board/bin/main.o
+	rm -f ./Board/bin/*.o
+	rm -f ./Pieces/bin/*.o

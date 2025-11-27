@@ -12,6 +12,7 @@ typedef struct
     int rowPosition; // Stores the row value 0 --> 7
     int colPosition; // Stores the col value 0 --> 7
     bool promoted; // Promotion flag
+    bool firstMove; // First Move Flag
 } Pawn;
 
 Pawn createPawn(PieceColor color, int row, int col);
