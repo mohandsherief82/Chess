@@ -2,6 +2,7 @@
 #include "../../chessTypes.h"
 
 #include <stdlib.h>
+#include <stdio.h>
 
 
 Player createPlayer(PieceColor color)
@@ -43,6 +44,80 @@ Player createPlayer(PieceColor color)
 
     return player;
 }
+
+
+bool isValidPiece(char symbol)
+{
+    if (symbol == 'p') return true;
+    else if (symbol == 'r') return true;
+    else if (symbol == 'n') return true;
+    else if (symbol == 'b') return true;
+    else if (symbol == 'q') return true;
+    else if (symbol == 'k') return true;
+    else return false;
+}
+
+
+bool isValidMove(int coordinate)
+{
+    if (coordinate >= 0 && coordinate <= 7) return true;
+
+    printf("Invalid Move, Try Again!!!!\n");
+
+    return false;
+}
+
+
+void toLower(char *letter)
+{
+    if (*letter >= 'A' && *letter <= 'Z') *letter += 32;
+}
+
+
+Move getMove()
+{
+    char tempColPrev, tempColNext, pieceSymbol;
+    int rowPrev, rowNext, colPrev, colNext;
+
+    while (true)
+    {
+        printf("\nEnter piece symbol(p, r, n, b, q, k): ");
+        scanf(" %c", &pieceSymbol);
+
+        toLower(&pieceSymbol);
+
+        if (isValidPiece(pieceSymbol)) break;
+        printf("Invalid Piece Symbol, Try Again!!!!\n");
+    }
+
+    while (true)
+    {
+        printf("\nEnter move: ");
+        scanf(" %c%d%c%d", &tempColPrev, &rowPrev, &tempColNext, &rowNext);
+
+        toLower(&tempColPrev);
+        toLower(&tempColNext);
+
+        colPrev = (int)tempColPrev - 97;
+        colNext = (int)tempColNext - 97;
+
+
+        if (isValidMove(colPrev) && isValidMove(--rowPrev) 
+                && isValidMove(colNext) && isValidMove(--rowNext)) break;
+    }
+    
+    Move move = {
+        .pieceSymbol = pieceSymbol,
+        .colPrev = colPrev,
+        .rowPrev = rowPrev,
+        .colNext = colNext,
+        .rowNext = rowNext,
+        .isValid = true
+    };
+
+    return move;
+}
+
 
 void freePlayer(Player player)
 {

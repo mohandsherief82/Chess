@@ -13,5 +13,7 @@ int main()
     // Display Board for testing
     display_board(Board, playerWhite, playerBlack);
 
+    freeBoard(Board, playerWhite, playerBlack);
+
     return 0;
 }

@@ -12,6 +12,8 @@ char** initialize_board();
 
 void display_board(char** board, Player player1, Player player2);
 
+void clearScreen();
+
 void freeBoard(char** board, Player player1, Player player2);
 
 #endif

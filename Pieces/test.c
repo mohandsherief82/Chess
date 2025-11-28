@@ -7,25 +7,10 @@ int main ()
 {
     Player player = createPlayer(COLOR_WHITE);
 
-    for (int i = 0; i < NUM_PAWNS; i++) printf("%c ", player.pawns[i].symbol);
+    printf("Player %d's move: \n", (player.color == COLOR_WHITE) ? 1: 2);
+    Move move = getMove();
 
-    printf("\n");
-
-    for (int i = 0; i < NUM_PIECES; i++) printf("%c ", player.rocks[i].symbol);
-
-    printf("\n");
-
-    for (int i = 0; i < NUM_PIECES; i++) printf("%c ", player.bishops[i].symbol);
-
-    printf("\n");
-
-    for (int i = 0; i < NUM_PIECES; i++) printf("%c ", player.knights[i].symbol);
-
-    printf("\n");
-
-    printf("%c %c", player.king.symbol, player.queen.symbol);
-
-    printf("%d\n", sizeof(Knight) == sizeof(Queen));
+    printf("%d %d %c %d %d %d\n", move.colPrev, move.rowPrev, move.pieceSymbol, move.colNext, move.rowNext, move.isValid);
 
     free(player.pawns);
     free(player.rocks);

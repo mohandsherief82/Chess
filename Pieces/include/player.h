@@ -25,5 +25,6 @@ typedef struct
 
 Player createPlayer(PieceColor color);
 void freePlayer(Player player);
+Move getMove();
 
 #endif

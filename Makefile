@@ -4,7 +4,7 @@ FLAGS=-Wall -g
 board: 
 	$(CC) $(FLAGS) ./Pieces/src/*.c ./Board/src/board.c ./Board/main.c -o ./Board/bin/main.o
 
-test_pieces:
+test_pieces: pieces
 	./Pieces/bin/pieces.o
 
 pieces:
@@ -16,3 +16,4 @@ run: board
 clean:
 	rm -f ./Board/bin/*.o
 	rm -f ./Pieces/bin/*.o
+	clear
