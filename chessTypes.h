@@ -19,7 +19,7 @@ typedef struct
 
 typedef struct
 {
-    char pieceSymbol;
+    char symbol;
     int colPrev;
     int colNext;
     int rowPrev;

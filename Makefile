@@ -7,6 +7,9 @@ board:
 test_pieces: pieces
 	./Pieces/bin/pieces.o
 
+test_moves: pieces
+	./Pieces/bin/pieces.o < ./Pieces/testing/input.txt > ./Pieces/testing/output.txt
+
 pieces:
 	$(CC) $(FLAGS) ./Pieces/test.c ./Pieces/src/*.c -o ./Pieces/bin/pieces.o
 
