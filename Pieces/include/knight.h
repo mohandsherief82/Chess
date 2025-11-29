@@ -1,4 +1,5 @@
 #include "../../chessTypes.h"
+#include <stdbool.h>
 
 #ifndef KNIGHT_H
 #define KNIGHT_H
@@ -12,5 +13,7 @@ typedef struct
 } Knight;
 
 Knight createKnight(PieceColor color, int row, int col);
+
+bool Valid_knightMove(const Rock* rock, int newrow, int newcol, char** board);
 
 #endif
