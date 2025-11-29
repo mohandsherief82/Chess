@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include "./include/pawnMoves.h"
+#include "./include/rockMoves.h"
 #include "../Board/include/board.h"
 
 int main ()
@@ -19,7 +20,8 @@ int main ()
     displayBoard(board, ply1, ply2);
 
     move = getMove();
-    movePawn(board, move, ply2);
+    printf("Player 1's turn: ");
+    movePawn(board, move, ply1);
     clearScreen();
     displayBoard(board, ply1, ply2);
 

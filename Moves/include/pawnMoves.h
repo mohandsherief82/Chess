@@ -3,6 +3,6 @@
 
 #include "../../Pieces/include/player.h"
 
-bool movePawn(char** board, Move move, Player player);
+bool movePawn(char** board, Player player, Move move);
 
 #endif

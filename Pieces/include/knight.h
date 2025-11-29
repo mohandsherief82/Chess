@@ -14,6 +14,4 @@ typedef struct
 
 Knight createKnight(PieceColor color, int row, int col);
 
-bool Valid_knightMove(const Rock* rock, int newrow, int newcol, char** board);
-
 #endif

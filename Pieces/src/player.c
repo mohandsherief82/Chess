@@ -132,12 +132,10 @@ Move getMove()
             colPrev = (int)tempColPrev - 97;
             colNext = (int)tempColNext - 97;
             
-            moveFlag = true;
+            if (rowPrev != rowNext && colPrev != colNext)moveFlag = true;
         }
-        else 
-        {
-            printf("Invalid coordinates: columns must be a-h and rows must be 1-8. Try Again!!!!\n");
-        }
+        
+        printf("Invalid coordinates: columns must be a-h and rows must be 1-8. Try Again!!!!\n");
     }
     
     rowPrev--;

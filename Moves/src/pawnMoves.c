@@ -4,8 +4,44 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <ctype.h>
 
-bool movePawn(char** board, Move move, Player player)
+void promotePawn(Pawn* pawn)
+{
+    if ((pawn->rowPosition == 7 && pawn->color == COLOR_WHITE) || 
+        (pawn->rowPosition == 0 && pawn->color == COLOR_BLACK))
+    {
+        char newSymbol;
+        pawn->promoted = true;
+
+        while (true)
+        {
+            char c;
+            printf("What do you want to promote the pawn to (r, n, b, q): ");
+            
+            if (scanf(" %c", &newSymbol) != 1)
+            {
+                while ((c = getchar()) != '\n' && c != EOF); 
+                printf("Invalid input. Try again.\n");
+                continue;
+            }
+
+            while ((c = getchar()) != '\n' && c != EOF);
+
+            newSymbol = tolower(newSymbol); 
+            
+            if (isValidPiece(newSymbol)) break; 
+            
+            printf("Invalid Piece Symbol, Try Again! (Must be r, n, b, or q)\n");
+        }
+        
+        pawn->symbol = (pawn->color == COLOR_BLACK) ? toupper(newSymbol) : newSymbol;
+    }
+
+    return;
+}
+
+bool movePawn(char** board, Player player, Move move)
 {
     Pawn* pawn = NULL;
     int moveDirection; // 1 for Black (0->7), -1 for White (7->0)
@@ -36,8 +72,11 @@ bool movePawn(char** board, Move move, Player player)
             board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
             board[move.rowNext][move.colNext] = pawn->symbol;
             
-            pawn->rowPosition += rowDiff;
+            pawn->rowPosition = move.rowNext;
             pawn->firstMove = false;
+
+            promotePawn(pawn);
+
             return true;
         }
     }
@@ -52,7 +91,7 @@ bool movePawn(char** board, Move move, Player player)
             board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
             board[move.rowNext][move.colNext] = pawn->symbol;
             
-            pawn->rowPosition += rowDiff;
+            pawn->rowPosition = move.rowNext;
             pawn->firstMove = false;
             
             // En Passant flag setup would happen here
@@ -69,8 +108,8 @@ bool movePawn(char** board, Move move, Player player)
             board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
             board[move.rowNext][move.colNext] = pawn->symbol;
             
-            pawn->rowPosition = rowDiff;
-            pawn->colPosition = colDiff;
+            pawn->rowPosition = move.rowNext;
+            pawn->colPosition = move.colNext;
             pawn->firstMove = false;
             return true;
         }
