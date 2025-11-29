@@ -8,10 +8,10 @@ int main()
     // Initialize Board and Players
     Player playerWhite = createPlayer(COLOR_WHITE),
         playerBlack = createPlayer(COLOR_BLACK);
-    char** Board = initialize_board();
+    char** Board = initializeBoard();
     
     // Display Board for testing
-    display_board(Board, playerWhite, playerBlack);
+    displayBoard(Board, playerWhite, playerBlack);
 
     freeBoard(Board, playerWhite, playerBlack);
 

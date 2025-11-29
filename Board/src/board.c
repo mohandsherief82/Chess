@@ -4,7 +4,7 @@
 #include "../../Pieces/include/player.h"
 #include "../include/board.h"
 
-char** initialize_board()
+char** initializeBoard()
 {
     char **board = (char**)malloc(BOARD_SIZE * sizeof(char*));
 
@@ -39,7 +39,7 @@ void addPieces(char** board, void* piecesArray, int numPieces, size_t piece_size
 }
 
 
-void display_board(char** board, Player player1, Player player2)
+void displayBoard(char** board, Player player1, Player player2)
 { 
     printf("\t\t\t    A   B   C   D   E   F   G   H \n");
     printf("\t\t\t  |---|---|---|---|---|---|---|---|\n");
@@ -79,6 +79,12 @@ void display_board(char** board, Player player1, Player player2)
     }
 
     printf("\t\t\t    A   B   C   D   E   F   G   H \n");
+}
+
+
+bool isEmpty(char** board, int r, int c)
+{
+    return board[r][c] != WHITE_SQUARE || board[r][c] != BLACK_SQUARE;
 }
 
 

@@ -49,23 +49,14 @@ Player createPlayer(PieceColor color)
 
 bool isValidPiece(char symbol)
 {
-    if (symbol == 'p') return true;
-    else if (symbol == 'r') return true;
-    else if (symbol == 'n') return true;
-    else if (symbol == 'b') return true;
-    else if (symbol == 'q') return true;
-    else if (symbol == 'k') return true;
-    else return false;
+    return (symbol == 'p' || symbol == 'r' || symbol == 'n' || 
+            symbol == 'b' || symbol == 'q' || symbol == 'k');
 }
 
 
 bool isValidMove(int coordinate)
 {
-    if (coordinate >= 1 && coordinate <= 8) return true;
-
-    printf("Invalid Move, Try Again!!!!\n");
-
-    return false;
+    return (coordinate >= 1 && coordinate <= 8);
 }
 
 
@@ -77,7 +68,8 @@ void toLower(char *letter)
 
 Move getMove()
 {
-    char symbol, moveInput[5]; // Array to hold the 4-character move (e2e4) plus null terminator
+    char symbol, moveInput[5]; 
+    char tempColPrev, tempColNext;
     int rowPrev, rowNext,
             colPrev, colNext;
     int c; // For input buffer clearing
@@ -88,7 +80,6 @@ Move getMove()
         printf("\nEnter piece symbol(p, r, n, b, q, k): ");
         if (scanf(" %c", &symbol) != 1) 
         {
-            // Handle scanf failures
             while ((c = getchar()) != '\n' && c != EOF);
             printf("Invalid input. Try again.\n");
             continue;
@@ -103,10 +94,8 @@ Move getMove()
     while (!moveFlag)
     {
         printf("\nEnter move (e.g., e2e4): ");
-        // Read up to 4 characters of the move into moveInput, ignoring leading spaces
         if (scanf(" %4s", moveInput) != 1) 
         {
-            // Handle scanf failure
             while ((c = getchar()) != '\n' && c != EOF);
             printf("Invalid move format, Try Again!!!!\n");
             continue;
@@ -121,31 +110,41 @@ Move getMove()
             continue;
         }
 
-        // Extract and process characters
-        char tempColPrev = moveInput[0];
-        char tempColNext = moveInput[2];
+        // Extract and preprocess characters
+        tempColPrev = moveInput[0];
+        tempColNext = moveInput[2];
         
-        // Convert to lowercase (as before)
         toLower(&tempColPrev);
         toLower(&tempColNext);
 
-        // Convert column characters to 0-7 indices
-        colPrev = (int)tempColPrev - 97;
-        colNext = (int)tempColNext - 97;
-
-        // Convert row characters ('1'-'8') to integers
+        // Convert row characters ('1'-'8') to integers (1-8)
         rowPrev = moveInput[1] - '0'; 
         rowNext = moveInput[3] - '0';
+        
+        bool colsValid = (tempColPrev >= 'a' && tempColPrev <= 'h' &&
+                          tempColNext >= 'a' && tempColNext <= 'h');
+                          
+        bool rowsValid = (isValidMove(rowPrev) && isValidMove(rowNext));
 
-        // 1. Validate the bounds (0-7 for columns, 1-8 for rows)
-        // We check the 1-8 user input *before* converting to 0-7 index
-        if (isValidMove(colPrev + 1) && isValidMove(colNext + 1)
-            && isValidMove(rowPrev) && isValidMove(rowNext)) moveFlag = true;
-        else printf("Invalid coordinates (must be a1-h8), Try Again!!!!\n");
+        if (colsValid && rowsValid) 
+        {
+            // Conversion to 0-7 indices happens here for storage
+            colPrev = (int)tempColPrev - 97;
+            colNext = (int)tempColNext - 97;
+            
+            moveFlag = true;
+        }
+        else 
+        {
+            printf("Invalid coordinates: columns must be a-h and rows must be 1-8. Try Again!!!!\n");
+        }
     }
     
     rowPrev--;
     rowNext--;
+
+    rowPrev = 7 - rowPrev;
+    rowNext = 7 - rowNext;
 
     Move move = {
         .symbol = symbol,
