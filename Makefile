@@ -1,6 +1,8 @@
 CC=gcc
 FLAGS=-Wall -g
 
+.PHONY: board pieces moves test_pieces test_moves test_moves_io test_board
+
 board: 
 	$(CC) $(FLAGS) ./Pieces/src/*.c ./Board/src/board.c ./Board/main.c -o ./Board/bin/main.o
 
