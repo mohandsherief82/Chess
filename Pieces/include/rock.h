@@ -1,4 +1,5 @@
 #include "../../chessTypes.h"
+#include <stdbool.h>
 
 #ifndef ROCK_H
 #define ROCK_H
@@ -12,5 +13,7 @@ typedef struct
 } Rock;
 
 Rock createRock(PieceColor color, int row, int col);
+
+bool Valid_rockMove(const Rock* rock, int newrow, int newcol, char** board);
 
 #endif
