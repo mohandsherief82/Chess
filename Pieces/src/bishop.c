@@ -48,6 +48,10 @@ bool Valid_BishopMove(const Bishop* bishop, int newrow, int newcol, char** board
     int diffrow = newrow - currentrow;
     int diffcol = newcol - currentcol;
 
+    if ((diffrow == 0) && (diffcol == 0)){
+        return false;
+    } 
+    
     if(abs(diffrow) != abs(diffcol)){
         return false;
     }
