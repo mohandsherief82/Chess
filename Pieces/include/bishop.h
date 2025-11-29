@@ -13,4 +13,6 @@ typedef struct
 
 Bishop createBishop(PieceColor color, int row, int col);
 
+bool Valid_BishopMove(const Bishop* bishop, int newrow, int newcol, char** board);
+
 #endif
