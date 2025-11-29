@@ -6,3 +6,4 @@
 - The pieces arrays that exist in the player structure will be dynamically allocated in the player's initialization function.
 - The board will need to be initialized once at the start of the game, so before printing or doing any moves we are going to initialize all cells with an empty cell represented as a space.
 - The initialization function of the board will only give us a pointer to the first address of the 2D grid, which is done to keep track of the place of the board across the whole runtime.
+- Added a function to clear the terminal each time a new move is made(Refrence: https://www.geeksforgeeks.org/c/clear-console-c-language/).
