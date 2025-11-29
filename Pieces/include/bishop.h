@@ -1,4 +1,5 @@
 #include "../../chessTypes.h"
+#include <stdbool.h>
 
 #ifndef BISHOP_H
 #define BISHOP_H
