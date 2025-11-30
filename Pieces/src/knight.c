@@ -14,7 +14,8 @@ Knight createKnight(PieceColor color, int row, int col)
         .symbol = sym,
         .color = color,
         .rowPosition = row,
-        .colPosition = 1 + 5 * col
+        .colPosition = 1 + 5 * col,
+        .isActive = true
     };
 
     return n;

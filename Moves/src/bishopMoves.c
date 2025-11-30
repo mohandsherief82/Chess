@@ -1,8 +1,9 @@
 #include "../../Pieces/include/player.h"
 #include "../../Board/include/board.h"
-#include "../include/utility.h"
+#include "../include/captures.h"
 
 #include <stdlib.h>
+#include <stdio.h>
 
 bool moveBishop(char** board ,Player player, Move move)
 {
@@ -18,7 +19,11 @@ bool moveBishop(char** board ,Player player, Move move)
         }
     }
 
-    if (bishop == NULL) return false;
+    if (bishop == NULL) 
+    {
+        printf("No Bishop At This Position, Try Again!!!\n");
+        return false;
+    }
 
     int currentrow = bishop->rowPosition;
     int currentcol = bishop->colPosition;
@@ -27,7 +32,11 @@ bool moveBishop(char** board ,Player player, Move move)
     dispX = move.rowNext - currentrow;
     dispY = move.colNext - currentcol;
 
-    if(abs(dispX) != abs(dispY)) return false;
+    if(abs(dispX) != abs(dispY)) 
+    {
+        printf("Invalid Move, Try Again!!!\n");
+        return false;
+    }
 
     rowStep = (dispX > 0) ? 1 : -1;
     colStep = (dispY > 0) ? 1 : -1;
@@ -37,7 +46,11 @@ bool moveBishop(char** board ,Player player, Move move)
 
     while (midRow != move.rowNext)
     {
-        if(!isEmpty(board, midRow, midCol)) return false;
+        if(!isEmpty(board, midRow, midCol))
+        {
+            printf("Invalid Move, Try Again!!!\n");
+            return false;
+        }
 
         midRow += rowStep;
         midCol += colStep;
@@ -45,8 +58,12 @@ bool moveBishop(char** board ,Player player, Move move)
 
     if(!isEmpty(board, move.rowNext, move.colNext))
     {
-        if(pieceColorAt(board, move.rowNext, move.colNext) == bishop->color) return false;
-        
+        if(pieceColorAt(board, move.rowNext, move.colNext) == bishop->color)
+        {
+            printf("Can't Capture Friendly piece, Try Again!!!\n");
+            return false;
+        }
+
         // Capture logic
     }
 

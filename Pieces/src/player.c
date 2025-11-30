@@ -89,6 +89,7 @@ Move getMove()
 
         if (isValidPiece(symbol)) break;
         printf("Invalid Piece Symbol, Try Again!!!!\n");
+        while ((c = getchar()) != '\n' && c != EOF);
     }
 
     while ((c = getchar()) != '\n' && c != EOF);
@@ -135,7 +136,8 @@ Move getMove()
             colPrev = (int)tempColPrev - 97;
             colNext = (int)tempColNext - 97;
             
-            if (rowPrev != rowNext || colPrev != colNext)moveFlag = true;
+            if (rowPrev != rowNext || colPrev != colNext) moveFlag = true;
+            else printf("Invalid Move, Try Again!!!\n");
         }
         
         else printf("Invalid coordinates: columns must be a-h and rows must be 1-8. Try Again!!!!\n");

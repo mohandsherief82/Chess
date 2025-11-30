@@ -34,7 +34,7 @@ void addPieces(char** board, void* piecesArray, int numPieces, size_t piece_size
         int col = p->colPosition;
         int row = p->rowPosition;
 
-        if ((col >= 0 && col < 8) && (row >= 0 && row < 8)) board[row][col] = p->symbol;
+        if ((col >= 0 && col < 8) && (row >= 0 && row < 8) && p->isActive) board[row][col] = p->symbol;
     }
 }
 

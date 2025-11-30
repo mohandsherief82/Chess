@@ -1,6 +1,6 @@
 #include "../../Pieces/include/player.h"
 #include "../../Board/include/board.h"
-#include "../include/utility.h"
+#include "../include/captures.h"
 
 #include <stdbool.h>
 #include <stdlib.h>
@@ -58,7 +58,7 @@ bool movePawn(char** board, Player player, Move move)
         }
     }    
     
-    if (pawn == NULL)
+    if (pawn == NULL || pawn->isActive == false)
     {
         printf("No Pawn At This Position, Try Again!!!\n");
         return false;

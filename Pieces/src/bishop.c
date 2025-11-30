@@ -13,7 +13,8 @@ Bishop createBishop(PieceColor color, int row, int col)
         .symbol = sym,
         .color = color,
         .rowPosition = row,
-        .colPosition = 2 + 3 * col
+        .colPosition = 2 + 3 * col,
+        .isActive = true
     };
 
     return b;
