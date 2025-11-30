@@ -1,7 +1,9 @@
 #include "../../Pieces/include/player.h"
 #include "../../Board/include/board.h"
+#include "../include/captures.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdbool.h>
 #include <ctype.h>
 
@@ -15,7 +17,7 @@ bool moveQueen(char** board, Player player, Move move)
         if (move.colPrev == player.pawns[i].colPosition && move.rowPrev == player.pawns[i].rowPosition
             && player.pawns[i].promoted == true && tolower(player.pawns[i].symbol) == 'q') 
         {
-            queen = &player.pawns[i];
+            queen = (Queen*)&player.pawns[i];
             break;
         }
     }
