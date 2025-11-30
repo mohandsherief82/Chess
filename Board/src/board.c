@@ -41,6 +41,8 @@ void addPieces(char** board, void* piecesArray, int numPieces, size_t piece_size
 
 void displayBoard(char** board, Player player1, Player player2)
 { 
+    printf("-------------------------------------------------------------------------------------"
+        "-----------------------------------------------------------\n");
     printf("\t\t\t    A   B   C   D   E   F   G   H \n");
     printf("\t\t\t  |---|---|---|---|---|---|---|---|\n");
 
@@ -79,18 +81,21 @@ void displayBoard(char** board, Player player1, Player player2)
     }
 
     printf("\t\t\t    A   B   C   D   E   F   G   H \n");
+    printf("-------------------------------------------------------------------------------------"
+        "-----------------------------------------------------------\n");
 }
 
 
 bool isEmpty(char** board, int r, int c)
 {
-    return board[r][c] != WHITE_SQUARE || board[r][c] != BLACK_SQUARE;
+    return board[r][c] == WHITE_SQUARE || board[r][c] == BLACK_SQUARE;
 }
 
 
 void clearScreen()
 {
     printf("\033[2J\033[H");
+    fflush(stdout);
 
     return;
 }

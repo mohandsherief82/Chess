@@ -6,24 +6,46 @@
 
 int main ()
 {
-    Player ply1 = createPlayer(COLOR_WHITE);
-    Player ply2 = createPlayer(COLOR_BLACK);
+    Player ply1 = createPlayer(COLOR_WHITE)
+            , ply2 = createPlayer(COLOR_BLACK);
     Move move;
     char** board = initializeBoard();
 
     displayBoard(board, ply1, ply2);
-    printf("Player 1's turn: ");
-    move = getMove();
 
-    movePawn(board, move, ply1);
-    clearScreen();
-    displayBoard(board, ply1, ply2);
+    while (true)
+    {
+        printf("Player 1's turn: ");
 
-    move = getMove();
-    printf("Player 1's turn: ");
-    movePawn(board, move, ply1);
-    clearScreen();
-    displayBoard(board, ply1, ply2);
+        while (true)
+        {
+            move = getMove();
+
+            if (move.symbol == 'p')
+            {
+                if (movePawn(board, ply1, move)) break;
+                else printf("Invalid Pawn Move, Try Again!!!\n");
+            }
+        }
+
+        clearScreen();
+        displayBoard(board, ply1, ply2);
+
+        printf("Player 2's turn: ");
+        while (true)
+        {
+            move = getMove();
+
+            if (move.symbol == 'p')
+            {
+                if (movePawn(board, ply2, move)) break;
+                else printf("Invalid Pawn Move, Try Again!!!\n");
+            }
+        }
+
+        clearScreen();
+        displayBoard(board, ply1, ply2);
+    }
 
     freeBoard(board, ply1, ply2);
 
