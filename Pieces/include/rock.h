@@ -14,6 +14,4 @@ typedef struct
 
 Rock createRock(PieceColor color, int row, int col);
 
-bool moveRock(const Rock* rock, int newrow, int newcol, char** board);
-
 #endif

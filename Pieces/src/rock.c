@@ -1,5 +1,4 @@
 #include "../include/rock.h"
-#include "../include/utility.h"
 #include "../../chessTypes.h"
 #include "../../Board/include/board.h"
 

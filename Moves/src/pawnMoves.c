@@ -1,5 +1,6 @@
 #include "../../Pieces/include/player.h"
 #include "../../Board/include/board.h"
+#include "../include/utility.h"
 
 #include <stdbool.h>
 #include <stdlib.h>
@@ -30,7 +31,8 @@ void promotePawn(Pawn* pawn)
 
             newSymbol = tolower(newSymbol); 
             
-            if (isValidPiece(newSymbol)) break; 
+            if (newSymbol == 'r' || newSymbol == 'n' || 
+                    newSymbol == 'b' || newSymbol == 'q') break; 
             
             printf("Invalid Piece Symbol, Try Again! (Must be r, n, b, or q)\n");
         }
@@ -56,7 +58,11 @@ bool movePawn(char** board, Player player, Move move)
         }
     }    
     
-    if (pawn == NULL) return false; 
+    if (pawn == NULL)
+    {
+        printf("No Pawn At This Position, Try Again!!!\n");
+        return false;
+    }
 
     // Determine direction
     moveDirection = (pawn->color == COLOR_WHITE) ? -1 : 1; 
@@ -73,7 +79,8 @@ bool movePawn(char** board, Player player, Move move)
             board[move.rowNext][move.colNext] = pawn->symbol;
             
             pawn->rowPosition = move.rowNext;
-            pawn->firstMove = false;
+            if (pawn->firstMove) pawn->firstMove = false;
+
 
             promotePawn(pawn);
 
@@ -104,17 +111,23 @@ bool movePawn(char** board, Player player, Move move)
     {
         if (!isEmpty(board, move.rowNext, move.colNext)) 
         { 
-            // NOTE: Full validation requires checking if the piece is an opponent's piece
+            if (pieceColorAt(board, move.rowNext, move.colNext) == pawn->color)
+            {
+                printf("Can't Capture Friendly Piece, Try Again!!!\n");
+                return false;
+            }
+
             board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
             board[move.rowNext][move.colNext] = pawn->symbol;
             
             pawn->rowPosition = move.rowNext;
             pawn->colPosition = move.colNext;
-            pawn->firstMove = false;
+            if (pawn->firstMove) pawn->firstMove = false;
             return true;
         }
     }
     
     // En Passant and Promotion logic would be added here
+    printf("Invalid Pawn Move, Try Again!!!\n");
     return false;
 }

@@ -14,6 +14,4 @@ typedef struct
 
 Bishop createBishop(PieceColor color, int row, int col);
 
-bool moveBishop(const Bishop* bishop, int newrow, int newcol, char** board);
-
 #endif
