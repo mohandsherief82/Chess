@@ -23,3 +23,11 @@ PieceColor pieceColorAt(char** board, int row, int col)
     
     return COLOR_WHITE;
 }
+
+
+captureArray capt ={
+    .countBlack =0,
+    .countWhite =0,
+    .captBlack = {'\0'},
+    .captBlack = {'\0'}
+};

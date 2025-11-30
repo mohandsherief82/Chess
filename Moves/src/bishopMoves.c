@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-bool moveBishop(char** board ,Player player, Move move)
+bool moveBishop(char** board ,Player player, Move move,captureArray* capture)
 {
     int dispX, dispY, midRow, midCol, rowStep, colStep;
     Bishop* bishop = NULL;
@@ -64,7 +64,21 @@ bool moveBishop(char** board ,Player player, Move move)
             return false;
         }
 
-        // Capture logic
+        if(pieceColorAt(board, move.rowNext, move.colNext) != bishop->color)
+        {
+            char symbolAt= board[move.rowNext][move.colNext];
+
+            if(pieceColorAt(board, move.rowNext, move.colNext) == COLOR_BLACK)
+            {
+                capture->captBlack[capture->countBlack] = symbolAt;
+                capture ->countBlack++;
+            }
+            else
+            {
+                capture->captWhite[capture->countWhite] = symbolAt;
+                capture ->countWhite++;
+            }
+        }
     }
 
     return true;
