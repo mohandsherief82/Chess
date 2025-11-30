@@ -10,6 +10,7 @@ typedef struct
     PieceColor color;
     int rowPosition; // Stores the row value 0 --> 7
     int colPosition; // Stores the col value 0 --> 7
+    bool isActive;
 } Rock;
 
 Rock createRock(PieceColor color, int row, int col);

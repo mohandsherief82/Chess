@@ -13,7 +13,8 @@ Rock createRock(PieceColor color, int row, int col)
         .symbol = sym,
         .color = color,
         .rowPosition = row,
-        .colPosition = 0 + col * 7
+        .colPosition = 0 + col * 7,
+        .isActive = true
     };
 
     return r;

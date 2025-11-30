@@ -1,8 +1,9 @@
 #include "../../Pieces/include/player.h"
 #include "../../Board/include/board.h"
-#include "../include/utility.h"
+#include "../include/captures.h"
 
 #include <stdlib.h>
+#include <stdio.h>
 
 bool moveRock(char** board ,Player player, Move move)
 {
@@ -18,13 +19,20 @@ bool moveRock(char** board ,Player player, Move move)
         }
     }
 
-    if (rock == NULL) return false; // Invalid rock postion.
+    if (rock == NULL)
+    {
+        printf("No Rock At This Position, Try Again!!!\n");
+        return false;
+    }
 
     diffrow = move.rowNext - move.rowPrev;
     diffcol = move.colNext - move.colPrev;
 
-    if ((diffrow == 0) && (diffcol == 0)) return false;
-    if((diffrow != 0) && (diffcol !=0)) return false;
+    if((diffrow != 0) && (diffcol !=0)) 
+    {
+        printf("Invalid Move, Try Agian!!!\n");
+        return false;
+    }
 
     if(diffrow != 0) rowstep = (diffrow > 0) ? 1 : -1;
     else colstep = (diffcol > 0) ? 1 : -1;
@@ -34,7 +42,11 @@ bool moveRock(char** board ,Player player, Move move)
 
     while ((r != move.rowNext) || (c != move.colNext))
     {
-        if(!isEmpty(board, r, c)) return false; // Blocked path.
+        if(!isEmpty(board, r, c)) // Blocked path.
+        {
+            printf("Invalid Move, Try Agian!!!\n");
+            return false;
+        }
         r += rowstep;
         c += colstep;
     }
@@ -42,7 +54,10 @@ bool moveRock(char** board ,Player player, Move move)
     if(!isEmpty(board, move.rowNext, move.colNext))
     {
         if(pieceColorAt(board, move.rowNext, move.colNext) == rock->color)
-            return false; // Invalid: Allied piece at destination
+        {   
+            printf("Can't Capture Friendly Piece, Try Again!!!\n"); 
+            return false;
+        }
 
         // Capture Logic
     }

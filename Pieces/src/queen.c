@@ -9,7 +9,8 @@ Queen createQueen(PieceColor color, int row)
         .symbol = sym,
         .color = color,
         .rowPosition = row,
-        .colPosition = 3
+        .colPosition = 3,
+        .isActive = true
     };
 
     return q;

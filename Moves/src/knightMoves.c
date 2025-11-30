@@ -1,6 +1,6 @@
 #include "../../Pieces/include/player.h"
 #include "../../Board/include/board.h"
-#include "../include/utility.h"
+#include "../include/captures.h"
 
 #include <stdlib.h>
 

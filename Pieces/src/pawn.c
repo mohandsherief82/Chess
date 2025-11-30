@@ -17,7 +17,8 @@ Pawn createPawn(PieceColor color, int row, int col)
         .rowPosition = row,
         .colPosition = col,
         .promoted = false,
-        .firstMove = true
+        .firstMove = true,
+        .isActive = true
     };
 
     return p;
