@@ -25,7 +25,7 @@ PieceColor pieceColorAt(char** board, int row, int col)
 }
 
 
-captureArray capt ={
+captureArray capture ={
     .countBlack =0,
     .countWhite =0,
     .captBlack = {'\0'},

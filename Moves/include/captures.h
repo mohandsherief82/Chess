@@ -26,7 +26,7 @@ typedef struct
     int  countBlack;
 }captureArray;
 
-extern captureArray capt;
+extern captureArray capture;
 
 
 
