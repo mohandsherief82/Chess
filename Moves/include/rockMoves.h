@@ -3,6 +3,6 @@
 
 #include "../../Pieces/include/player.h"
 
-bool moveRock(char** board ,Player player, Move move);
+bool moveRock(char** board ,Player player, Move move, Captured* playerCaptures);
 
 #endif
