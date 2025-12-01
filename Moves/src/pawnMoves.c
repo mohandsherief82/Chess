@@ -7,6 +7,24 @@
 #include <stdio.h>
 #include <ctype.h>
 
+Piece* checkPromotedPawn(Player player, Move move)
+{
+    Piece* promotedPawn = NULL;
+
+    for (int i = 0; i < NUM_PAWNS; i++)
+    {
+        if (move.colPrev == player.pawns[i].colPosition && move.rowPrev == player.pawns[i].rowPosition
+            && player.pawns[i].promoted == true && tolower(player.pawns[i].symbol) == move.symbol) 
+        {
+            promotedPawn = (Piece*)&player.pawns[i];
+            break;
+        }
+    }
+
+    return promotedPawn;
+}
+
+
 void promotePawn(Pawn* pawn)
 {
     if ((pawn->rowPosition == 7 && pawn->color == COLOR_WHITE) || 
@@ -43,7 +61,8 @@ void promotePawn(Pawn* pawn)
     return;
 }
 
-bool movePawn(char** board, Player player, Move move)
+
+bool movePawn(char** board, Player player, Move move, Captured* playerCaptures)
 {
     Pawn* pawn = NULL;
     int moveDirection; // 1 for Black (0->7), -1 for White (7->0)
@@ -75,12 +94,9 @@ bool movePawn(char** board, Player player, Move move)
     {
         if (isEmpty(board, move.rowNext, move.colNext)) 
         {
-            board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
-            board[move.rowNext][move.colNext] = pawn->symbol;
-            
+            board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;            
             pawn->rowPosition = move.rowNext;
             if (pawn->firstMove) pawn->firstMove = false;
-
 
             promotePawn(pawn);
 
@@ -96,7 +112,6 @@ bool movePawn(char** board, Player player, Move move)
         if (isEmpty(board, midRow, move.colNext) && isEmpty(board, move.rowNext, move.colNext)) 
         {
             board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
-            board[move.rowNext][move.colNext] = pawn->symbol;
             
             pawn->rowPosition = move.rowNext;
             pawn->firstMove = false;
@@ -117,8 +132,17 @@ bool movePawn(char** board, Player player, Move move)
                 return false;
             }
 
+            playerCaptures->capturedPiece.color = (isupper(board[move.rowNext][move.colNext])) ? COLOR_BLACK: COLOR_WHITE;
+            
+            playerCaptures->capturedPiece.colPosition = move.colNext;
+            playerCaptures->capturedPiece.rowPosition = move.rowNext;
+            playerCaptures->capturedPiece.symbol = board[move.rowNext][move.colNext];
+            playerCaptures->capturedPiece.isActive = false;
+            
+            playerCaptures->captureCount++;
+            playerCaptures->newCapture = true;
+
             board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
-            board[move.rowNext][move.colNext] = pawn->symbol;
             pawn->rowPosition = move.rowNext;
             pawn->colPosition = move.colNext;
             

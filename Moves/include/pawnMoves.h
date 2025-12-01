@@ -2,7 +2,9 @@
 #define PAWN_MOVES_H
 
 #include "../../Pieces/include/player.h"
+#include "./captures.h"
 
-bool movePawn(char** board, Player player, Move move);
+Piece* checkPromotedPawn(Player player, Move move);
+bool movePawn(char** board, Player player, Move move, Captured* playerCaptures);
 
 #endif

@@ -1,5 +1,6 @@
 #include "../../Pieces/include/player.h"
 #include "../../Board/include/board.h"
+#include "../include/pawnMoves.h"
 #include "../include/captures.h"
 
 #include <stdlib.h>
@@ -8,11 +9,12 @@
 bool moveRock(char** board ,Player player, Move move)
 {
     int diffrow, diffcol, rowstep = 0, colstep = 0, r, c;
-    Rock* rock = NULL;
+    Rock* rock = (Rock*)checkPromotedPawn(player, move);
 
     for (int i = 0; i < NUM_PIECES; i++)
     {
-        if (player.rocks[i].colPosition == move.colPrev && player.rocks[i].rowPosition == move.rowPrev)
+        if (player.rocks[i].colPosition == move.colPrev 
+            && player.rocks[i].rowPosition == move.rowPrev && player.rocks[i].isActive)
         {
             rock = &player.rocks[i];
             break;
@@ -30,7 +32,7 @@ bool moveRock(char** board ,Player player, Move move)
 
     if((diffrow != 0) && (diffcol !=0)) 
     {
-        printf("Invalid Move, Try Agian!!!\n");
+        printf("Invalid Rock Move, Try Agian!!!\n");
         return false;
     }
 
@@ -44,7 +46,7 @@ bool moveRock(char** board ,Player player, Move move)
     {
         if(!isEmpty(board, r, c)) // Blocked path.
         {
-            printf("Invalid Move, Try Agian!!!\n");
+            printf("Invalid Rock Move, Try Agian!!!\n");
             return false;
         }
         r += rowstep;
@@ -62,7 +64,6 @@ bool moveRock(char** board ,Player player, Move move)
         // Capture Logic
     }
     
-    board[move.rowNext][move.colNext] = rock->symbol;
     board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
     rock->rowPosition = move.rowNext;
     rock->colPosition = move.colNext;

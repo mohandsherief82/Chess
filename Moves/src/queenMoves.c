@@ -1,5 +1,6 @@
 #include "../../Pieces/include/player.h"
 #include "../../Board/include/board.h"
+#include "../include/pawnMoves.h"
 #include "../include/captures.h"
 
 #include <stdio.h>
@@ -10,17 +11,7 @@
 bool moveQueen(char** board, Player player, Move move)
 {
     int diffrow, diffcol, rowstep = 0, colstep = 0, r, c;
-    Queen* queen = NULL;
-
-    for (int i = 0; i < NUM_PAWNS; i++)
-    {
-        if (move.colPrev == player.pawns[i].colPosition && move.rowPrev == player.pawns[i].rowPosition
-            && player.pawns[i].promoted == true && tolower(player.pawns[i].symbol) == 'q') 
-        {
-            queen = (Queen*)&player.pawns[i];
-            break;
-        }
-    }
+    Queen* queen = (Queen*)checkPromotedPawn(player, move);
     
     if (queen == NULL && player.queen.isActive) 
     {
@@ -44,7 +35,7 @@ bool moveQueen(char** board, Player player, Move move)
     // or one of them is zero.
     if (diffrow != 0 && diffcol != 0 && abs(diffrow) != abs(diffcol)) 
     {
-        printf("Invalid Move, Try Again!!!\n");
+        printf("Invalid Queen Move, Try Again!!!\n");
         return false; 
     }
 
@@ -58,14 +49,13 @@ bool moveQueen(char** board, Player player, Move move)
     {
         if(!isEmpty(board, r, c)) 
         {
-            printf("Invalid Move, Try Again!!!\n");
+            printf("Invalid Queen Move, Try Again!!!\n");
             return false;
         }
 
         r += rowstep;
         c += colstep;
     }
-
 
     // --- 4. Destination Check and Execution ---
 
@@ -79,12 +69,9 @@ bool moveQueen(char** board, Player player, Move move)
         
         // Capture Logic
     }
-    
-    // Execution for non-capture move (assuming logic is placed here)
-    // board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
-    // board[move.rowNext][move.colNext] = queen->symbol;
-    // queen->rowPosition = move.rowNext;
-    // queen->colPosition = move.colNext;
 
+    board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
+    queen->rowPosition = move.rowNext;
+    queen->colPosition = move.colNext;
     return true;
 }

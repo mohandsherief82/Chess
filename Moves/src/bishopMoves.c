@@ -1,14 +1,15 @@
 #include "../../Pieces/include/player.h"
 #include "../../Board/include/board.h"
+#include "../include/pawnMoves.h"
 #include "../include/captures.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 
-bool moveBishop(char** board ,Player player, Move move,CaptureArray* capture)
+bool moveBishop(char** board ,Player player, Move move, Captured* capture)
 {
     int dispX, dispY, midRow, midCol, rowStep, colStep;
-    Bishop* bishop = NULL;
+    Bishop* bishop = (Bishop*)checkPromotedPawn(player, move);
 
     for (int i = 0; i < NUM_PIECES; i++)
     {
@@ -35,7 +36,7 @@ bool moveBishop(char** board ,Player player, Move move,CaptureArray* capture)
 
     if(abs(dispX) != abs(dispY)) 
     {
-        printf("Invalid Move, Try Again!!!\n");
+        printf("Invalid Bishop Move, Try Again!!!\n");
         return false;
     }
 
@@ -49,7 +50,7 @@ bool moveBishop(char** board ,Player player, Move move,CaptureArray* capture)
     {
         if(!isEmpty(board, midRow, midCol))
         {
-            printf("Invalid Move, Try Again!!!\n");
+            printf("Invalid Bishop Move, Try Again!!!\n");
             return false;
         }
 
@@ -65,24 +66,9 @@ bool moveBishop(char** board ,Player player, Move move,CaptureArray* capture)
             return false;
         }
 
-        if(pieceColorAt(board, move.rowNext, move.colNext) != bishop->color)
-        {
-            char symbolAt= board[move.rowNext][move.colNext];
-
-            if(pieceColorAt(board, move.rowNext, move.colNext) == COLOR_BLACK)
-            {
-                capture->captBlack[capture->countBlack] = symbolAt;
-                capture ->countBlack++;
-            }
-            else
-            {
-                capture->captWhite[capture->countWhite] = symbolAt;
-                capture ->countWhite++;
-            }
-        }
+        // Capture Logic
     }
 
-    board[move.rowNext][move.colNext] = bishop->symbol;
     board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
     bishop->rowPosition = move.rowNext;
     bishop->colPosition = move.colNext;

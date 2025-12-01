@@ -7,10 +7,12 @@
 #define EMPTY_SQUARE ' '
 
 #include "../../Pieces/include/player.h"
+#include "../../Moves/include/captures.h"
 
 char** initializeBoard();
 
-void displayBoard(char** board, Player player1, Player player2);
+void displayBoard(char** board, Player player1, Player player2, 
+                        Captured ply1Captures, Captured ply2Captures);
 void clearScreen();
 void freeBoard(char** board, Player player1, Player player2);
 bool isEmpty(char** board, int r, int c);

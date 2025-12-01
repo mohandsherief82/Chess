@@ -6,8 +6,6 @@
 #include "../include/board.h"
 #include "../../Moves/include/captures.h"
 
-extern CaptureArray capture;
-
 char** initializeBoard()
 {
     char **board = (char**)malloc(BOARD_SIZE * sizeof(char*));
@@ -43,10 +41,8 @@ void addPieces(char** board, void* piecesArray, int numPieces, size_t piece_size
 }
 
 
-void displayBoard(char** board, Player player1, Player player2)
+void displayBoard(char** board, Player player1, Player player2, Captured ply1Captures, Captured ply2Captures)
 { 
-    int count = 0;
-
     printf("\t\t\t|---------------------------------------------------------------------------------------"
             "-------------------------------------------|\n");
     printf("\t\t\t|\t\t\t\t\t Board \t\t\t\t\t\t\t\t\t\t\t   |\n");
@@ -89,23 +85,26 @@ void displayBoard(char** board, Player player1, Player player2)
         if (i == 4) 
         {
             printf("\t\t\t White Captures \t\t\t   |");
-            count = 0;
         }
         else if (i % 5 == 1 || i % 5 == 2)
         {
+            Captured currentCaptures = (i < 4) ? ply2Captures : ply1Captures;
+
+            int startIndex = (i % 4 == 1) ? 0 : 8
+                , endIndex = startIndex + 8;
+            char symbol;
+            
             printf("                 ");
-            while (count <= MAXCAPTNUM)
+
+            for (int k = startIndex; k < endIndex; k++)
             {
-                char symbol;
-
-                if (i == 1 || i == 2) symbol = (isValidPiece(capture.captBlack[count])) ? capture.captBlack[count]: EMPTY_SQUARE;
-                else symbol = (isValidPiece(capture.captBlack[count])) ? capture.captWhite[count]: EMPTY_SQUARE;
-
-                printf("| %c ", (char)symbol);
-                count++;
-                if (count == 8) break;
+                symbol = (currentCaptures.capturedSymbol[k] == '\0') ? EMPTY_SQUARE : currentCaptures.capturedSymbol[k];
+                if (symbol == 'X') printf("| %c |   ", symbol);
+                else printf("| %c ", symbol);
             }
-            printf("|                |");
+
+            if (i % 5 == 1) printf("|                |");
+            else printf("             |");
         }
         else printf("                                                                  |");
         printf("\n");
