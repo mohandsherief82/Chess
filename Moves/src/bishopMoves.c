@@ -67,15 +67,14 @@ bool moveBishop(char** board ,Player player, Move move, Captured* playerCaptures
         }
 
         // Capture Logic
-        
-            playerCaptures->capturedPiece.color = (isupper(board[move.rowNext][move.colNext])) ? COLOR_BLACK: COLOR_WHITE;
+        playerCaptures->capturedPiece.color = (isupper(board[move.rowNext][move.colNext])) ? COLOR_BLACK: COLOR_WHITE;
             
-            playerCaptures->capturedPiece.colPosition = move.colNext;
-            playerCaptures->capturedPiece.rowPosition = move.rowNext;
-            playerCaptures->capturedPiece.symbol = board[move.rowNext][move.colNext];
+        playerCaptures->capturedPiece.colPosition = move.colNext;
+        playerCaptures->capturedPiece.rowPosition = move.rowNext;
+        playerCaptures->capturedPiece.symbol = board[move.rowNext][move.colNext];
             
-            playerCaptures->captureCount++;
-            playerCaptures->newCapture = true;
+        playerCaptures->captureCount++;
+        playerCaptures->newCapture = true;
 
     }
 
