@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-bool moveBishop(char** board ,Player player, Move move, Captured* capture)
+bool moveBishop(char** board ,Player player, Move move, Captured* playerCaptures)
 {
     int dispX, dispY, midRow, midCol, rowStep, colStep;
     Bishop* bishop = (Bishop*)checkPromotedPawn(player, move);
@@ -67,6 +67,16 @@ bool moveBishop(char** board ,Player player, Move move, Captured* capture)
         }
 
         // Capture Logic
+        
+            playerCaptures->capturedPiece.color = (isupper(board[move.rowNext][move.colNext])) ? COLOR_BLACK: COLOR_WHITE;
+            
+            playerCaptures->capturedPiece.colPosition = move.colNext;
+            playerCaptures->capturedPiece.rowPosition = move.rowNext;
+            playerCaptures->capturedPiece.symbol = board[move.rowNext][move.colNext];
+            
+            playerCaptures->captureCount++;
+            playerCaptures->newCapture = true;
+
     }
 
     board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
