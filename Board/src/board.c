@@ -51,8 +51,8 @@ void addPiece(char** board, void* piece)
 
 void display_board(char** board, Player player1, Player player2)
 { 
-    printf("\n   A B C D E F G H\n");
-    printf("  -----------------\n");
+    printf("\t\t\t\t    A   B   C   D   E   F   G   H \n");
+    printf("\t\t\t\t  |---|---|---|---|---|---|---|---|\n");
 
     addPieces(board, player1.pawns, NUM_PAWNS, sizeof(Pawn));
     addPieces(board, player2.pawns, NUM_PAWNS, sizeof(Pawn));
@@ -75,14 +75,25 @@ void display_board(char** board, Player player1, Player player2)
 
     for(int i = 0; i < BOARD_SIZE; i++)
     {
-        printf("%d", BOARD_SIZE -i);
+        printf("\t\t\t\t%d", BOARD_SIZE -i);
 
-        for (int j = 0; j < BOARD_SIZE; j++) printf("|%c", board[i][j]);
+        for (int j = 0; j < BOARD_SIZE; j++) 
+            {
+                if (board[i][j] == EMPTY_SQUARE)
+                    board[i][j] = ((i + j) % 2 == 0) ? WHITE_SQUARE : BLACK_SQUARE;
+                printf(" | %c", board[i][j]);
+            }
         
         printf(" |%d\n", BOARD_SIZE -i);
+        printf("\t\t\t\t  |---|---|---|---|---|---|---|---|\n");
     }
 
+    printf("\t\t\t\t    A   B   C   D   E   F   G   H \n");
+}
 
-    printf("  -----------------\n");
-    printf("   A B C D E F G H\n");
+void clearScreen()
+{
+    printf("\033[2J\033[H");
+
+    return;
 }
