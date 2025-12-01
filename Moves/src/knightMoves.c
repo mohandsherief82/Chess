@@ -33,5 +33,9 @@ bool moveKnight(char** board ,Player player, Move move)
         // Capture logic
     }
 
+    board[move.rowNext][move.colNext] = knight->symbol;
+    board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
+    knight->rowPosition = move.rowNext;
+    knight->colPosition = move.colNext;
     return true;
 }

@@ -62,5 +62,9 @@ bool moveRock(char** board ,Player player, Move move)
         // Capture Logic
     }
     
+    board[move.rowNext][move.colNext] = rock->symbol;
+    board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
+    rock->rowPosition = move.rowNext;
+    rock->colPosition = move.colNext;
     return true;
 }

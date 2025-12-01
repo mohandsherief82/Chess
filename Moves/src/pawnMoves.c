@@ -119,9 +119,9 @@ bool movePawn(char** board, Player player, Move move)
 
             board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
             board[move.rowNext][move.colNext] = pawn->symbol;
-            
             pawn->rowPosition = move.rowNext;
             pawn->colPosition = move.colNext;
+            
             if (pawn->firstMove) pawn->firstMove = false;
             return true;
         }

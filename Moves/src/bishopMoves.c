@@ -82,5 +82,9 @@ bool moveBishop(char** board ,Player player, Move move,CaptureArray* capture)
         }
     }
 
+    board[move.rowNext][move.colNext] = bishop->symbol;
+    board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
+    bishop->rowPosition = move.rowNext;
+    bishop->colPosition = move.colNext;
     return true;
 }

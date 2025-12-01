@@ -2,8 +2,13 @@
 
 #include "./include/pawnMoves.h"
 #include "./include/rockMoves.h"
-#include "../Board/include/board.h"
+#include "./include/knightMoves.h"
+#include "./include/bishopMoves.h"
+#include "./include/queenMoves.h"
 #include "./include/captures.h"
+#include "../Board/include/board.h"
+
+extern CaptureArray capture;
 
 // Important for Game Logic
 void playerTurn(char** board, Player player)
@@ -13,6 +18,26 @@ void playerTurn(char** board, Player player)
     {
         move = getMove();
 
+        if (move.symbol == 'p')
+        {
+            if (movePawn(board, player, move)) break;
+        }
+        if (move.symbol == 'r')
+        {
+            if (moveRock(board, player, move)) break;
+        }
+        if (move.symbol == 'n')
+        {
+            if (moveKnight(board, player, move)) break;
+        }
+        if (move.symbol == 'b')
+        {
+            if (moveBishop(board, player, move, &capture)) break;
+        }
+        if (move.symbol == 'q')
+        {
+            if (moveQueen(board, player, move)) break;
+        }
         if (move.symbol == 'p')
         {
             if (movePawn(board, player, move)) break;
