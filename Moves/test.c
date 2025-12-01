@@ -6,7 +6,7 @@
 #include "./include/captures.h"
 
 // Important for Game Logic
-void playerTurn(char** board, Player player, Captured captures)
+void playerTurn(char** board, Player player)
 {
     Move move;
     while (true)
@@ -25,8 +25,6 @@ int main ()
 {
     Player ply1 = createPlayer(COLOR_WHITE)
             , ply2 = createPlayer(COLOR_BLACK);
-    Captured whiteCaptures = initializeCapture(ply1.color)
-            , blackCaptures = initializeCapture(ply2.color);
     char** board = initializeBoard();
 
     displayBoard(board, ply1, ply2);
@@ -35,14 +33,14 @@ int main ()
     {
         printf("Player 1's turn: ");
 
-        playerTurn(board, ply1, whiteCaptures);
+        playerTurn(board, ply1);
 
         clearScreen();
         displayBoard(board, ply1, ply2);
 
         printf("Player 2's turn: ");
         
-        playerTurn(board, ply2, blackCaptures);
+        playerTurn(board, ply2);
 
         clearScreen();
         displayBoard(board, ply1, ply2);

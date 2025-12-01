@@ -4,6 +4,6 @@
 #include "../../Pieces/include/player.h"
 #include "captures.h"
 
-bool moveBishop(char** board ,Player player, Move move, captureArray* capture);
+bool moveBishop(char** board ,Player player, Move move, CaptureArray* capture);
 
 #endif

@@ -5,14 +5,15 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-bool moveBishop(char** board ,Player player, Move move,captureArray* capture)
+bool moveBishop(char** board ,Player player, Move move,CaptureArray* capture)
 {
     int dispX, dispY, midRow, midCol, rowStep, colStep;
     Bishop* bishop = NULL;
 
     for (int i = 0; i < NUM_PIECES; i++)
     {
-        if (player.bishops[i].colPosition == move.colPrev && player.bishops[i].rowPosition == move.rowPrev)
+        if (player.bishops[i].colPosition == move.colPrev 
+            && player.bishops[i].rowPosition == move.rowPrev && player.bishops[i].isActive)
         {
             bishop = &player.bishops[i];
             break;

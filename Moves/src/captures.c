@@ -1,20 +1,6 @@
 #include "../include/captures.h"
 #include "../../Board/include/board.h"
 
-Captured initializeCapture(PieceColor color)
-{
-    Captured captures = {
-        .color = color,
-        .capturedPawns = 0,
-        .capturedRocks = 0,
-        .capturedKnights = 0,
-        .capturedBishops = 0,
-        .capturedQueens = 0
-    };
-
-    return captures;
-}
-
 PieceColor pieceColorAt(char** board, int row, int col)
 {    
     if (isEmpty(board, row, col)) return -1; 
@@ -25,9 +11,9 @@ PieceColor pieceColorAt(char** board, int row, int col)
 }
 
 
-captureArray capture ={
-    .countBlack =0,
+CaptureArray capture ={
+    .countBlack =2,
     .countWhite =0,
-    .captBlack = {'\0'},
+    .captBlack = {'p', 'p', 'q'},
     .captBlack = {'\0'}
 };

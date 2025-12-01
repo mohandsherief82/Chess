@@ -1,8 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include "../../Pieces/include/player.h"
 #include "../include/board.h"
+#include "../../Moves/include/captures.h"
+
+extern CaptureArray capture;
 
 char** initializeBoard()
 {
@@ -41,10 +45,15 @@ void addPieces(char** board, void* piecesArray, int numPieces, size_t piece_size
 
 void displayBoard(char** board, Player player1, Player player2)
 { 
-    printf("-------------------------------------------------------------------------------------"
-        "-----------------------------------------------------------\n");
-    printf("\t\t\t    A   B   C   D   E   F   G   H \n");
-    printf("\t\t\t  |---|---|---|---|---|---|---|---|\n");
+    int count = 0;
+
+    printf("\t\t\t|---------------------------------------------------------------------------------------"
+            "-------------------------------------------|\n");
+    printf("\t\t\t|\t\t\t\t\t Board \t\t\t\t\t\t\t\t\t\t\t   |\n");
+    printf("\t\t\t|-------------------|-------------------------------------------|------------------------------------------------------------------|\n");
+    printf("\t\t\t|       Moves       |\t    A   B   C   D   E   F   G   H  \t|\t\t\t Black Captured \t\t\t   |\n");
+    printf("\t\t\t|-------------------|\t  |---|---|---|---|---|---|---|---|\t|"
+            "------------------------------------------------------------------|\n");
 
     addPieces(board, player1.pawns, NUM_PAWNS, sizeof(Pawn));
     addPieces(board, player2.pawns, NUM_PAWNS, sizeof(Pawn));
@@ -67,22 +76,50 @@ void displayBoard(char** board, Player player1, Player player2)
 
     for(int i = 0; i < BOARD_SIZE; i++)
     {
-        printf("\t\t\t%d", BOARD_SIZE -i);
+        printf("\t\t\t|\t\t    |\t%d", BOARD_SIZE - i);
 
         for (int j = 0; j < BOARD_SIZE; j++) 
-            {
-                if (board[i][j] == EMPTY_SQUARE)
-                    board[i][j] = ((i + j) % 2 == 0) ? WHITE_SQUARE : BLACK_SQUARE;
-                printf(" | %c", board[i][j]);
-            }
+        {
+            if (board[i][j] == EMPTY_SQUARE)
+                board[i][j] = ((i + j) % 2 == 0) ? WHITE_SQUARE : BLACK_SQUARE;
+            printf(" | %c", board[i][j]);
+        }
         
-        printf(" |%d\n", BOARD_SIZE -i);
-        printf("\t\t\t  |---|---|---|---|---|---|---|---|\n");
+        printf(" |%d\t|", BOARD_SIZE - i);
+        if (i == 4) 
+        {
+            printf("\t\t\t White Captures \t\t\t   |");
+            count = 0;
+        }
+        else if (i % 5 == 1 || i % 5 == 2)
+        {
+            printf("                 ");
+            while (count <= MAXCAPTNUM)
+            {
+                char symbol;
+
+                if (i == 1 || i == 2) symbol = (isValidPiece(capture.captBlack[count])) ? capture.captBlack[count]: EMPTY_SQUARE;
+                else symbol = (isValidPiece(capture.captBlack[count])) ? capture.captWhite[count]: EMPTY_SQUARE;
+
+                printf("| %c ", (char)symbol);
+                count++;
+                if (count == 8) break;
+            }
+            printf("|                |");
+        }
+        else printf("                                                                  |");
+        printf("\n");
+
+        printf("\t\t\t|\t\t    |\t  |---|---|---|---|---|---|---|---|\t|");
+        if (i == 3 || i == 4) printf("------------------------------------------------------------------|");
+        else if (i % 5 >= 0 && i % 5 <= 2) printf("                 |---|---|---|---|---|---|---|---|                |");
+        else printf("                                                                  |");
+        printf("\n");
     }
 
-    printf("\t\t\t    A   B   C   D   E   F   G   H \n");
-    printf("-------------------------------------------------------------------------------------"
-        "-----------------------------------------------------------\n");
+    printf("\t\t\t|\t\t    |\t    A   B   C   D   E   F   G   H  \t|                                                                  |\n");
+    printf("\t\t\t|---------------------------------------------------------------------------------------"
+            "-------------------------------------------|\n");
 }
 
 
