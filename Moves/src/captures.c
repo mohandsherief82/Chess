@@ -8,10 +8,15 @@ Captured initializeCapture(PieceColor color)
 {
     Captured captures = {
         .captureCount = 0,
-        .capturedSymbol = {},
-        .capturedSymbol[MAXCAPTNUM - 1] = 'X',
+        .capturedSymbols = {},
+        .capturedSymbols[MAXCAPTNUM - 1] = 'X',
         .newCapture = false
     };
+
+    for (int i = 0; i < MAXCAPTNUM - 1; i++)
+    {
+        captures.capturedSymbols[i] = ' ';
+    }
 
     return captures;
 }
@@ -37,7 +42,7 @@ void capturePiece(Player player, Captured* captureData)
             {
                 player.pawns[i].isActive = false;
                 captureData->newCapture = false;
-                captureData->capturedSymbol[captureData->captureCount] = player.pawns[i].symbol;
+                captureData->capturedSymbols[captureData->captureCount - 1] = player.pawns[i].symbol;
                 return;
             }
         }
@@ -107,7 +112,7 @@ void capturePiece(Player player, Captured* captureData)
             {
                 player.pawns[i].isActive = false;
                 captureData->newCapture = false;
-                captureData->capturedSymbol[captureData->captureCount] = player.pawns[i].symbol;
+                captureData->capturedSymbols[captureData->captureCount] = player.pawns[i].symbol;
                 return;
             }
         }

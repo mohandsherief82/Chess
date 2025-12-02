@@ -27,8 +27,8 @@ Piece* checkPromotedPawn(Player player, Move move)
 
 void promotePawn(Pawn* pawn)
 {
-    if ((pawn->rowPosition == 7 && pawn->color == COLOR_WHITE) || 
-        (pawn->rowPosition == 0 && pawn->color == COLOR_BLACK))
+    if ((pawn->rowPosition == 0 && pawn->color == COLOR_WHITE) || 
+        (pawn->rowPosition == 7 && pawn->color == COLOR_BLACK))
     {
         char newSymbol;
         pawn->promoted = true;
@@ -132,6 +132,27 @@ bool movePawn(char** board, Player player, Move move, Captured* playerCaptures)
                 return false;
             }
 
+            playerCaptures->capturedPiece.color = (isupper(board[move.rowNext][move.colNext])) ? COLOR_BLACK: COLOR_WHITE;
+            
+            playerCaptures->capturedPiece.colPosition = move.colNext;
+            playerCaptures->capturedPiece.rowPosition = move.rowNext;
+            playerCaptures->capturedPiece.symbol = board[move.rowNext][move.colNext];
+            playerCaptures->capturedPiece.isActive = false;
+            
+            playerCaptures->captureCount++;
+            playerCaptures->newCapture = true;
+
+            board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
+            pawn->rowPosition = move.rowNext;
+            pawn->colPosition = move.colNext;
+            
+            if (pawn->firstMove) pawn->firstMove = false;
+            promotePawn(pawn);
+            return true;
+        }
+        // For En Passant Capturing
+        if (tolower(board[move.rowPrev][move.colNext]) == 'p' && (move.rowPrev == 4 || move.rowPrev == 3)) // && enPassantFlag)
+        {
             playerCaptures->capturedPiece.color = (isupper(board[move.rowNext][move.colNext])) ? COLOR_BLACK: COLOR_WHITE;
             
             playerCaptures->capturedPiece.colPosition = move.colNext;

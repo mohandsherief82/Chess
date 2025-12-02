@@ -68,6 +68,7 @@ int main ()
         printf("Player 2's turn: ");
         
         playerTurn(board, ply2, &blackCaptures);
+        if (blackCaptures.newCapture == true) capturePiece(ply1, &blackCaptures);
 
         clearScreen();
         displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);

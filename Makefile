@@ -4,7 +4,7 @@ FLAGS=-Wall -g
 .PHONY: board pieces moves test_pieces test_moves test_moves_io test_board
 
 board: 
-	$(CC) $(FLAGS) ./Pieces/src/*.c ./Moves/src/captures.c ./Board/src/board.c ./Board/main.c -o ./Board/bin/main.o
+	$(CC) $(FLAGS) ./Pieces/src/*.c ./Moves/src/captures.c ./Board/src/board.c ./Board/test.c -o ./Board/bin/test.o
 
 pieces:
 	$(CC) $(FLAGS) ./Pieces/test.c ./Pieces/src/*.c -o ./Pieces/bin/pieces.o
@@ -22,7 +22,7 @@ test_moves_io: moves
 	./Moves/bin/test.o < ./Moves/testing/input.txt > ./Moves/testing/output.txt
 
 test_board: board
-	./Board/bin/main.o
+	./Board/bin/test.o
 
 clean:
 	rm -f ./Board/bin/*

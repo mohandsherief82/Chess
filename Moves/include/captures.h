@@ -12,7 +12,7 @@ typedef struct
 {
     Piece capturedPiece;
     int captureCount;
-    char capturedSymbol[MAXCAPTNUM];
+    char capturedSymbols[MAXCAPTNUM];
     bool newCapture;
 } Captured;
 

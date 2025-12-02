@@ -86,24 +86,35 @@ void displayBoard(char** board, Player player1, Player player2, Captured ply1Cap
         {
             printf("\t\t\t White Captures \t\t\t   |");
         }
-        else if (i % 5 == 1 || i % 5 == 2)
+        else if (i == 1 || i == 2)
         {
-            Captured currentCaptures = (i < 4) ? ply2Captures : ply1Captures;
-
-            int startIndex = (i % 4 == 1) ? 0 : 8
+            int startIndex = (i % 5 == 1) ? 0 : 8
                 , endIndex = startIndex + 8;
-            char symbol;
             
             printf("                 ");
 
             for (int k = startIndex; k < endIndex; k++)
             {
-                symbol = (currentCaptures.capturedSymbol[k] == '\0') ? EMPTY_SQUARE : currentCaptures.capturedSymbol[k];
-                if (symbol == 'X') printf("| %c |   ", symbol);
-                else printf("| %c ", symbol);
+                printf("| %c ", ply2Captures.capturedSymbols[k]);
+                if (ply2Captures.capturedSymbols[k] == 'X') printf("|   ");
             }
 
-            if (i % 5 == 1) printf("|                |");
+            if (i == 1) printf("|                |");
+            else printf("             |");
+        }
+        else if (i == 6 || i == 7)
+        {
+            int startIndex = (i % 5 == 1) ? 0 : 8
+                , endIndex = startIndex + 8;            
+            printf("                 ");
+
+            for (int k = startIndex; k < endIndex; k++)
+            {
+                printf("| %c ", ply1Captures.capturedSymbols[k]);
+                if (ply1Captures.capturedSymbols[k] == 'X') printf("|   ");
+            }
+
+            if (i == 6) printf("|                |");
             else printf("             |");
         }
         else printf("                                                                  |");
@@ -145,4 +156,3 @@ void freeBoard(char** board, Player player1, Player player2)
 
     return;
 }
-
