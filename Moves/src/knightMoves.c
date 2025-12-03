@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-bool moveKnight(char** board ,Player player, Move move)
+bool moveKnight(char** board ,Player player, Move move, Captured* playerCaptures)
 {
     int dispX, dispY;
     Knight* knight = (Knight*)checkPromotedPawn(player, move);
@@ -40,7 +40,15 @@ bool moveKnight(char** board ,Player player, Move move)
             return false;
         }
         
-        // Capture logic
+        // Capture Logic
+        playerCaptures->capturedPiece.color = (isupper(board[move.rowNext][move.colNext])) ? COLOR_BLACK: COLOR_WHITE;
+            
+        playerCaptures->capturedPiece.colPosition = move.colNext;
+        playerCaptures->capturedPiece.rowPosition = move.rowNext;
+        playerCaptures->capturedPiece.symbol = board[move.rowNext][move.colNext];
+            
+        playerCaptures->captureCount++;
+        playerCaptures->newCapture = true;
     }
 
     board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
