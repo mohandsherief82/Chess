@@ -6,42 +6,50 @@
 #include "./include/bishopMoves.h"
 #include "./include/queenMoves.h"
 #include "./include/captures.h"
+#include "./include/saveGame.h"
 #include "../Board/include/board.h"
 
 // Important for Game Logic
-void playerTurn(char** board, Player player, Captured* capture)
+bool playerTurn(char** board, Player player, Captured* capture)
 {
     Move move;
     while (true)
     {
         move = getMove();
 
-        if (move.symbol == 'p')
+        if (move.symbol == 's')
+        {
+            return true;
+        }
+        else if (move.symbol == 'p')
         {
             if (movePawn(board, player, move, capture)) break;
         }
-        if (move.symbol == 'r')
+        else if (move.symbol == 'r')
         {
             if (moveRock(board, player, move)) break;
         }
-        if (move.symbol == 'n')
+        else if (move.symbol == 'n')
         {
             if (moveKnight(board, player, move)) break;
         }
-        if (move.symbol == 'b')
+        else if (move.symbol == 'b')
         {
             if (moveBishop(board, player, move, capture)) break;
         }
-        if (move.symbol == 'q')
+        else if (move.symbol == 'q')
         {
-            if (moveQueen(board, player, move)) break;
+            if (moveQueen(board, player, move, capture)) break;
         }
-        // if (move.symbol == 'k')
+        // else if (move.symbol == 'k')
         // {
         //     if (moveKing(board, player, move, capture)) break;
         // }
-
     }
+    
+    saveMove(move);
+
+    return false;
 }
 
 // Prototype for game logic
@@ -52,6 +60,7 @@ int main ()
     Captured whiteCaptures = initializeCapture(COLOR_WHITE)
             , blackCaptures = initializeCapture(COLOR_BLACK);
     char** board = initializeBoard();
+    bool saveGame = false;
 
     displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
 
@@ -59,19 +68,32 @@ int main ()
     {
         printf("Player 1's turn: ");
 
-        playerTurn(board, ply1, &whiteCaptures);
+        saveGame = playerTurn(board, ply1, &whiteCaptures);
         if (whiteCaptures.newCapture == true) capturePiece(ply2, &whiteCaptures);
+        if (saveGame)
+        {
+            clearScreen();
+            printf("Done, Game Saved!!!\n");
+            break;
+        }
 
         clearScreen();
         displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
 
         printf("Player 2's turn: ");
         
-        playerTurn(board, ply2, &blackCaptures);
+        saveGame = playerTurn(board, ply2, &blackCaptures);
         if (blackCaptures.newCapture == true) capturePiece(ply1, &blackCaptures);
 
         clearScreen();
         displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
+
+        if (saveGame)
+        {
+            clearScreen();
+            printf("Done, Game Saved!!!\n");
+            break;
+        }
     }
 
     freeBoard(board, ply1, ply2);

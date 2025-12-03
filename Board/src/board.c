@@ -24,13 +24,10 @@ char** initializeBoard()
 
 void addPieces(char** board, void* piecesArray, int numPieces, size_t piece_size)
 {
-    // Pointer to the current piece (treated as raw bytes)
     char* current_piece = (char*)piecesArray;
 
     for (int i = 0; i < numPieces; i++)
     {
-        // Get the current piece's address by moving 'i' steps of size 'piece_size'
-        // This is done using pointer arithmetic on the char* pointer.
         Piece* p = (Piece*)(current_piece + i * piece_size);
 
         int col = p->colPosition;
@@ -42,13 +39,13 @@ void addPieces(char** board, void* piecesArray, int numPieces, size_t piece_size
 
 
 void displayBoard(char** board, Player player1, Player player2, Captured ply1Captures, Captured ply2Captures)
-{ 
+{
     printf("\t\t\t|---------------------------------------------------------------------------------------"
             "-------------------------------------------|\n");
-    printf("\t\t\t|\t\t\t\t\t Board \t\t\t\t\t\t\t\t\t\t\t   |\n");
+    printf("\t\t\t|        Moves      |\t\t\t Board \t\t\t|\t\t\t Captures \t\t\t\t   |\n");
     printf("\t\t\t|-------------------|-------------------------------------------|------------------------------------------------------------------|\n");
-    printf("\t\t\t|       Moves       |\t    A   B   C   D   E   F   G   H  \t|\t\t\t Black Captured \t\t\t   |\n");
-    printf("\t\t\t|-------------------|\t  |---|---|---|---|---|---|---|---|\t|"
+    printf("\t\t\t| White    | Black  |\t    A   B   C   D   E   F   G   H  \t|\t\t\t Black Captured \t\t\t   |\n");
+    printf("\t\t\t|----------|--------|\t  |---|---|---|---|---|---|---|---|\t|"
             "------------------------------------------------------------------|\n");
 
     addPieces(board, player1.pawns, NUM_PAWNS, sizeof(Pawn));
@@ -72,7 +69,7 @@ void displayBoard(char** board, Player player1, Player player2, Captured ply1Cap
 
     for(int i = 0; i < BOARD_SIZE; i++)
     {
-        printf("\t\t\t|\t\t    |\t%d", BOARD_SIZE - i);
+        printf("\t\t\t|\t   |\t    |\t%d", BOARD_SIZE - i);
 
         for (int j = 0; j < BOARD_SIZE; j++) 
         {
@@ -120,14 +117,14 @@ void displayBoard(char** board, Player player1, Player player2, Captured ply1Cap
         else printf("                                                                  |");
         printf("\n");
 
-        printf("\t\t\t|\t\t    |\t  |---|---|---|---|---|---|---|---|\t|");
+        printf("\t\t\t|\t   |\t    |\t  |---|---|---|---|---|---|---|---|\t|");
         if (i == 3 || i == 4) printf("------------------------------------------------------------------|");
         else if (i % 5 >= 0 && i % 5 <= 2) printf("                 |---|---|---|---|---|---|---|---|                |");
         else printf("                                                                  |");
         printf("\n");
     }
 
-    printf("\t\t\t|\t\t    |\t    A   B   C   D   E   F   G   H  \t|                                                                  |\n");
+    printf("\t\t\t|\t   |\t    |\t    A   B   C   D   E   F   G   H  \t|\t\t\t\t\t\t\t\t   |\n");
     printf("\t\t\t|---------------------------------------------------------------------------------------"
             "-------------------------------------------|\n");
 }

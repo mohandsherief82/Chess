@@ -50,7 +50,7 @@ Player createPlayer(PieceColor color)
 bool isValidPiece(char symbol)
 {
     return (symbol == 'p' || symbol == 'r' || symbol == 'n' || 
-            symbol == 'b' || symbol == 'q' || symbol == 'k');
+            symbol == 'b' || symbol == 'q' || symbol == 'k' || symbol == 's');
 }
 
 
@@ -68,6 +68,8 @@ void toLower(char *letter)
 
 Move getMove()
 {
+    Move move;
+
     char symbol, moveInput[5]; 
     char tempColPrev, tempColNext;
     int rowPrev, rowNext,
@@ -93,6 +95,9 @@ Move getMove()
     }
 
     while ((c = getchar()) != '\n' && c != EOF);
+
+    move.symbol = symbol;
+    if (move.symbol == 's') return move;
 
 
     while (!moveFlag)
@@ -149,14 +154,11 @@ Move getMove()
     rowPrev = 7 - rowPrev;
     rowNext = 7 - rowNext;
 
-    Move move = {
-        .symbol = symbol,
-        .colPrev = colPrev,
-        .rowPrev = rowPrev,
-        .colNext = colNext,
-        .rowNext = rowNext,
-        .isValid = true
-    };
+    move.colPrev = colPrev,
+    move.rowPrev = rowPrev,
+    move.colNext = colNext,
+    move.rowNext = rowNext,
+    move.isValid = true;
 
     return move;
 }

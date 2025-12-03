@@ -8,7 +8,7 @@
 #include <stdbool.h>
 #include <ctype.h>
 
-bool moveQueen(char** board, Player player, Move move)
+bool moveQueen(char** board, Player player, Move move, Captured* playerCaptures)
 {
     int diffrow, diffcol, rowstep = 0, colstep = 0, r, c;
     Queen* queen = (Queen*)checkPromotedPawn(player, move);
@@ -57,8 +57,6 @@ bool moveQueen(char** board, Player player, Move move)
         c += colstep;
     }
 
-    // --- 4. Destination Check and Execution ---
-
     if(!isEmpty(board, move.rowNext, move.colNext))
     {
         if(pieceColorAt(board, move.rowNext, move.colNext) == queen->color)
@@ -67,11 +65,21 @@ bool moveQueen(char** board, Player player, Move move)
             return false;
         }
         
-        // Capture Logic
+        playerCaptures->capturedPiece.color = (isupper(board[move.rowNext][move.colNext])) ? COLOR_BLACK: COLOR_WHITE;
+        playerCaptures->capturedPiece.colPosition = move.colNext;
+        playerCaptures->capturedPiece.rowPosition = move.rowNext;
+        playerCaptures->capturedPiece.symbol = board[move.rowNext][move.colNext];
+        playerCaptures->capturedPiece.isActive = false;
+        
+        playerCaptures->captureCount++;
+        playerCaptures->newCapture = true;
     }
 
-    board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
+    board[move.rowPrev][move.colPrev] = 'p';
+    if (board[move.rowPrev][move.colPrev] == EMPTY_SQUARE) printf("true \n");
     queen->rowPosition = move.rowNext;
     queen->colPosition = move.colNext;
+    board[move.rowNext][move.colNext] = queen->symbol;
+    
     return true;
 }

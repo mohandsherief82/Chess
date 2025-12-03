@@ -97,7 +97,6 @@ bool movePawn(char** board, Player player, Move move, Captured* playerCaptures)
             board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;            
             pawn->rowPosition = move.rowNext;
             if (pawn->firstMove) pawn->firstMove = false;
-
             promotePawn(pawn);
 
             return true;
@@ -112,7 +111,6 @@ bool movePawn(char** board, Player player, Move move, Captured* playerCaptures)
         if (isEmpty(board, midRow, move.colNext) && isEmpty(board, move.rowNext, move.colNext)) 
         {
             board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
-            
             pawn->rowPosition = move.rowNext;
             pawn->firstMove = false;
             
