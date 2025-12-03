@@ -60,8 +60,8 @@ void displayBoard(char** board, Player player1, Player player2, Captured ply1Cap
     addPieces(board, player1.bishops, NUM_PIECES, sizeof(Bishop));
     addPieces(board, player2.bishops, NUM_PIECES, sizeof(Bishop));
 
-    addPieces(board, &player1.queen, 1, sizeof(Queen));
-    addPieces(board, &player2.queen, 1, sizeof(Queen));
+    addPieces(board, player1.queen, 1, sizeof(Queen));
+    addPieces(board, player2.queen, 1, sizeof(Queen));
 
     addPieces(board, &player1.king, 1, sizeof(King));
     addPieces(board, &player2.king, 1, sizeof(King));

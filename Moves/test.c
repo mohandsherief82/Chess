@@ -62,6 +62,8 @@ int main ()
     char** board = initializeBoard();
     bool saveGame = false;
 
+    printf("%p\n", &ply1.queen);
+
     displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
 
     while (true)

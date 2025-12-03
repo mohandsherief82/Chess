@@ -10,14 +10,14 @@
 
 bool moveQueen(char** board, Player player, Move move, Captured* playerCaptures)
 {
-    int diffrow, diffcol, rowstep = 0, colstep = 0, r, c;
+    int dispX, dispY, rowStep = 0, colStep = 0, r, c;
     Queen* queen = (Queen*)checkPromotedPawn(player, move);
     
-    if (queen == NULL && player.queen.isActive) 
+    if (queen == NULL && player.queen[0].isActive) 
     {
-        if (player.queen.colPosition == move.colPrev && player.queen.rowPosition == move.rowPrev) 
+        if (player.queen[0].colPosition == move.colPrev && player.queen[0].rowPosition == move.rowPrev) 
         {
-            queen = &player.queen;
+            queen = player.queen;
         }
     }
     
@@ -27,34 +27,48 @@ bool moveQueen(char** board, Player player, Move move, Captured* playerCaptures)
         return false;
     }
 
-    diffrow = move.rowNext - move.rowPrev;
-    diffcol = move.colNext - move.colPrev;
+    dispX = move.rowNext - move.rowPrev;
+    dispY = move.colNext - move.colPrev;
 
-    // Queen's Path Check:
-    // If both row and column change, they must change by the same absolute amount (diagonal)
-    // or one of them is zero.
-    if (diffrow != 0 && diffcol != 0 && abs(diffrow) != abs(diffcol)) 
+    if ((dispX != 0 && dispY != 0) && abs(dispX) != abs(dispY)) 
     {
         printf("Invalid Queen Move, Try Again!!!\n");
         return false; 
     }
 
-    if (diffrow != 0) rowstep = (diffrow > 0) ? 1 : -1;
-    if (diffcol != 0) colstep = (diffcol > 0) ? 1 : -1;
+    if (dispX != 0) rowStep = (dispX > 0) ? 1 : -1;
+    if (dispY != 0) colStep = (dispY > 0) ? 1 : -1;
 
-    r = move.rowPrev + rowstep;
-    c = move.colPrev + colstep;
+    r = move.rowPrev + rowStep;
+    c = move.colPrev + colStep;
 
-    while ((r != move.rowNext) || (c != move.colNext))
-    {
-        if(!isEmpty(board, r, c)) 
+    if (dispX == 0 || dispY == 0) // Orthogonal (Rook-like) Movement
+    {   
+        while ((r != move.rowNext) || (c != move.colNext))
         {
-            printf("Invalid Queen Move, Try Again!!!\n");
-            return false;
-        }
+            if(!isEmpty(board, r, c)) 
+            {
+                printf("Invalid Queen Move, Try Again!!!\n");
+                return false;
+            }
 
-        r += rowstep;
-        c += colstep;
+            r += rowStep;
+            c += colStep;
+        }
+    }
+    else // Diagonal (Bishop-like) Movement
+    {
+        while ((r != move.rowNext) || (c != move.colNext))
+        {
+            if(!isEmpty(board, r, c))
+            {
+                printf("Invalid Queen Move, Try Again!!!\n");
+                return false;
+            }
+
+            r += rowStep;
+            c += colStep;
+        }
     }
 
     if(!isEmpty(board, move.rowNext, move.colNext))
@@ -75,11 +89,9 @@ bool moveQueen(char** board, Player player, Move move, Captured* playerCaptures)
         playerCaptures->newCapture = true;
     }
 
-    board[move.rowPrev][move.colPrev] = 'p';
-    if (board[move.rowPrev][move.colPrev] == EMPTY_SQUARE) printf("true \n");
+    board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
     queen->rowPosition = move.rowNext;
     queen->colPosition = move.colNext;
-    board[move.rowNext][move.colNext] = queen->symbol;
     
     return true;
 }

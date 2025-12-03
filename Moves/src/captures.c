@@ -91,11 +91,11 @@ void capturePiece(Player player, Captured* captureData)
     }
     else if (tolower(captureData->capturedPiece.symbol) == 'q')
     {
-        if (captureData->capturedPiece.colPosition == player.queen.colPosition 
-                    && captureData->capturedPiece.rowPosition == player.queen.rowPosition 
+        if (captureData->capturedPiece.colPosition == player.queen->colPosition 
+                    && captureData->capturedPiece.rowPosition == player.queen->rowPosition 
                         && captureData->newCapture == true)
         {
-            player.queen.isActive = false;
+            player.queen->isActive = false;
             captureData->newCapture = false;
         }
     }

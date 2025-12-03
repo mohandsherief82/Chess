@@ -19,7 +19,7 @@ typedef struct
     Rock *rocks;
     Knight *knights;
     Bishop *bishops;
-    Queen queen;
+    Queen *queen;
     King king;
 } Player;
 

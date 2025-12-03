@@ -33,13 +33,16 @@ Player createPlayer(PieceColor color)
     Pawn *pawns = (Pawn*)malloc(NUM_PAWNS * sizeof(Pawn));
     for (int i = 0; i < NUM_PAWNS; i++) pawns[i] = createPawn(color, pawnRank, i);
 
+    Queen *queen = (Queen*)malloc(sizeof(Queen));
+    *queen = createQueen(color, backRank);
+
     Player player = {
         .color = color,
         .bishops = bishops,
         .knights = knights,
         .rocks = rocks,
         .pawns = pawns,
-        .queen = createQueen(color, backRank),
+        .queen = queen,
         .king = createKing(color, backRank)
     };
 
