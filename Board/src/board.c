@@ -63,8 +63,8 @@ void displayBoard(char** board, Player player1, Player player2, Captured ply1Cap
     addPieces(board, player1.queen, 1, sizeof(Queen));
     addPieces(board, player2.queen, 1, sizeof(Queen));
 
-    addPieces(board, &player1.king, 1, sizeof(King));
-    addPieces(board, &player2.king, 1, sizeof(King));
+    addPieces(board, player1.king, 1, sizeof(King));
+    addPieces(board, player2.king, 1, sizeof(King));
 
 
     for(int i = 0; i < BOARD_SIZE; i++)

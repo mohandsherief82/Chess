@@ -10,7 +10,8 @@ King createKing(PieceColor color, int row)
         .color = color,
         .rowPosition = row,
         .colPosition = 4,
-        .isActive = true
+        .isActive = true,
+        .firstMove = true
     };
 
     return k;

@@ -14,7 +14,8 @@ Rock createRock(PieceColor color, int row, int col)
         .color = color,
         .rowPosition = row,
         .colPosition = 0 + col * 7,
-        .isActive = true
+        .isActive = true,
+        .firstMove = true
     };
 
     return r;

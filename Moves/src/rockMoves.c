@@ -76,5 +76,6 @@ bool moveRock(char** board ,Player player, Move move, Captured* playerCaptures)
     board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
     rock->rowPosition = move.rowNext;
     rock->colPosition = move.colNext;
+    rock->firstMove = false;
     return true;
 }

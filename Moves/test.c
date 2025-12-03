@@ -5,6 +5,7 @@
 #include "./include/knightMoves.h"
 #include "./include/bishopMoves.h"
 #include "./include/queenMoves.h"
+#include "./include/kingMoves.h"
 #include "./include/captures.h"
 #include "./include/saveGame.h"
 #include "../Board/include/board.h"
@@ -41,10 +42,10 @@ bool playerTurn(char** board, Player player, Captured* capture)
         {
             if (moveQueen(board, player, move, capture)) break;
         }
-        // else if (move.symbol == 'k')
-        // {
-        //     if (moveKing(board, player, move, capture)) break;
-        // }
+        else if (move.symbol == 'k')
+        {
+            if (moveKing(board, player, move, capture)) break;
+        }
     }
     
     saveMove(move);

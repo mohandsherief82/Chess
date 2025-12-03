@@ -41,9 +41,8 @@ void capturePiece(Player player, Captured* captureData)
                         && captureData->newCapture == true)
             {
                 player.pawns[i].isActive = false;
-                captureData->newCapture = false;
                 captureData->capturedSymbols[captureData->captureCount - 1] = player.pawns[i].symbol;
-                return;
+                break;
             }
         }
     }
@@ -56,7 +55,6 @@ void capturePiece(Player player, Captured* captureData)
                         && captureData->newCapture == true)
             {
                 player.rocks[i].isActive = false;
-                captureData->newCapture = false;
                 captureData->capturedSymbols[captureData->captureCount - 1] = player.rocks[i].symbol;
                 break;
             }
@@ -71,7 +69,6 @@ void capturePiece(Player player, Captured* captureData)
                         && captureData->newCapture == true)
             {
                 player.knights[i].isActive = false;
-                captureData->newCapture = false;
                 captureData->capturedSymbols[captureData->captureCount - 1] = player.knights[i].symbol;
                 break;
             }
@@ -86,7 +83,6 @@ void capturePiece(Player player, Captured* captureData)
                         && captureData->newCapture == true)
             {
                 player.bishops[i].isActive = false;
-                captureData->newCapture = false;
                 captureData->capturedSymbols[captureData->captureCount - 1] = player.bishops[i].symbol;
                 break;
             }
@@ -99,7 +95,6 @@ void capturePiece(Player player, Captured* captureData)
                         && captureData->newCapture == true)
         {
             player.queen->isActive = false;
-            captureData->newCapture = false;
             captureData->capturedSymbols[captureData->captureCount - 1] = player.queen->symbol;
         }
     }
@@ -115,10 +110,11 @@ void capturePiece(Player player, Captured* captureData)
                             && captureData->newCapture == true )
             {
                 player.pawns[i].isActive = false;
-                captureData->newCapture = false;
                 captureData->capturedSymbols[captureData->captureCount] = player.pawns[i].symbol;
-                return;
             }
         }
     }
+
+    captureData->newCapture = false;
+    return;
 }

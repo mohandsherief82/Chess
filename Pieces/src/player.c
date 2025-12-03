@@ -36,6 +36,9 @@ Player createPlayer(PieceColor color)
     Queen *queen = (Queen*)malloc(sizeof(Queen));
     *queen = createQueen(color, backRank);
 
+    King *king = (King*)malloc(sizeof(King));
+    *king = createKing(color, backRank);
+
     Player player = {
         .color = color,
         .bishops = bishops,
@@ -43,7 +46,7 @@ Player createPlayer(PieceColor color)
         .rocks = rocks,
         .pawns = pawns,
         .queen = queen,
-        .king = createKing(color, backRank)
+        .king = king
     };
 
     return player;

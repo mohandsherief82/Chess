@@ -20,7 +20,7 @@ typedef struct
     Knight *knights;
     Bishop *bishops;
     Queen *queen;
-    King king;
+    King *king;
 } Player;
 
 Player createPlayer(PieceColor color);
