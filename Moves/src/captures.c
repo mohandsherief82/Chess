@@ -57,6 +57,7 @@ void capturePiece(Player player, Captured* captureData)
             {
                 player.rocks[i].isActive = false;
                 captureData->newCapture = false;
+                captureData->capturedSymbols[captureData->captureCount - 1] = player.rocks[i].symbol;
                 break;
             }
         }
@@ -71,6 +72,7 @@ void capturePiece(Player player, Captured* captureData)
             {
                 player.knights[i].isActive = false;
                 captureData->newCapture = false;
+                captureData->capturedSymbols[captureData->captureCount - 1] = player.knights[i].symbol;
                 break;
             }
         }
@@ -85,6 +87,7 @@ void capturePiece(Player player, Captured* captureData)
             {
                 player.bishops[i].isActive = false;
                 captureData->newCapture = false;
+                captureData->capturedSymbols[captureData->captureCount - 1] = player.bishops[i].symbol;
                 break;
             }
         }
@@ -97,6 +100,7 @@ void capturePiece(Player player, Captured* captureData)
         {
             player.queen->isActive = false;
             captureData->newCapture = false;
+            captureData->capturedSymbols[captureData->captureCount - 1] = player.queen->symbol;
         }
     }
 

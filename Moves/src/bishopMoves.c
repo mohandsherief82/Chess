@@ -5,6 +5,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <ctype.h>
 
 bool moveBishop(char** board ,Player player, Move move, Captured* playerCaptures)
 {

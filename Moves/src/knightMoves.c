@@ -5,6 +5,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <ctype.h>
 
 bool moveKnight(char** board ,Player player, Move move, Captured* playerCaptures)
 {
@@ -54,5 +55,6 @@ bool moveKnight(char** board ,Player player, Move move, Captured* playerCaptures
     board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
     knight->rowPosition = move.rowNext;
     knight->colPosition = move.colNext;
+    
     return true;
 }

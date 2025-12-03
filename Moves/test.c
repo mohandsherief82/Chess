@@ -27,11 +27,11 @@ bool playerTurn(char** board, Player player, Captured* capture)
         }
         else if (move.symbol == 'r')
         {
-            if (moveRock(board, player, move)) break;
+            if (moveRock(board, player, move, capture)) break;
         }
         else if (move.symbol == 'n')
         {
-            if (moveKnight(board, player, move)) break;
+            if (moveKnight(board, player, move, capture)) break;
         }
         else if (move.symbol == 'b')
         {
