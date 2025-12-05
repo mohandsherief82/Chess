@@ -7,17 +7,17 @@
 #include <stdio.h>
 #include <ctype.h>
 
-bool moveRock(char** board ,Player player, Move move, Captured* playerCaptures)
+bool moveRock(char** board ,Player* player, Move move, Captured* playerCaptures)
 {
     int diffrow, diffcol, rowstep = 0, colstep = 0, r, c;
     Rock* rock = (Rock*)checkPromotedPawn(player, move);
 
     for (int i = 0; i < NUM_PIECES; i++)
     {
-        if (player.rocks[i].colPosition == move.colPrev 
-            && player.rocks[i].rowPosition == move.rowPrev && player.rocks[i].isActive)
+        if (player->rocks[i].colPosition == move.colPrev 
+            && player->rocks[i].rowPosition == move.rowPrev && player->rocks[i].isActive)
         {
-            rock = &player.rocks[i];
+            rock = &player->rocks[i];
             break;
         }
     }

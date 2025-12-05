@@ -4,7 +4,7 @@
 #include "../../Pieces/include/player.h"
 #include "./captures.h"
 
-Piece* checkPromotedPawn(Player player, Move move);
-bool movePawn(char** board, Player player, Move move, Captured* playerCaptures);
+Piece* checkPromotedPawn(Player* player, Move move);
+bool movePawn(char** board, Player* player, Move move, Captured* playerCaptures);
 
 #endif

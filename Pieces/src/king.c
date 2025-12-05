@@ -11,7 +11,8 @@ King createKing(PieceColor color, int row)
         .rowPosition = row,
         .colPosition = 4,
         .isActive = true,
-        .firstMove = true
+        .firstMove = true,
+        .isChecked = false
     };
 
     return k;

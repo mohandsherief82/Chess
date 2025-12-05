@@ -6,5 +6,7 @@
 #include <stdio.h>
 
 void saveMove(Move move);
+void loadGame(char** board, Player player1, Player player2);
+void undoLastMove();
 
 #endif

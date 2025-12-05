@@ -7,16 +7,16 @@
 #include <stdio.h>
 #include <ctype.h>
 
-bool moveKnight(char** board ,Player player, Move move, Captured* playerCaptures)
+bool moveKnight(char** board ,Player* player, Move move, Captured* playerCaptures)
 {
     int dispX, dispY;
     Knight* knight = (Knight*)checkPromotedPawn(player, move);
 
     for (int i = 0; i < NUM_PIECES; i++)
     {
-        if (player.knights[i].colPosition == move.colPrev && player.knights[i].rowPosition == move.rowPrev)
+        if (player->knights[i].colPosition == move.colPrev && player->knights[i].rowPosition == move.rowPrev)
         {
-            knight = &player.knights[i];
+            knight = &player->knights[i];
             break;
         }
     }

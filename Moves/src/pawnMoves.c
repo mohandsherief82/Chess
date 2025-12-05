@@ -7,16 +7,16 @@
 #include <stdio.h>
 #include <ctype.h>
 
-Piece* checkPromotedPawn(Player player, Move move)
+Piece* checkPromotedPawn(Player* player, Move move)
 {
     Piece* promotedPawn = NULL;
 
     for (int i = 0; i < NUM_PAWNS; i++)
     {
-        if (move.colPrev == player.pawns[i].colPosition && move.rowPrev == player.pawns[i].rowPosition
-            && player.pawns[i].promoted == true && tolower(player.pawns[i].symbol) == move.symbol) 
+        if (move.colPrev == player->pawns[i].colPosition && move.rowPrev == player->pawns[i].rowPosition
+            && player->pawns[i].promoted == true && tolower(player->pawns[i].symbol) == move.symbol) 
         {
-            promotedPawn = (Piece*)&player.pawns[i];
+            promotedPawn = (Piece*)&player->pawns[i];
             break;
         }
     }
@@ -62,7 +62,7 @@ void promotePawn(Pawn* pawn)
 }
 
 
-bool movePawn(char** board, Player player, Move move, Captured* playerCaptures)
+bool movePawn(char** board, Player* player, Move move, Captured* playerCaptures)
 {
     Pawn* pawn = NULL;
     int moveDirection; // 1 for Black (0->7), -1 for White (7->0)
@@ -70,9 +70,9 @@ bool movePawn(char** board, Player player, Move move, Captured* playerCaptures)
     // Locate the correct Pawn object
     for (int i = 0; i < NUM_PAWNS; i++)
     {
-        if (move.colPrev == player.pawns[i].colPosition && move.rowPrev == player.pawns[i].rowPosition) 
+        if (move.colPrev == player->pawns[i].colPosition && move.rowPrev == player->pawns[i].rowPosition) 
         {
-            pawn = &player.pawns[i];
+            pawn = &player->pawns[i];
             break;
         }
     }    
@@ -81,6 +81,10 @@ bool movePawn(char** board, Player player, Move move, Captured* playerCaptures)
     {
         printf("No Pawn At This Position, Try Again!!!\n");
         return false;
+    }
+    else if (pawn->isPinned)
+    {
+        printf("This Pawn is pinned, Try Again!!!\n");
     }
 
     // Determine direction

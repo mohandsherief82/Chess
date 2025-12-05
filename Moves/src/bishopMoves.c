@@ -7,17 +7,17 @@
 #include <stdio.h>
 #include <ctype.h>
 
-bool moveBishop(char** board ,Player player, Move move, Captured* playerCaptures)
+bool moveBishop(char** board ,Player* player, Move move, Captured* playerCaptures)
 {
-    int dispX, dispY, midRow, midCol, rowStep, colStep;
+    int dispX, dispY, r, c, rowStep, colStep;
     Bishop* bishop = (Bishop*)checkPromotedPawn(player, move);
 
     for (int i = 0; i < NUM_PIECES; i++)
     {
-        if (player.bishops[i].colPosition == move.colPrev 
-            && player.bishops[i].rowPosition == move.rowPrev && player.bishops[i].isActive)
+        if (player->bishops[i].colPosition == move.colPrev 
+            && player->bishops[i].rowPosition == move.rowPrev && player->bishops[i].isActive)
         {
-            bishop = &player.bishops[i];
+            bishop = &player->bishops[i];
             break;
         }
     }
@@ -44,19 +44,19 @@ bool moveBishop(char** board ,Player player, Move move, Captured* playerCaptures
     rowStep = (dispX > 0) ? 1 : -1;
     colStep = (dispY > 0) ? 1 : -1;
 
-    midRow = currentrow + rowStep;
-    midCol = currentcol + colStep;
+    r = currentrow + rowStep;
+    c = currentcol + colStep;
 
-    while (midRow != move.rowNext)
+    while (r != move.rowNext)
     {
-        if(!isEmpty(board, midRow, midCol))
+        if(!isEmpty(board, r, c))
         {
             printf("Invalid Bishop Move, Try Again!!!\n");
             return false;
         }
 
-        midRow += rowStep;
-        midCol += colStep;
+        r += rowStep;
+        c += colStep;
     }
 
     if(!isEmpty(board, move.rowNext, move.colNext))
