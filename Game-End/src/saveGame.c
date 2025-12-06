@@ -13,7 +13,7 @@
 
 #define MOVE_SIZE 7
 
-static const char* path = "./Moves/testing/game.bin";
+static const char* path = "./Game-End/testing/game.bin";
 
 void loadPlayerTurn(char** board, Player* player, Move move, Captured* capture)
 {
