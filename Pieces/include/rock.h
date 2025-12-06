@@ -1,4 +1,5 @@
 #include "../../chessTypes.h"
+#include <stdbool.h>
 
 #ifndef ROCK_H
 #define ROCK_H
@@ -9,6 +10,9 @@ typedef struct
     PieceColor color;
     int rowPosition; // Stores the row value 0 --> 7
     int colPosition; // Stores the col value 0 --> 7
+    bool isActive;
+    bool isPinned;
+    bool firstMove;
 } Rock;
 
 Rock createRock(PieceColor color, int row, int col);

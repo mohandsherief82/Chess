@@ -1,0 +1,9 @@
+Player 1's move: 
+
+Enter piece symbol(p, r, n, b, q, k): Invalid Piece Symbol, Try Again!!!!
+
+Enter piece symbol(p, r, n, b, q, k): 
+Enter move (e.g., e2e4): Invalid Move, Try Again!!!!
+Invalid coordinates (must be a1-h8), Try Again!!!!
+
+Enter move (e.g., e2e4): 4 1 q 0 2 1

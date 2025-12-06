@@ -1,17 +1,31 @@
 CC=gcc
 FLAGS=-Wall -g
 
-board: 
-	$(CC) $(FLAGS) ./Pieces/src/*.c ./Board/src/board.c ./Board/main.c -o ./Board/bin/main.o
+.PHONY: board pieces moves test_pieces test_moves test_moves_io test_board
 
-test_pieces:
-	./Pieces/bin/pieces.o
+board: 
+	$(CC) $(FLAGS) ./Pieces/src/*.c ./Moves/src/captures.c ./Board/src/board.c ./Board/test.c -o ./Board/bin/test.o
 
 pieces:
 	$(CC) $(FLAGS) ./Pieces/test.c ./Pieces/src/*.c -o ./Pieces/bin/pieces.o
 
-run: board
-	./Board/bin/main.o
+moves:
+	$(CC) $(FLAGS) ./Pieces/src/*.c ./Board/src/board.c ./Moves/src/*.c ./Moves/test.c -o ./Moves/bin/test.o
+
+test_pieces: pieces
+	./Pieces/bin/pieces.o
+
+test_moves: moves
+	./Moves/bin/test.o
+
+test_moves_io: moves
+	./Moves/bin/test.o < ./Moves/testing/input.txt > ./Moves/testing/output.txt
+
+test_board: board
+	./Board/bin/test.o
 
 clean:
-	rm -f ./Board/bin/main.o
+	rm -f ./Board/bin/*
+	rm -f ./Pieces/bin/*
+	rm -f ./Moves/bin/*
+	clear

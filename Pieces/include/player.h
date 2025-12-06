@@ -19,10 +19,13 @@ typedef struct
     Rock *rocks;
     Knight *knights;
     Bishop *bishops;
-    Queen queen;
-    King king;
+    Queen *queen;
+    King *king;
 } Player;
 
 Player createPlayer(PieceColor color);
+bool isValidPiece(char symbol);
+void freePlayer(Player player);
+Move getMove();
 
 #endif

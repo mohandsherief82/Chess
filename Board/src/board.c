@@ -1,10 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include "../../Pieces/include/player.h"
 #include "../include/board.h"
+#include "../../Moves/include/captures.h"
 
-char** initialize_board()
+char** initializeBoard()
 {
     char **board = (char**)malloc(BOARD_SIZE * sizeof(char*));
 
@@ -22,37 +24,30 @@ char** initialize_board()
 
 void addPieces(char** board, void* piecesArray, int numPieces, size_t piece_size)
 {
-    // Pointer to the current piece (treated as raw bytes)
     char* current_piece = (char*)piecesArray;
 
     for (int i = 0; i < numPieces; i++)
     {
-        // Get the current piece's address by moving 'i' steps of size 'piece_size'
-        // This is done using pointer arithmetic on the char* pointer.
         Piece* p = (Piece*)(current_piece + i * piece_size);
 
         int col = p->colPosition;
         int row = p->rowPosition;
 
-        if ((col >= 0 && col < 8) && (row >= 0 && row < 8)) board[row][col] = p->symbol;
+        if ((col >= 0 && col < 8) && (row >= 0 && row < 8) && p->isActive) board[row][col] = p->symbol;
     }
 }
 
 
-void addPiece(char** board, void* piece)
+void displayBoard(char** board, Player player1, Player player2, Captured ply1Captures, Captured ply2Captures)
 {
-    int col = ((Piece*)piece)->colPosition,
-        row = ((Piece*)piece)->rowPosition;
-
-    if ((col >= 0 && col < 8) && (row >= 0 && row < 8)) board[row][col] = ((Piece*)piece)->symbol;
-}
-
-
-
-void display_board(char** board, Player player1, Player player2)
-{ 
-    printf("\t\t\t\t    A   B   C   D   E   F   G   H \n");
-    printf("\t\t\t\t  |---|---|---|---|---|---|---|---|\n");
+    clearScreen();
+    printf("------------------------|---------------------------------------------------------------------------------------"
+            "-------------------------------------------|-------------------\n");
+    printf("\t\t\t|        Moves      |\t\t\t Board \t\t\t|\t\t\t Captures \t\t\t\t   |\n");
+    printf("\t\t\t|-------------------|-------------------------------------------|------------------------------------------------------------------|\n");
+    printf("\t\t\t| White    | Black  |\t    A   B   C   D   E   F   G   H  \t|\t\t\t Black Captured \t\t\t   |\n");
+    printf("\t\t\t|----------|--------|\t  |---|---|---|---|---|---|---|---|\t|"
+            "------------------------------------------------------------------|\n");
 
     addPieces(board, player1.pawns, NUM_PAWNS, sizeof(Pawn));
     addPieces(board, player2.pawns, NUM_PAWNS, sizeof(Pawn));
@@ -66,34 +61,96 @@ void display_board(char** board, Player player1, Player player2)
     addPieces(board, player1.bishops, NUM_PIECES, sizeof(Bishop));
     addPieces(board, player2.bishops, NUM_PIECES, sizeof(Bishop));
 
-    addPiece(board, &player1.queen);
-    addPiece(board, &player2.queen);
+    addPieces(board, player1.queen, 1, sizeof(Queen));
+    addPieces(board, player2.queen, 1, sizeof(Queen));
 
-    addPiece(board, &player1.king);
-    addPiece(board, &player2.king);
+    addPieces(board, player1.king, 1, sizeof(King));
+    addPieces(board, player2.king, 1, sizeof(King));
 
 
     for(int i = 0; i < BOARD_SIZE; i++)
     {
-        printf("\t\t\t\t%d", BOARD_SIZE -i);
+        printf("\t\t\t|\t   |\t    |\t%d", BOARD_SIZE - i);
 
         for (int j = 0; j < BOARD_SIZE; j++) 
-            {
-                if (board[i][j] == EMPTY_SQUARE)
-                    board[i][j] = ((i + j) % 2 == 0) ? WHITE_SQUARE : BLACK_SQUARE;
-                printf(" | %c", board[i][j]);
-            }
+        {
+            if (board[i][j] == EMPTY_SQUARE)
+                board[i][j] = ((i + j) % 2 == 0) ? WHITE_SQUARE : BLACK_SQUARE;
+            printf(" | %c", board[i][j]);
+        }
         
-        printf(" |%d\n", BOARD_SIZE -i);
-        printf("\t\t\t\t  |---|---|---|---|---|---|---|---|\n");
+        printf(" |%d\t|", BOARD_SIZE - i);
+        if (i == 4) 
+        {
+            printf("\t\t\t White Captures \t\t\t   |");
+        }
+        else if (i == 1 || i == 2)
+        {
+            int startIndex = (i % 5 == 1) ? 0 : 8
+                , endIndex = startIndex + 8;
+            
+            printf("                 ");
+
+            for (int k = startIndex; k < endIndex; k++)
+            {
+                printf("| %c ", ply2Captures.capturedSymbols[k]);
+                if (ply2Captures.capturedSymbols[k] == 'X') printf("|   ");
+            }
+
+            if (i == 1) printf("|                |");
+            else printf("             |");
+        }
+        else if (i == 6 || i == 7)
+        {
+            int startIndex = (i % 5 == 1) ? 0 : 8
+                , endIndex = startIndex + 8;            
+            printf("                 ");
+
+            for (int k = startIndex; k < endIndex; k++)
+            {
+                printf("| %c ", ply1Captures.capturedSymbols[k]);
+                if (ply1Captures.capturedSymbols[k] == 'X') printf("|   ");
+            }
+
+            if (i == 6) printf("|                |");
+            else printf("             |");
+        }
+        else printf("                                                                  |");
+        printf("\n");
+
+        printf("\t\t\t|\t   |\t    |\t  |---|---|---|---|---|---|---|---|\t|");
+        if (i == 3 || i == 4) printf("------------------------------------------------------------------|");
+        else if (i % 5 >= 0 && i % 5 <= 2) printf("                 |---|---|---|---|---|---|---|---|                |");
+        else printf("                                                                  |");
+        printf("\n");
     }
 
-    printf("\t\t\t\t    A   B   C   D   E   F   G   H \n");
+    printf("\t\t\t|\t   |\t    |\t    A   B   C   D   E   F   G   H  \t|\t\t\t\t\t\t\t\t   |\n");
+    printf("\t\t\t|---------------------------------------------------------------------------------------"
+            "-------------------------------------------|\n");
 }
+
+
+bool isEmpty(char** board, int r, int c)
+{
+    return board[r][c] == WHITE_SQUARE || board[r][c] == BLACK_SQUARE;
+}
+
 
 void clearScreen()
 {
     printf("\033[2J\033[H");
+    fflush(stdout);
+
+    return;
+}
+
+
+void freeBoard(char** board, Player player1, Player player2)
+{
+    free(board);
+    freePlayer(player1);
+    freePlayer(player2);
 
     return;
 }

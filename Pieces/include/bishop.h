@@ -1,4 +1,5 @@
 #include "../../chessTypes.h"
+#include <stdbool.h>
 
 #ifndef BISHOP_H
 #define BISHOP_H
@@ -9,6 +10,8 @@ typedef struct
     PieceColor color;
     int rowPosition; // Stores the row value 0 --> 7
     int colPosition; // Stores the col value 0 --> 7
+    bool isActive;
+    bool isPinned;
 } Bishop;
 
 Bishop createBishop(PieceColor color, int row, int col);
