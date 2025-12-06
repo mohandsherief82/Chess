@@ -148,8 +148,9 @@ bool movePawn(char** board, Player* player, Move move, Captured* playerCaptures)
             pawn->rowPosition = move.rowNext;
             pawn->colPosition = move.colNext;
             
-            if (pawn->firstMove) pawn->firstMove = false;
-            promotePawn(pawn);
+            if (!pawn->firstMove) promotePawn(pawn);
+            else pawn->firstMove = false;
+
             return true;
         }
         // For En Passant Capturing
@@ -174,7 +175,6 @@ bool movePawn(char** board, Player* player, Move move, Captured* playerCaptures)
         }
     }
     
-    // En Passant and Promotion logic would be added here
     printf("Invalid Pawn Move, Try Again!!!\n");
     return false;
 }

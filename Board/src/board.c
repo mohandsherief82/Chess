@@ -40,8 +40,9 @@ void addPieces(char** board, void* piecesArray, int numPieces, size_t piece_size
 
 void displayBoard(char** board, Player player1, Player player2, Captured ply1Captures, Captured ply2Captures)
 {
-    printf("\t\t\t|---------------------------------------------------------------------------------------"
-            "-------------------------------------------|\n");
+    clearScreen();
+    printf("------------------------|---------------------------------------------------------------------------------------"
+            "-------------------------------------------|-------------------\n");
     printf("\t\t\t|        Moves      |\t\t\t Board \t\t\t|\t\t\t Captures \t\t\t\t   |\n");
     printf("\t\t\t|-------------------|-------------------------------------------|------------------------------------------------------------------|\n");
     printf("\t\t\t| White    | Black  |\t    A   B   C   D   E   F   G   H  \t|\t\t\t Black Captured \t\t\t   |\n");
