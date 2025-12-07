@@ -13,3 +13,5 @@
 - The initialization function of the board will only give us a pointer to the first address of the 2D grid, which is done to keep track of the place of the board across the whole runtime.
 
 - Added a function to clear the terminal each time a new move is made (Reference: https://www.geeksforgeeks.org/c/clear-console-c-language/).
+
+- Added a copy function for board and player (Reference: https://www.geeksforgeeks.org/cpp/memcpy-in-cc/)
