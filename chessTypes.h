@@ -26,7 +26,6 @@ typedef struct
     int colNext;
     int rowPrev;
     int rowNext;
-    bool isValid;
 } Move;
 
 #endif

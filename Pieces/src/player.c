@@ -160,11 +160,10 @@ Move getMove()
     rowPrev = 7 - rowPrev;
     rowNext = 7 - rowNext;
 
-    move.colPrev = colPrev,
-    move.rowPrev = rowPrev,
-    move.colNext = colNext,
-    move.rowNext = rowNext,
-    move.isValid = true;
+    move.colPrev = colPrev;
+    move.rowPrev = rowPrev;
+    move.colNext = colNext;
+    move.rowNext = rowNext;
 
     return move;
 }

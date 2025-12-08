@@ -2,18 +2,18 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#include "../include/pawnMoves.h"
-#include "../include/rockMoves.h"
-#include "../include/knightMoves.h"
-#include "../include/bishopMoves.h"
-#include "../include/queenMoves.h"
-#include "../include/kingMoves.h"
-#include "../include/captures.h"
+#include "../../Moves/include/pawnMoves.h"
+#include "../../Moves/include/rockMoves.h"
+#include "../../Moves/include/knightMoves.h"
+#include "../../Moves/include/bishopMoves.h"
+#include "../../Moves/include/queenMoves.h"
+#include "../../Moves/include/kingMoves.h"
+#include "../../Moves/include/captures.h"
 #include "../../chessTypes.h"
 
 #define MOVE_SIZE 7
 
-static const char* path = "./Game-End/testing/game.bin";
+const char* path = "./Game-End/testing/game.bin";
 
 void loadPlayerTurn(char** board, Player* player, Move move, Captured* capture)
 {

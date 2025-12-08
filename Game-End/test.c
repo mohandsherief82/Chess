@@ -1,15 +1,17 @@
 #include <stdio.h>
 #include <ctype.h>
 
-#include "./include/pawnMoves.h"
-#include "./include/rockMoves.h"
-#include "./include/knightMoves.h"
-#include "./include/bishopMoves.h"
-#include "./include/queenMoves.h"
-#include "./include/kingMoves.h"
-#include "./include/captures.h"
+#include "../Moves/include/pawnMoves.h"
+#include "../Moves/include/rockMoves.h"
+#include "../Moves/include/knightMoves.h"
+#include "../Moves/include/bishopMoves.h"
+#include "../Moves/include/queenMoves.h"
+#include "../Moves/include/kingMoves.h"
+#include "../Moves/include/captures.h"
 #include "./include/saveGame.h"
 #include "../Board/include/board.h"
+
+extern char *path;
 
 
 bool playerTurn(char** board, Player* player, Captured* capture)
@@ -30,11 +32,7 @@ bool playerTurn(char** board, Player* player, Captured* capture)
         else if (move.symbol == 'q') pieceMoveValid = moveQueen(board, player, move, capture);
         else if (move.symbol == 'k') pieceMoveValid = moveKing(board, player, move, capture);
         
-        if (!pieceMoveValid)
-        {
-            printf("Invalid piece movement rules or target, Try Again!!!\n");
-            continue;
-        }
+        if (!pieceMoveValid) continue;
         
         if (isChecked(board, player))
         {
@@ -107,6 +105,12 @@ int main ()
             isChecked(board, &ply2);
             saveGame = playerTurn(board, &ply2, &blackCaptures);
             if (blackCaptures.newCapture == true) capturePiece(ply1, &blackCaptures);
+            if (saveGame)
+            {
+                clearScreen();
+                printf("Done, Game Saved!!!\n");
+                return 0;
+            }
 
             clearScreen();
         }
@@ -148,6 +152,8 @@ int main ()
     }
 
     freeBoard(board, ply1, ply2);
+
+    if (!saveGame) remove(path);
 
     return 0;
 }
