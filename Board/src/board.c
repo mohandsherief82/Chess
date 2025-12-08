@@ -8,8 +8,6 @@
 #include "../../Game-End/include/saveGame.h"
 #include "../../Moves/include/captures.h"
 
-extern char *path;
-
 
 char** initializeBoard()
 {
@@ -46,12 +44,13 @@ void addPieces(char** board, void* piecesArray, int numPieces, size_t piece_size
 void displayBoard(char** board, Player player1, Player player2, Captured ply1Captures, Captured ply2Captures)
 {
     clearScreen();
-    printf("------------------------|---------------------------------------------------------------------------------------"
-            "-------------------------------------------|-------------------\n");
-    printf("\t\t\t|       Moves       |\t\t\t Board \t\t\t|\t\t\t Captures \t\t\t\t   |\n");
-    printf("\t\t\t|-------------------|-------------------------------------------|------------------------------------------------------------------|\n");
-    printf("\t\t\t|  White  |  Black  |\t    A   B   C   D   E   F   G   H  \t|\t\t\t Black Captured \t\t\t   |\n");
-    printf("\t\t\t|---------|---------|\t  |---|---|---|---|---|---|---|---|\t|"
+    printf("----------------|-------------------------------|-----------------------------------------------|----------------------"
+            "--------------------------------------------|-----------\n");
+    printf("\t\t|             Moves             |\t\t\t Board \t\t\t|\t\t\t Captures \t\t\t\t   |\n");
+    printf("\t\t|---------------|---------------|-----------------------------------------------|--------------------"
+                "----------------------------------------------|\n");
+    printf("\t\t|     White     |     Black     |\t    A   B   C   D   E   F   G   H  \t|\t\t\t Black Captured \t\t\t   |\n");
+    printf("\t\t|---------------|---------------|\t  |---|---|---|---|---|---|---|---|\t|"
             "------------------------------------------------------------------|\n");
 
     addPieces(board, player1.pawns, NUM_PAWNS, sizeof(Pawn));
@@ -72,22 +71,21 @@ void displayBoard(char** board, Player player1, Player player2, Captured ply1Cap
     addPieces(board, player1.king, 1, sizeof(King));
     addPieces(board, player2.king, 1, sizeof(King));
 
-    FILE *fptr = fopen(path, "rb"),
+    FILE *fptr = fopen("./Game-End/testing/game.bin", "rb"),
             *f = fopen("./test.txt", "a");
 
     for(int i = 0; i < BOARD_SIZE; i++)
     {
-        printf("\t\t\t");
+        printf("\t\t");
         Move move;
 
         if (fptr != NULL)
         {
             for (int j = 0; j < 2; j++)
             {
-                char symbol = (j == 0) ? move.symbol: toupper(move.symbol);
                 if (fread(&move, sizeof(Move), 1, fptr)) 
-                    printf("|  %c%c%d%c%d  ", move.symbol, move.colPrev + 'A', 8 - move.rowPrev, move.colNext + 'A', 8 - move.rowNext);
-                else printf("|         ");
+                    printf("|  %c: %c%d -> %c%d  ", ((j == 0) ? move.symbol : toupper(move.symbol)), move.colPrev + 'A', 8 - move.rowPrev, move.colNext + 'A', 8 - move.rowNext);
+                else printf("|               ");
             }
         }
 
@@ -139,16 +137,16 @@ void displayBoard(char** board, Player player1, Player player2, Captured ply1Cap
         else printf("                                                                  |");
         printf("\n");
 
-        printf("\t\t\t|\t  |\t    |\t  |---|---|---|---|---|---|---|---|\t|");
+        printf("\t\t|---------------|---------------|\t  |---|---|---|---|---|---|---|---|\t|");
         if (i == 3 || i == 4) printf("------------------------------------------------------------------|");
         else if (i % 5 >= 0 && i % 5 <= 2) printf("                 |---|---|---|---|---|---|---|---|                |");
         else printf("                                                                  |");
         printf("\n");
     }
 
-    printf("\t\t\t|\t  |\t    |\t    A   B   C   D   E   F   G   H  \t|\t\t\t\t\t\t\t\t   |\n");
-    printf("------------------------|---------|---------|-------------------------------------------|----------------------"
-            "--------------------------------------------|-------------------\n");
+    printf("\t\t|\t        |\t        |\t    A   B   C   D   E   F   G   H  \t|\t\t\t\t\t\t\t\t   |\n");
+    printf("----------------|---------------|---------------|-----------------------------------------------|----------------------"
+            "--------------------------------------------|-----------\n");
 
     if (fptr != NULL) fclose(fptr);
     if (f != NULL) fclose(f);
