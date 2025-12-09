@@ -42,9 +42,14 @@ bool loadGame(char** board, Player* player1, Player* player2,
 
     while ((readData = fread(move, sizeof(Move), 2, fptr)) >= 1)
     {
-        loadPlayerTurn(board, player1, move[0], ply1Captures); 
+        loadPlayerTurn(board, player1, move[0], ply1Captures);
+        if (ply1Captures->newCapture == true) capturePiece(*player2, &ply1Captures);
                 
-        if (readData == 2) loadPlayerTurn(board, player2, move[1], ply2Captures);
+        if (readData == 2) 
+        {
+            loadPlayerTurn(board, player2, move[1], ply2Captures);
+            if (ply2Captures->newCapture == true) capturePiece(*player1, &ply2Captures);
+        }
     }    
 
     isChecked(board, player1);

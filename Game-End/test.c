@@ -87,34 +87,41 @@ int main ()
 
             continue;
         }
+        else if (tolower(gameInit) == 'l')
+        {
+            FILE *fptr = fopen(path, 'rb');
+            if (fptr == NULL)
+            {
+                printf("No Game to Load, A New Game Will Be Initialized.\n");
+                break;
+            }
+
+            bool turnFlag = loadGame(board, &ply1, &ply2, &whiteCaptures, &blackCaptures);
+
+            if (turnFlag)
+            {
+                displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
+
+                printf("Player 2's turn: ");
+                
+                isChecked(board, &ply2);
+                saveGame = playerTurn(board, &ply2, &blackCaptures);
+                if (blackCaptures.newCapture == true) capturePiece(ply1, &blackCaptures);
+                if (saveGame)
+                {
+                    clearScreen();
+                    printf("Done, Game Saved!!!\n");
+                    return 0;
+                }
+
+                clearScreen();
+                break;
+            }
+        }
         else break;
     }
 
     while ((c = getchar()) != '\n' && c != EOF);
-
-    if (gameInit == 'l')
-    {
-        bool turnFlag = loadGame(board, &ply1, &ply2, &whiteCaptures, &blackCaptures);
-
-        if (turnFlag)
-        {
-            displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
-
-            printf("Player 2's turn: ");
-            
-            isChecked(board, &ply2);
-            saveGame = playerTurn(board, &ply2, &blackCaptures);
-            if (blackCaptures.newCapture == true) capturePiece(ply1, &blackCaptures);
-            if (saveGame)
-            {
-                clearScreen();
-                printf("Done, Game Saved!!!\n");
-                return 0;
-            }
-
-            clearScreen();
-        }
-    }
 
     displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
 
