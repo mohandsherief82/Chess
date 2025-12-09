@@ -111,7 +111,7 @@ bool movePawn(char** board, Player* player, Move move, Captured* playerCaptures)
     if (colDiff == 0 && rowDiff == (moveDirection * 2) && pawn->firstMove)
     {
         int midRow = move.rowPrev + moveDirection;
-        
+
         if (isEmpty(board, midRow, move.colNext) && isEmpty(board, move.rowNext, move.colNext)) 
         {
             board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;

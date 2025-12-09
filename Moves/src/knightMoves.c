@@ -26,7 +26,6 @@ bool moveKnight(char** board ,Player* player, Move move, Captured* playerCapture
     dispX = abs(move.rowNext - move.rowPrev);
     dispY = abs(move.colNext - move.colPrev);
 
-    // Fix: Corrected the logical expression to validate the L-shape movement.
     if (!((dispX == 2 && dispY == 1) || (dispX == 1 && dispY == 2))) 
     {
         printf("Invalid Knight Move, Try Again!!!\n");

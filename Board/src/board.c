@@ -161,7 +161,7 @@ void displayBoard(char** board, Player player1, Player player2, Captured ply1Cap
 
 bool isEmpty(char** board, int r, int c)
 {
-    return board[r][c] == WHITE_SQUARE || board[r][c] == BLACK_SQUARE;
+    return board[r][c] == WHITE_SQUARE || board[r][c] == BLACK_SQUARE || board[r][c] == EMPTY_SQUARE;
 }
 
 

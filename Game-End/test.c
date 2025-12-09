@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <ctype.h>
+#include <stdbool.h>
+#include <stdlib.h>
 
 #include "../Moves/include/pawnMoves.h"
 #include "../Moves/include/rockMoves.h"
@@ -10,9 +12,9 @@
 #include "../Moves/include/captures.h"
 #include "./include/saveGame.h"
 #include "../Board/include/board.h"
+#include "../Pieces/include/player.h"
 
 extern char *path;
-
 
 bool playerTurn(char** board, Player* player, Captured* capture)
 {
@@ -21,16 +23,17 @@ bool playerTurn(char** board, Player* player, Captured* capture)
     {
         move = getMove();
 
-        if (move.symbol == 's') return true;
+        if (tolower(move.symbol) == 's') return true;
 
         bool pieceMoveValid = false;
+        char moveSymbol = tolower(move.symbol);
         
-        if (move.symbol == 'p') pieceMoveValid = movePawn(board, player, move, capture);
-        else if (move.symbol == 'r') pieceMoveValid = moveRock(board, player, move, capture);
-        else if (move.symbol == 'n') pieceMoveValid = moveKnight(board, player, move, capture);
-        else if (move.symbol == 'b') pieceMoveValid = moveBishop(board, player, move, capture);
-        else if (move.symbol == 'q') pieceMoveValid = moveQueen(board, player, move, capture);
-        else if (move.symbol == 'k') pieceMoveValid = moveKing(board, player, move, capture);
+        if (moveSymbol == 'p') pieceMoveValid = movePawn(board, player, move, capture);
+        else if (moveSymbol == 'r') pieceMoveValid = moveRock(board, player, move, capture);
+        else if (moveSymbol == 'n') pieceMoveValid = moveKnight(board, player, move, capture);
+        else if (moveSymbol == 'b') pieceMoveValid = moveBishop(board, player, move, capture);
+        else if (moveSymbol == 'q') pieceMoveValid = moveQueen(board, player, move, capture);
+        else if (moveSymbol == 'k') pieceMoveValid = moveKing(board, player, move, capture);
         
         if (!pieceMoveValid) continue;
         
@@ -50,7 +53,6 @@ bool playerTurn(char** board, Player* player, Captured* capture)
     return false;
 }
 
-// Prototype for game logic
 int main ()
 {
     Player ply1 = createPlayer(COLOR_WHITE)
@@ -59,11 +61,9 @@ int main ()
             , blackCaptures = initializeCapture(COLOR_BLACK);
     char** board = initializeBoard(), gameInit = '\0';
     bool saveGame = false;
-    int c;
+    int c, currentPlayerTurn = 1;
 
-
-    printf("|-------------------------------------------------------------------------------------------------------------------"
-            "----------------------------------------------------------|\n");
+    printf("|-------------------------------------------------------------------------------------------------------------------------------------------------------------|\n");
     printf("\t\t\t\t\t\t\t\t Welcome To Terminal Chess\n");
     printf("- In our game, we represent white pieces with lowercase letters and black pieces with uppercase letters.\n\
         - Each piece has a different letter, where: \n \t- p: white pawn\n\t- r: white rock.\n\t- N: black knight.\n\t- b: white bishop\n\
@@ -89,36 +89,17 @@ int main ()
         }
         else if (tolower(gameInit) == 'l')
         {
-            FILE *fptr = fopen(path, 'rb');
-            if (fptr == NULL)
-            {
-                printf("No Game to Load, A New Game Will Be Initialized.\n");
-                break;
-            }
-
-            bool turnFlag = loadGame(board, &ply1, &ply2, &whiteCaptures, &blackCaptures);
-
-            if (turnFlag)
-            {
-                displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
-
-                printf("Player 2's turn: ");
-                
-                isChecked(board, &ply2);
-                saveGame = playerTurn(board, &ply2, &blackCaptures);
-                if (blackCaptures.newCapture == true) capturePiece(ply1, &blackCaptures);
-                if (saveGame)
-                {
-                    clearScreen();
-                    printf("Done, Game Saved!!!\n");
-                    return 0;
-                }
-
-                clearScreen();
-                break;
-            }
+            currentPlayerTurn = loadGame(board, &ply1, &ply2, &whiteCaptures, &blackCaptures);
+            break;
         }
-        else break;
+        else
+        {
+            remove(path);
+            FILE *fptr = fopen(path, "wb");
+            if (fptr != NULL) fclose(fptr);
+            currentPlayerTurn = 1;
+            break;
+        }
     }
 
     while ((c = getchar()) != '\n' && c != EOF);
@@ -127,40 +108,47 @@ int main ()
 
     while (true && !saveGame)
     {
-        printf("Player 1's turn: ");
-
-        isChecked(board, &ply1);
-        saveGame = playerTurn(board, &ply1, &whiteCaptures);
-        if (whiteCaptures.newCapture == true) capturePiece(ply2, &whiteCaptures);
-        if (saveGame)
+        // Player 1's turn
+        if (currentPlayerTurn == 1)
         {
+            printf("Player 1's turn: \n");
+
+            isChecked(board, &ply1);
+            saveGame = playerTurn(board, &ply1, &whiteCaptures);
+            if (whiteCaptures.newCapture == true) capturePiece(ply2, &whiteCaptures);
+            
+            if (saveGame) break;
+
             clearScreen();
-            printf("Done, Game Saved!!!\n");
-            break;
+            displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
+            currentPlayerTurn = 2;
         }
 
-        clearScreen();
-        displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
-
-        printf("Player 2's turn: ");
-        
-        isChecked(board, &ply2);
-        saveGame = playerTurn(board, &ply2, &blackCaptures);
-        if (blackCaptures.newCapture == true) capturePiece(ply1, &blackCaptures);
-        if (saveGame)
+        // Player 2's turn
+        if (currentPlayerTurn == 2)
         {
+            printf("Player 2's turn: \n");
+            
+            isChecked(board, &ply2);
+            saveGame = playerTurn(board, &ply2, &blackCaptures);
+            if (blackCaptures.newCapture == true) capturePiece(ply1, &blackCaptures);
+            
+            if (saveGame) break;
+            
             clearScreen();
-            printf("Done, Game Saved!!!\n");
-            break;
+            displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
+            currentPlayerTurn = 1;
         }
-
-        clearScreen();
-        displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
     }
 
     freeBoard(board, ply1, ply2);
 
-    if (!saveGame) remove(path);
+    if (saveGame)
+    {
+        clearScreen();
+        printf("Done, Game Saved!!!\n");
+    }
+    else remove(path);
 
     return 0;
 }
