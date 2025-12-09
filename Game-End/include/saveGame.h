@@ -6,8 +6,8 @@
 #include <stdio.h>
 
 void saveMove(Move move);
-int loadGame(char** board, Player* player1, Player* player2, 
-                        Captured* ply1Captures, Captured* ply2Captures);
+int loadGame(char** board, Player* player1, Player* player2, Captured* ply1Captures
+            , Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol);
 void undoLastMove();
 
 #endif

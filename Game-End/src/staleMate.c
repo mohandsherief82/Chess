@@ -71,7 +71,10 @@ void freeCopy(Player copyPlayer, char** copyBoard)
 bool legalMove(char** board, Player* player)
 {
     Move testMove;
-    Captured tempCapture = {0}; 
+    Captured tempCapture = {0};
+    
+    int plyEpCol = -1; 
+    int oppEpCol = -1;
     
     for (int rPrev = 0; rPrev < BOARD_SIZE; rPrev++)
     {
@@ -96,8 +99,8 @@ bool legalMove(char** board, Player* player)
 
                     bool moveSuccessful = false;
                     char pieceType = tolower(testMove.symbol);
-                    
-                    if (pieceType == 'p') moveSuccessful = movePawn(cpyBoard , &cpyPlayer, testMove, &tempCapture);
+
+                    if (pieceType == 'p') moveSuccessful = movePawn(cpyBoard , &cpyPlayer, testMove, &tempCapture, &plyEpCol, &oppEpCol);
                     else if (pieceType == 'r') moveSuccessful = moveRock(cpyBoard , &cpyPlayer, testMove, &tempCapture);
                     else if (pieceType == 'n') moveSuccessful = moveKnight(cpyBoard , &cpyPlayer, testMove, &tempCapture);
                     else if (pieceType == 'b') moveSuccessful = moveBishop(cpyBoard , &cpyPlayer, testMove, &tempCapture);
@@ -119,6 +122,9 @@ bool legalMove(char** board, Player* player)
                     cpyPlayer.queen = NULL;
                     cpyPlayer.king = NULL;
                     cpyBoard = NULL;
+                    
+                    plyEpCol = -1;
+                    oppEpCol = -1;
                 }
             }
         }

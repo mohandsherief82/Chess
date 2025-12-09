@@ -12,7 +12,7 @@
 #include "../Board/include/board.h"
 
 
-bool playerTurn(char** board, Player* player, Captured* capture)
+bool playerTurn(char** board, Player* player, Captured* capture, bool *enPassantFlag)
 {
     Move move;
     while (true)
@@ -23,7 +23,7 @@ bool playerTurn(char** board, Player* player, Captured* capture)
 
         bool pieceMoveValid = false;
         
-        if (move.symbol == 'p') pieceMoveValid = movePawn(board, player, move, capture);
+        if (move.symbol == 'p') pieceMoveValid = movePawn(board, player, move, capture, enPassantFlag);
         else if (move.symbol == 'r') pieceMoveValid = moveRock(board, player, move, capture);
         else if (move.symbol == 'n') pieceMoveValid = moveKnight(board, player, move, capture);
         else if (move.symbol == 'b') pieceMoveValid = moveBishop(board, player, move, capture);
@@ -60,7 +60,7 @@ int main ()
     Captured whiteCaptures = initializeCapture(COLOR_WHITE)
             , blackCaptures = initializeCapture(COLOR_BLACK);
     char** board = initializeBoard(), gameInit = '\0';
-    bool saveGame = false;
+    bool saveGame = false, whiteEnPassant = false, blackEnPassant = false;
     int c;
 
 
@@ -105,7 +105,7 @@ int main ()
             printf("Player 2's turn: ");
             
             isChecked(board, &ply2);
-            saveGame = playerTurn(board, &ply2, &blackCaptures);
+            saveGame = playerTurn(board, &ply2, &blackCaptures, &whiteEnPassant);
             if (blackCaptures.newCapture == true) capturePiece(ply1, &blackCaptures);
 
             clearScreen();
@@ -119,7 +119,7 @@ int main ()
         printf("Player 1's turn: ");
 
         isChecked(board, &ply1);
-        saveGame = playerTurn(board, &ply1, &whiteCaptures);
+        saveGame = playerTurn(board, &ply1, &whiteCaptures, &blackEnPassant);
         if (whiteCaptures.newCapture == true) capturePiece(ply2, &whiteCaptures);
         if (saveGame)
         {
@@ -134,7 +134,7 @@ int main ()
         printf("Player 2's turn: ");
         
         isChecked(board, &ply2);
-        saveGame = playerTurn(board, &ply2, &blackCaptures);
+        saveGame = playerTurn(board, &ply2, &blackCaptures, &whiteEnPassant);
         if (blackCaptures.newCapture == true) capturePiece(ply1, &blackCaptures);
         if (saveGame)
         {

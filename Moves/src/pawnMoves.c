@@ -62,7 +62,8 @@ void promotePawn(Pawn* pawn)
 }
 
 
-bool movePawn(char** board, Player* player, Move move, Captured* playerCaptures)
+bool movePawn(char** board, Player* player, Move move
+        , Captured* playerCaptures, int *plyEnPassantCol, int *oppEnPassantCol)
 {
     Pawn* pawn = NULL;
     int moveDirection; // 1 for Black (0->7), -1 for White (7->0)
@@ -118,7 +119,7 @@ bool movePawn(char** board, Player* player, Move move, Captured* playerCaptures)
             pawn->rowPosition = move.rowNext;
             pawn->firstMove = false;
             
-            // En Passant flag setup would happen here
+            *plyEnPassantCol = move.colNext;
             return true;
         }
     }
@@ -153,14 +154,14 @@ bool movePawn(char** board, Player* player, Move move, Captured* playerCaptures)
 
             return true;
         }
-        // For En Passant Capturing
-        if (tolower(board[move.rowPrev][move.colNext]) == 'p' && (move.rowPrev == 4 || move.rowPrev == 3)) // && enPassantFlag)
+        
+        if (isEmpty(board, move.rowNext, move.colNext) && move.colNext == *oppEnPassantCol)
         {
-            playerCaptures->capturedPiece.color = (isupper(board[move.rowNext][move.colNext])) ? COLOR_BLACK: COLOR_WHITE;
+            playerCaptures->capturedPiece.color = (isupper(board[move.rowPrev][move.colNext])) ? COLOR_BLACK: COLOR_WHITE;
             
             playerCaptures->capturedPiece.colPosition = move.colNext;
-            playerCaptures->capturedPiece.rowPosition = move.rowNext;
-            playerCaptures->capturedPiece.symbol = board[move.rowNext][move.colNext];
+            playerCaptures->capturedPiece.rowPosition = move.rowPrev;
+            playerCaptures->capturedPiece.symbol = board[move.rowPrev][move.colNext];
             playerCaptures->capturedPiece.isActive = false;
             
             playerCaptures->captureCount++;
@@ -169,6 +170,7 @@ bool movePawn(char** board, Player* player, Move move, Captured* playerCaptures)
             board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
             pawn->rowPosition = move.rowNext;
             pawn->colPosition = move.colNext;
+            board[move.rowPrev][move.colNext] = EMPTY_SQUARE;
             
             if (pawn->firstMove) pawn->firstMove = false;
             return true;

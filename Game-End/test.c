@@ -16,7 +16,7 @@
 
 extern char *path;
 
-bool playerTurn(char** board, Player* player, Captured* capture)
+bool playerTurn(char** board, Player* player, Captured* capture, int* plyEnPassantCol, int* opponentEnPassantCol)
 {
     Move move;
     while (true)
@@ -28,7 +28,7 @@ bool playerTurn(char** board, Player* player, Captured* capture)
         bool pieceMoveValid = false;
         char moveSymbol = tolower(move.symbol);
         
-        if (moveSymbol == 'p') pieceMoveValid = movePawn(board, player, move, capture);
+        if (moveSymbol == 'p') pieceMoveValid = movePawn(board, player, move, capture, plyEnPassantCol, opponentEnPassantCol);
         else if (moveSymbol == 'r') pieceMoveValid = moveRock(board, player, move, capture);
         else if (moveSymbol == 'n') pieceMoveValid = moveKnight(board, player, move, capture);
         else if (moveSymbol == 'b') pieceMoveValid = moveBishop(board, player, move, capture);
@@ -61,14 +61,16 @@ int main ()
             , blackCaptures = initializeCapture(COLOR_BLACK);
     char** board = initializeBoard(), gameInit = '\0';
     bool saveGame = false;
+    int whiteEnPassantCol = -1, blackEnPassantCol = -1;
     int c, currentPlayerTurn = 1;
 
+    
     printf("|-------------------------------------------------------------------------------------------------------------------------------------------------------------|\n");
     printf("\t\t\t\t\t\t\t\t Welcome To Terminal Chess\n");
     printf("- In our game, we represent white pieces with lowercase letters and black pieces with uppercase letters.\n\
         - Each piece has a different letter, where: \n \t- p: white pawn\n\t- r: white rock.\n\t- N: black knight.\n\t- b: white bishop\n\
         - Q: black queen.\n\t- K: black king.\n");
-    
+        
     while (gameInit == '\0')
     {
         printf("Do you want to load a game or play game(p, l): ");
@@ -89,7 +91,7 @@ int main ()
         }
         else if (tolower(gameInit) == 'l')
         {
-            currentPlayerTurn = loadGame(board, &ply1, &ply2, &whiteCaptures, &blackCaptures);
+            currentPlayerTurn = loadGame(board, &ply1, &ply2, &whiteCaptures, &blackCaptures, &whiteEnPassantCol, &blackEnPassantCol);
             break;
         }
         else
@@ -101,7 +103,7 @@ int main ()
             break;
         }
     }
-
+    
     while ((c = getchar()) != '\n' && c != EOF);
 
     displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
@@ -111,10 +113,13 @@ int main ()
         // Player 1's turn
         if (currentPlayerTurn == 1)
         {
+            if (blackEnPassantCol != -1) blackEnPassantCol = -1; 
+            
             printf("Player 1's turn: \n");
 
             isChecked(board, &ply1);
-            saveGame = playerTurn(board, &ply1, &whiteCaptures);
+            saveGame = playerTurn(board, &ply1, &whiteCaptures, &whiteEnPassantCol, &blackEnPassantCol);
+
             if (whiteCaptures.newCapture == true) capturePiece(ply2, &whiteCaptures);
             
             if (saveGame) break;
@@ -127,10 +132,12 @@ int main ()
         // Player 2's turn
         if (currentPlayerTurn == 2)
         {
+            if (whiteEnPassantCol != -1) whiteEnPassantCol = -1; 
+
             printf("Player 2's turn: \n");
             
             isChecked(board, &ply2);
-            saveGame = playerTurn(board, &ply2, &blackCaptures);
+            saveGame = playerTurn(board, &ply2, &blackCaptures, &blackEnPassantCol, &whiteEnPassantCol);
             if (blackCaptures.newCapture == true) capturePiece(ply1, &blackCaptures);
             
             if (saveGame) break;

@@ -14,9 +14,10 @@
 
 const char* path = "./Game-End/testing/game.bin";
 
-void loadPlayerTurn(char** board, Player* player, Move move, Captured* capture)
+void loadPlayerTurn(char** board, Player* player, Move move, Captured* capture
+                         , int *whiteEnPassantCol, int *blackEnPassantCol)
 {
-    if (tolower(move.symbol) == 'p') movePawn(board, player, move, capture);
+    if (tolower(move.symbol) == 'p') movePawn(board, player, move, capture, whiteEnPassantCol, blackEnPassantCol);
     else if (tolower(move.symbol) == 'r') moveRock(board, player, move, capture);
     else if (tolower(move.symbol) == 'n') moveKnight(board, player, move, capture);
     else if (tolower(move.symbol) == 'b') moveBishop(board, player, move, capture);
@@ -32,8 +33,8 @@ void undoLastMove()
 }
 
 
-int loadGame(char** board, Player* player1, Player* player2, 
-                        Captured* ply1Captures, Captured* ply2Captures)
+int loadGame(char** board, Player* player1, Player* player2, Captured* ply1Captures
+            , Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol)
 {
     FILE* fptr = fopen(path, "rb");
 
@@ -47,13 +48,13 @@ int loadGame(char** board, Player* player1, Player* player2,
 
         if (readData == 0) break;
 
-        loadPlayerTurn(board, player1, move[0], ply1Captures);
+        loadPlayerTurn(board, player1, move[0], ply1Captures, whiteEnPassantCol, blackEnPassantCol);
         if (ply1Captures->newCapture == true) capturePiece(*player2, ply1Captures);
         totalMovesRead++; 
                 
         if (readData == 2) 
         {
-            loadPlayerTurn(board, player2, move[1], ply2Captures);
+            loadPlayerTurn(board, player2, move[1], ply2Captures, blackEnPassantCol, whiteEnPassantCol);
             if (ply2Captures->newCapture == true) capturePiece(*player1, ply2Captures);
             totalMovesRead++;
         } 
