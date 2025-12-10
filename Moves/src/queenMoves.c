@@ -15,7 +15,7 @@ bool moveQueen(char** board, Player* player, Move move, Captured* playerCaptures
     
     if (queen == NULL && player->queen[0].isActive) 
     {
-        if (player->queen[0].colPosition == move.colPrev && player->queen[0].rowPosition == move.rowPrev) 
+        if (player->queen->colPosition == move.colPrev && player->queen->rowPosition == move.rowPrev && !player->queen->isPinned) 
         {
             queen = player->queen;
         }
@@ -24,6 +24,11 @@ bool moveQueen(char** board, Player* player, Move move, Captured* playerCaptures
     if (queen == NULL)
     {
         printf("No Queen At This Position, Try Again!!!\n");
+        return false;
+    }
+    else if (queen->isPinned)
+    {
+        printf("This queen is pinned, Try Again!!!\n");
         return false;
     }
 

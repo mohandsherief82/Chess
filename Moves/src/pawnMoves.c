@@ -13,8 +13,9 @@ Piece* checkPromotedPawn(Player* player, Move move)
 
     for (int i = 0; i < NUM_PAWNS; i++)
     {
-        if (move.colPrev == player->pawns[i].colPosition && move.rowPrev == player->pawns[i].rowPosition
-            && player->pawns[i].promoted == true && tolower(player->pawns[i].symbol) == move.symbol) 
+        if (move.colPrev == player->pawns[i].colPosition && player->pawns[i].isActive
+                && move.rowPrev == player->pawns[i].rowPosition && !player->pawns[i].isPinned 
+                    && player->pawns[i].promoted == true && tolower(player->pawns[i].symbol) == move.symbol) 
         {
             promotedPawn = (Piece*)&player->pawns[i];
             break;
@@ -71,7 +72,8 @@ bool movePawn(char** board, Player* player, Move move
     // Locate the correct Pawn object
     for (int i = 0; i < NUM_PAWNS; i++)
     {
-        if (move.colPrev == player->pawns[i].colPosition && move.rowPrev == player->pawns[i].rowPosition) 
+        if (move.colPrev == player->pawns[i].colPosition && player->pawns[i].isActive
+                    && move.rowPrev == player->pawns[i].rowPosition) 
         {
             pawn = &player->pawns[i];
             break;
@@ -86,6 +88,7 @@ bool movePawn(char** board, Player* player, Move move
     else if (pawn->isPinned)
     {
         printf("This Pawn is pinned, Try Again!!!\n");
+        return false;
     }
 
     // Determine direction

@@ -27,6 +27,11 @@ bool moveBishop(char** board ,Player* player, Move move, Captured* playerCapture
         printf("No Bishop At This Position, Try Again!!!\n");
         return false;
     }
+    else if (bishop->isPinned)
+    {
+        printf("This bishop is pinned, Try Again!!!\n");
+        return false;
+    }
 
     int currentrow = bishop->rowPosition;
     int currentcol = bishop->colPosition;

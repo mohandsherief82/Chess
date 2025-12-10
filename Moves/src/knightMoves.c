@@ -14,14 +14,24 @@ bool moveKnight(char** board ,Player* player, Move move, Captured* playerCapture
 
     for (int i = 0; i < NUM_PIECES; i++)
     {
-        if (player->knights[i].colPosition == move.colPrev && player->knights[i].rowPosition == move.rowPrev)
+        if (player->knights[i].colPosition == move.colPrev && player->knights[i].isActive
+                && player->knights[i].rowPosition == move.rowPrev)
         {
             knight = &player->knights[i];
             break;
         }
     }
 
-    if (knight == NULL) return false;
+    if (knight == NULL) 
+    {
+        printf("No Knight At This Position, Try Agin!!!\n");
+        return false;
+    }
+    else if (knight->isPinned)
+    {
+        printf("This knight is pinned, Try Again!!!\n");
+        return false;
+    }
 
     dispX = abs(move.rowNext - move.rowPrev);
     dispY = abs(move.colNext - move.colPrev);

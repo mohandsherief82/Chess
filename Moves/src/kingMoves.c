@@ -1,126 +1,15 @@
 #include "../../Pieces/include/player.h"
 #include "../../Board/include/board.h"
 #include "../include/captures.h"
+#include "../../Game-End/include/check.h"
 
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
 
-
 static const int dx[8] = {-1,  0,  1, -1, 1, -1, 0, 1};
 static const int dy[8] = {-1, -1, -1,  0, 0,  1, 1, 1};
-
-
-static const int movesRBRow[8] = {-1, -1, -1, 0, 0, 1, 1, 1};
-static const int movesRBCol[8] = {-1, 0, 1, -1, 1, -1, 0, 1};
-
-static const int knightRow[8] = {-2, -2, -1, -1, 1, 1, 2, 2};
-static const int knightCol[8] = {-1, 1, -2, 2, -2, 2, -1, 1};
-
-
-bool isChecked(char** board, Player* player)
-{
-    King* king = player->king;
-    king->isChecked = false; 
-
-    for (int i = 0; i < 8; i++)
-    {
-        int r = king->rowPosition + knightRow[i];
-        int c = king->colPosition + knightCol[i];
-
-        if (r >= 0 && r < BOARD_SIZE && c >= 0 && c < BOARD_SIZE)
-        {
-            if (!isEmpty(board, r, c))
-            {
-                if (tolower(board[r][c]) == 'n' && (islower(king->symbol) != islower(board[r][c])))
-                {
-                    king->isChecked = true;
-                    printf("King is checked by a Knight at (%d, %d)!\n", r, c);
-                    return true;
-                }
-            }
-        }
-    }
-
-    for (int d = 0; d < 8; d++)
-    {
-        bool isDiagonal = (movesRBRow[d] != 0 && movesRBCol[d] != 0);
-        bool isOrthogonal = (movesRBRow[d] == 0 || movesRBCol[d] == 0) && (!isDiagonal);
-
-        for (int step = 1; ; step++)
-        {
-            int r = king->rowPosition + movesRBRow[d] * step;
-            int c = king->colPosition + movesRBCol[d] * step;
-
-            if (r < 0 || r >= BOARD_SIZE || c < 0 || c >= BOARD_SIZE) break;
-
-            if (!isEmpty(board, r, c))
-            {
-                bool isEnemy = (islower(king->symbol) != islower(board[r][c]));
-
-                if (isEnemy)
-                {
-                    char piece = tolower(board[r][c]);
-
-                    if (isOrthogonal) 
-                    {
-                        if (piece == 'r' || piece == 'q')
-                        {
-                            king->isChecked = true;
-                            if (piece == 'r') printf("King is checked by a Rook at (%d, %d)!\n", r, c);
-                            else printf("King is checked by a Queen at (%d, %d)!\n", r, c);
-                            return true;
-                        }
-                    }
-                    
-                    if (isDiagonal)
-                    {
-                        if (piece == 'b' || piece == 'q')
-                        {
-                            king->isChecked = true;
-                            if (piece == 'b') printf("King is checked by a Bishop at (%d, %d)!\n", r, c);
-                            else printf("King is checked by a Queen at (%d, %d)!\n", r, c);
-                            return true;
-                        }
-                    }
-                    
-                    if (step == 1 && piece == 'k')
-                    {
-                        king->isChecked = true;
-                        printf("King is checked by the opposing King at (%d, %d)!\n", r, c);
-                        return true;
-                    }
-                    
-                    if (step == 1 && isDiagonal && piece == 'p')
-                    {
-                        if (islower(king->symbol) && movesRBRow[d] == -1)
-                        {
-                            king->isChecked = true;
-                            printf("White King is checked by a Black Pawn at (%d, %d)!\n", r, c);
-                            return true;
-                        }
-                        if (isupper(king->symbol) && movesRBRow[d] == 1)
-                        {
-                            king->isChecked = true;
-                            printf("Black King is checked by a White Pawn at (%d, %d)!\n", r, c);
-                            return true;
-                        }
-                    }
-
-                    break;
-                }
-                else
-                {
-                    // Pinning
-                    break;
-                }
-            }
-        }
-    }
-
-    return false;
-}
 
 
 bool performCastling(char** board, Player* player, Move move)

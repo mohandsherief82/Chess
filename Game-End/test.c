@@ -23,7 +23,8 @@ bool playerTurn(char** board, Player* player, Captured* capture, int* plyEnPassa
     {
         move = getMove();
 
-        if (tolower(move.symbol) == 's') return true;
+        if (move.symbol == 's') return true;
+        // else if (move.symbol == 'u') return false;
 
         bool pieceMoveValid = false;
         char moveSymbol = tolower(move.symbol);
@@ -39,7 +40,7 @@ bool playerTurn(char** board, Player* player, Captured* capture, int* plyEnPassa
         
         if (isChecked(board, player))
         {
-            printf("Illegal move: King remains in check or moved into check. Reverting move.\n");
+            printf("Illegal move: King remains in check, Try Again!!!\n");
             
             // undoLastMove(board, player, move, capture); 
             continue; 
@@ -113,8 +114,6 @@ int main ()
         // Player 1's turn
         if (currentPlayerTurn == 1)
         {
-            if (blackEnPassantCol != -1) blackEnPassantCol = -1; 
-            
             printf("Player 1's turn: \n");
 
             isChecked(board, &ply1);
@@ -127,13 +126,13 @@ int main ()
             clearScreen();
             displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
             currentPlayerTurn = 2;
+
+            if (blackEnPassantCol != -1) blackEnPassantCol = -1; 
         }
 
         // Player 2's turn
         if (currentPlayerTurn == 2)
         {
-            if (whiteEnPassantCol != -1) whiteEnPassantCol = -1; 
-
             printf("Player 2's turn: \n");
             
             isChecked(board, &ply2);
@@ -145,6 +144,8 @@ int main ()
             clearScreen();
             displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
             currentPlayerTurn = 1;
+
+            if (whiteEnPassantCol != -1) whiteEnPassantCol = -1; 
         }
     }
 
