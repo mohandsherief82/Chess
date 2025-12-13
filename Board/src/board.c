@@ -8,6 +8,7 @@
 #include "../../Game-End/include/saveGame.h"
 #include "../../Moves/include/captures.h"
 
+#define MAX_MOVES_TO_DISPLAY 16
 
 char** initializeBoard()
 {
@@ -22,6 +23,18 @@ char** initializeBoard()
     }
 
     return board;
+}
+
+
+long get_file_size(FILE *fp) 
+{
+    long current_pos = ftell(fp);
+    fseek(fp, 0, SEEK_END);
+
+    long size = ftell(fp);
+    fseek(fp, current_pos, SEEK_SET);
+    
+    return size;
 }
 
 
@@ -72,30 +85,64 @@ void displayBoard(char** board, Player player1, Player player2, Captured ply1Cap
     addPieces(board, player2.king, 1, sizeof(King));
 
     FILE *fptr = fopen("./Game-End/testing/game.bin", "rb");
+    Move movesToDisplay[MAX_MOVES_TO_DISPLAY];
+    int actualMovesRead = 0;
+    long file_size = 0;
+    size_t move_size = sizeof(Move);
+
+    if (fptr != NULL)
+    {
+        long total_moves_in_file = 0;
+        
+        file_size = get_file_size(fptr);
+        total_moves_in_file = file_size / move_size;
+
+        long moves_to_skip = 0;
+        
+        if (total_moves_in_file > MAX_MOVES_TO_DISPLAY) 
+        {
+            moves_to_skip = total_moves_in_file - MAX_MOVES_TO_DISPLAY;
+            actualMovesRead = MAX_MOVES_TO_DISPLAY;
+        } 
+        else 
+        {
+            moves_to_skip = 0;
+            actualMovesRead = (int)total_moves_in_file;
+        }
+
+        fseek(fptr, moves_to_skip * move_size, SEEK_SET);
+
+        if (actualMovesRead > 0) fread(movesToDisplay, move_size, actualMovesRead, fptr);
+        
+        fclose(fptr);
+        fptr = NULL;
+    }
+    
+    if (fptr == NULL)
+    {
+        FILE* ftemp = fopen("./Game-End/testing/game.bin", "wb");
+        if (ftemp != NULL) fclose(ftemp);
+    }
 
     for(int i = 0; i < BOARD_SIZE; i++)
     {
         printf("\t\t");
-        Move move;
-
-        if (fptr == NULL)
+        
+        for (int j = 0; j < 2; j++)
         {
-            fclose(fptr);
-            FILE* ftemp = fopen("./Game-End/testing/game.bin", "wb");
-            fclose(ftemp);
-            fptr = fopen("./Game-End/testing/game.bin", "rb");
-        }
-
-        if (fptr != NULL)
-        {
-            for (int j = 0; j < 2; j++)
+            int move_index = actualMovesRead - 16 + (i * 2) + j;
+            
+            if (move_index >= 0 && move_index < actualMovesRead)
             {
-                if (fread(&move, sizeof(Move), 1, fptr)) 
-                    printf("|  %c: %c%d -> %c%d  ", ((j == 0) ? move.symbol : toupper(move.symbol)), move.colPrev + 'A', 8 - move.rowPrev, move.colNext + 'A', 8 - move.rowNext);
-                else printf("|               ");
-            }
+                Move move = movesToDisplay[move_index];
+                printf("|  %c: %c%d -> %c%d  ", 
+                       ((j == 0) ? move.symbol : toupper(move.symbol)), 
+                       move.colPrev + 'A', 8 - move.rowPrev, 
+                       move.colNext + 'A', 8 - move.rowNext);
+            } 
+            else printf("|               ");
         }
-
+        
         printf("|\t%d", BOARD_SIZE - i);
 
         for (int j = 0; j < BOARD_SIZE; j++) 
@@ -106,10 +153,7 @@ void displayBoard(char** board, Player player1, Player player2, Captured ply1Cap
         }
         
         printf(" |%d\t|", BOARD_SIZE - i);
-        if (i == 4) 
-        {
-            printf("\t\t\t White Captures \t\t\t   |");
-        }
+        if (i == 4) printf("\t\t\t White Captures \t\t\t   |");
         else if (i == 1 || i == 2)
         {
             int startIndex = (i % 5 == 1) ? 0 : 8
@@ -154,8 +198,6 @@ void displayBoard(char** board, Player player1, Player player2, Captured ply1Cap
     printf("\t\t|\t        |\t        |\t    A   B   C   D   E   F   G   H  \t|\t\t\t\t\t\t\t\t   |\n");
     printf("----------------|---------------|---------------|-----------------------------------------------|----------------------"
             "--------------------------------------------|-----------\n");
-
-    if (fptr != NULL) fclose(fptr);
 }
 
 
@@ -167,6 +209,7 @@ bool isEmpty(char** board, int r, int c)
 
 void clearScreen()
 {
+    // system("clear");
     printf("\033[2J\033[H");
     fflush(stdout);
 

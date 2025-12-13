@@ -13,11 +13,18 @@
 #include "./include/saveGame.h"
 #include "../Board/include/board.h"
 #include "../Pieces/include/player.h"
+#include "./include/staleMate.h"
 
 extern char *path;
 
 bool playerTurn(char** board, Player* player, Captured* capture, int* plyEnPassantCol, int* opponentEnPassantCol)
 {
+    if (checkStalemate(board, player))
+    {
+        printf("No Valid Moves for this playre.\nGame Ended with a Stalemate!!!\n");
+        exit(0);
+    }
+
     Move move;
     while (true)
     {
@@ -42,7 +49,6 @@ bool playerTurn(char** board, Player* player, Captured* capture, int* plyEnPassa
         {
             printf("Illegal move: King remains in check, Try Again!!!\n");
             
-            // undoLastMove(board, player, move, capture); 
             continue; 
         }
 
