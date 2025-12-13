@@ -14,8 +14,8 @@ bool moveRock(char** board ,Player* player, Move move, Captured* playerCaptures)
 
     for (int i = 0; i < NUM_PIECES; i++)
     {
-        if (player->rocks[i].colPosition == move.colPrev 
-            && player->rocks[i].rowPosition == move.rowPrev && player->rocks[i].isActive)
+        if (player->rocks[i].colPosition == move.colPrev
+            && player->rocks[i].rowPosition == move.rowPrev && player->rocks[i].isActive )
         {
             rock = &player->rocks[i];
             break;
@@ -25,6 +25,11 @@ bool moveRock(char** board ,Player* player, Move move, Captured* playerCaptures)
     if (rock == NULL)
     {
         printf("No Rock At This Position, Try Again!!!\n");
+        return false;
+    }
+    else if (rock->isPinned)
+    {
+        printf("This rock is pinned, Try Again!!!\n");
         return false;
     }
 

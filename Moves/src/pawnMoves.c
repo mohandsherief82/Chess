@@ -13,8 +13,9 @@ Piece* checkPromotedPawn(Player* player, Move move)
 
     for (int i = 0; i < NUM_PAWNS; i++)
     {
-        if (move.colPrev == player->pawns[i].colPosition && move.rowPrev == player->pawns[i].rowPosition
-            && player->pawns[i].promoted == true && tolower(player->pawns[i].symbol) == move.symbol) 
+        if (move.colPrev == player->pawns[i].colPosition && player->pawns[i].isActive
+                && move.rowPrev == player->pawns[i].rowPosition && !player->pawns[i].isPinned 
+                    && player->pawns[i].promoted == true && tolower(player->pawns[i].symbol) == move.symbol) 
         {
             promotedPawn = (Piece*)&player->pawns[i];
             break;
@@ -62,7 +63,8 @@ void promotePawn(Pawn* pawn)
 }
 
 
-bool movePawn(char** board, Player* player, Move move, Captured* playerCaptures)
+bool movePawn(char** board, Player* player, Move move
+        , Captured* playerCaptures, int *plyEnPassantCol, int *oppEnPassantCol)
 {
     Pawn* pawn = NULL;
     int moveDirection; // 1 for Black (0->7), -1 for White (7->0)
@@ -70,7 +72,8 @@ bool movePawn(char** board, Player* player, Move move, Captured* playerCaptures)
     // Locate the correct Pawn object
     for (int i = 0; i < NUM_PAWNS; i++)
     {
-        if (move.colPrev == player->pawns[i].colPosition && move.rowPrev == player->pawns[i].rowPosition) 
+        if (move.colPrev == player->pawns[i].colPosition && player->pawns[i].isActive
+                    && move.rowPrev == player->pawns[i].rowPosition) 
         {
             pawn = &player->pawns[i];
             break;
@@ -85,6 +88,7 @@ bool movePawn(char** board, Player* player, Move move, Captured* playerCaptures)
     else if (pawn->isPinned)
     {
         printf("This Pawn is pinned, Try Again!!!\n");
+        return false;
     }
 
     // Determine direction
@@ -111,14 +115,14 @@ bool movePawn(char** board, Player* player, Move move, Captured* playerCaptures)
     if (colDiff == 0 && rowDiff == (moveDirection * 2) && pawn->firstMove)
     {
         int midRow = move.rowPrev + moveDirection;
-        
+
         if (isEmpty(board, midRow, move.colNext) && isEmpty(board, move.rowNext, move.colNext)) 
         {
             board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
             pawn->rowPosition = move.rowNext;
             pawn->firstMove = false;
             
-            // En Passant flag setup would happen here
+            *plyEnPassantCol = move.colNext;
             return true;
         }
     }
@@ -153,14 +157,14 @@ bool movePawn(char** board, Player* player, Move move, Captured* playerCaptures)
 
             return true;
         }
-        // For En Passant Capturing
-        if (tolower(board[move.rowPrev][move.colNext]) == 'p' && (move.rowPrev == 4 || move.rowPrev == 3)) // && enPassantFlag)
+        
+        if (isEmpty(board, move.rowNext, move.colNext) && move.colNext == *oppEnPassantCol)
         {
-            playerCaptures->capturedPiece.color = (isupper(board[move.rowNext][move.colNext])) ? COLOR_BLACK: COLOR_WHITE;
+            playerCaptures->capturedPiece.color = (isupper(board[move.rowPrev][move.colNext])) ? COLOR_BLACK: COLOR_WHITE;
             
             playerCaptures->capturedPiece.colPosition = move.colNext;
-            playerCaptures->capturedPiece.rowPosition = move.rowNext;
-            playerCaptures->capturedPiece.symbol = board[move.rowNext][move.colNext];
+            playerCaptures->capturedPiece.rowPosition = move.rowPrev;
+            playerCaptures->capturedPiece.symbol = board[move.rowPrev][move.colNext];
             playerCaptures->capturedPiece.isActive = false;
             
             playerCaptures->captureCount++;
@@ -169,6 +173,7 @@ bool movePawn(char** board, Player* player, Move move, Captured* playerCaptures)
             board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
             pawn->rowPosition = move.rowNext;
             pawn->colPosition = move.colNext;
+            board[move.rowPrev][move.colNext] = EMPTY_SQUARE;
             
             if (pawn->firstMove) pawn->firstMove = false;
             return true;
