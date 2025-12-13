@@ -131,7 +131,7 @@ int main ()
             if (gameState == 's') break;
             else if (gameState == 'u')
             {
-                undoMove(board, &ply1, &ply2, &whiteCaptures, &blackCaptures
+                undoLastMove(board, &ply1, &ply2, &whiteCaptures, &blackCaptures
                             , &whiteEnPassantCol, &blackEnPassantCol);
                 printf("Move undone.\n Returning turn to player 2!!!\n");
                 currentPlayerTurn = 2;
@@ -163,7 +163,7 @@ int main ()
             if (gameState == 's') break;
             else if (gameState == 'u')
             {
-                undoMove(board, &ply1, &ply2, &whiteCaptures, &blackCaptures
+                undoLastMove(board, &ply1, &ply2, &whiteCaptures, &blackCaptures
                             , &whiteEnPassantCol, &blackEnPassantCol);
                 printf("Move undone.\n Returning turn to player 1!!!\n");
                 currentPlayerTurn = 1;
