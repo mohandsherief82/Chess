@@ -94,7 +94,7 @@ void displayBoard(char** board, Player player1, Player player2, Captured ply1Cap
     {
         long total_moves_in_file = 0;
         
-        file_size = get_file_size(fptr);
+        file_size = getFileSize(fptr);
         total_moves_in_file = file_size / move_size;
 
         long moves_to_skip = 0;

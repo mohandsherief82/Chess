@@ -27,30 +27,15 @@ void loadPlayerTurn(char** board, Player* player, Move move, Captured* capture
 }
 
 
-void undoLastMove(char** board, Player* player1, Player* player2, Captured* ply1Captures
-            , Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol)
-{
-    FILE* fptr = fopen(path, "wb+");
-
-    fseek(fptr, 0, SEEK_END);
-    int totalMoves = ftell(fptr) / sizeof(Move);
-
-    Move* backMove = malloc(sizeof(Move) * (totalMoves -1));
-    fseek(fptr, 0, SEEK_SET);
-    fread(backMove, sizeof(Move), totalMoves -1, fptr);
-    fwrite(backMove, sizeof(Move), totalMoves -1, fptr);
-    fclose(fptr);
-    free(backMove);
-
-    loadGame(board, player1, player2, ply1Captures
-            , ply2Captures, whiteEnPassantCol, blackEnPassantCol);
-}
-
-
 int loadGame(char** board, Player* player1, Player* player2, Captured* ply1Captures
             , Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol)
 {
     FILE* fptr = fopen(path, "rb");
+    if (fptr == NULL)
+    {
+        printf("No Game to Load, Starting a New Game!!!\n");
+        return 1;
+    }
 
     Move move[2];
     int readData;
@@ -82,6 +67,26 @@ int loadGame(char** board, Player* player1, Player* player2, Captured* ply1Captu
 
     if (totalMovesRead == 0 || totalMovesRead % 2 == 0) return 1;
     else return 2;
+}
+
+
+void undoLastMove(char** board, Player* player1, Player* player2, Captured* ply1Captures
+            , Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol)
+{
+    FILE* fptr = fopen(path, "wb+");
+
+    fseek(fptr, 0, SEEK_END);
+    int totalMoves = ftell(fptr) / sizeof(Move);
+
+    Move* backMove = malloc(sizeof(Move) * (totalMoves -1));
+    fseek(fptr, 0, SEEK_SET);
+    fread(backMove, sizeof(Move), totalMoves -1, fptr);
+    fwrite(backMove, sizeof(Move), totalMoves -1, fptr);
+    fclose(fptr);
+    free(backMove);
+
+    loadGame(board, player1, player2, ply1Captures
+            , ply2Captures, whiteEnPassantCol, blackEnPassantCol);
 }
 
 
