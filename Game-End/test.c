@@ -20,11 +20,11 @@ extern char *path;
 
 char playerTurn(char** board, Player* player, Captured* capture, int* plyEnPassantCol, int* opponentEnPassantCol)
 {
-    if (checkStalemate(board, player))
-    {
-        printf("No Valid Moves for this playre.\nGame Ended with a Stalemate!!!\n");
-        exit(0);
-    }
+    // if (checkStalemate(board, player))
+    // {
+    //     printf("No Valid Moves for this player.\nGame Ended with a Stalemate!!!\n");
+    //     exit(0);
+    // }
 
     Move move;
     while (true)
@@ -193,7 +193,7 @@ int main ()
     }
     else remove(path);
 
-    printf("------------------------------------------------------------------------------------------------|----------------------"
+    printf("-----------------------------------------------------------------------------------------------------------------------"
             "--------------------------------------------------------\n");
 
     return 0;

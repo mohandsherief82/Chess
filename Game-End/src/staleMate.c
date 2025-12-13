@@ -32,6 +32,8 @@ Player copyPlayer(Player* player)
 {
     Player copyPlayer;
 
+    memcpy(&copyPlayer, player, sizeof(Player));
+
     copyPlayer.bishops = (Bishop*)malloc(NUM_PIECES * sizeof(Bishop));
     memcpy(copyPlayer.bishops, player->bishops, NUM_PIECES * sizeof(Bishop)); 
 
@@ -99,7 +101,7 @@ bool legalMove(char** board, Player* player)
 
                     bool moveSuccessful = false;
                     char pieceType = tolower(testMove.symbol);
-
+                    
                     if (pieceType == 'p') moveSuccessful = movePawn(cpyBoard , &cpyPlayer, testMove, &tempCapture, &plyEpCol, &oppEpCol);
                     else if (pieceType == 'r') moveSuccessful = moveRock(cpyBoard , &cpyPlayer, testMove, &tempCapture);
                     else if (pieceType == 'n') moveSuccessful = moveKnight(cpyBoard , &cpyPlayer, testMove, &tempCapture);
@@ -114,14 +116,6 @@ bool legalMove(char** board, Player* player)
                     } 
                     
                     freeCopy(cpyPlayer, cpyBoard);
-
-                    cpyPlayer.pawns = NULL;
-                    cpyPlayer.rocks = NULL;
-                    cpyPlayer.knights = NULL;
-                    cpyPlayer.bishops = NULL;
-                    cpyPlayer.queen = NULL;
-                    cpyPlayer.king = NULL;
-                    cpyBoard = NULL;
                     
                     plyEpCol = -1;
                     oppEpCol = -1;
