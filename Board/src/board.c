@@ -26,7 +26,7 @@ char** initializeBoard()
 }
 
 
-long get_file_size(FILE *fp) 
+long getFileSize(FILE *fp)
 {
     long current_pos = ftell(fp);
     fseek(fp, 0, SEEK_END);

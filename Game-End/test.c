@@ -14,10 +14,11 @@
 #include "../Board/include/board.h"
 #include "../Pieces/include/player.h"
 #include "./include/staleMate.h"
+#include "./include/checkMate.h"
 
 extern char *path;
 
-bool playerTurn(char** board, Player* player, Captured* capture, int* plyEnPassantCol, int* opponentEnPassantCol)
+char playerTurn(char** board, Player* player, Captured* capture, int* plyEnPassantCol, int* opponentEnPassantCol)
 {
     if (checkStalemate(board, player))
     {
@@ -30,8 +31,8 @@ bool playerTurn(char** board, Player* player, Captured* capture, int* plyEnPassa
     {
         move = getMove();
 
-        if (move.symbol == 's') return true;
-        // else if (move.symbol == 'u') return false;
+        if (move.symbol == 's') return 's';
+        // else if (move.symbol == 'u') return 'u';
 
         bool pieceMoveValid = false;
         char moveSymbol = tolower(move.symbol);
@@ -57,7 +58,7 @@ bool playerTurn(char** board, Player* player, Captured* capture, int* plyEnPassa
     
     saveMove(move);
 
-    return false;
+    return '_';
 }
 
 int main ()
@@ -67,7 +68,7 @@ int main ()
     Captured whiteCaptures = initializeCapture(COLOR_WHITE)
             , blackCaptures = initializeCapture(COLOR_BLACK);
     char** board = initializeBoard(), gameInit = '\0';
-    bool saveGame = false;
+    char gameState = '_';
     int whiteEnPassantCol = -1, blackEnPassantCol = -1;
     int c, currentPlayerTurn = 1;
 
@@ -115,7 +116,7 @@ int main ()
 
     displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
 
-    while (true && !saveGame)
+    while (true && gameState != 's')
     {
         // Player 1's turn
         if (currentPlayerTurn == 1)
@@ -123,15 +124,29 @@ int main ()
             printf("Player 1's turn: \n");
 
             isChecked(board, &ply1);
-            saveGame = playerTurn(board, &ply1, &whiteCaptures, &whiteEnPassantCol, &blackEnPassantCol);
+            gameState = playerTurn(board, &ply1, &whiteCaptures, &whiteEnPassantCol, &blackEnPassantCol);
 
             if (whiteCaptures.newCapture == true) capturePiece(ply2, &whiteCaptures);
             
-            if (saveGame) break;
+            if (gameState == 's') break;
+            else if (gameState == 'u')
+            {
+                undoMove(board, &ply1, &ply2, &whiteCaptures, &blackCaptures
+                            , &whiteEnPassantCol, &blackEnPassantCol);
+                printf("Move undone.\n Returning turn to player 2!!!\n");
+                currentPlayerTurn = 2;
+                continue;
+            }
 
             clearScreen();
             displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
             currentPlayerTurn = 2;
+
+            if (checkMate(board, &ply2))
+            {
+                printf("Game Ended By Checkmate.\n Player 1 wins!!!\n");
+                break;
+            }
 
             if (blackEnPassantCol != -1) blackEnPassantCol = -1; 
         }
@@ -142,14 +157,28 @@ int main ()
             printf("Player 2's turn: \n");
             
             isChecked(board, &ply2);
-            saveGame = playerTurn(board, &ply2, &blackCaptures, &blackEnPassantCol, &whiteEnPassantCol);
+            gameState = playerTurn(board, &ply2, &blackCaptures, &blackEnPassantCol, &whiteEnPassantCol);
             if (blackCaptures.newCapture == true) capturePiece(ply1, &blackCaptures);
             
-            if (saveGame) break;
+            if (gameState == 's') break;
+            else if (gameState == 'u')
+            {
+                undoMove(board, &ply1, &ply2, &whiteCaptures, &blackCaptures
+                            , &whiteEnPassantCol, &blackEnPassantCol);
+                printf("Move undone.\n Returning turn to player 1!!!\n");
+                currentPlayerTurn = 1;
+                continue;
+            }
             
             clearScreen();
             displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
             currentPlayerTurn = 1;
+
+            if (checkMate(board, &ply1))
+            {
+                printf("Game Ended By Checkmate.\n Player 2 wins!!!\n");
+                break;
+            }
 
             if (whiteEnPassantCol != -1) whiteEnPassantCol = -1; 
         }
@@ -157,12 +186,15 @@ int main ()
 
     freeBoard(board, ply1, ply2);
 
-    if (saveGame)
+    if (gameState == 's')
     {
         clearScreen();
         printf("Done, Game Saved!!!\n");
     }
     else remove(path);
+
+    printf("------------------------------------------------------------------------------------------------|----------------------"
+            "--------------------------------------------------------\n");
 
     return 0;
 }

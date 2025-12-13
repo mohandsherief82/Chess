@@ -42,7 +42,7 @@ bool playerTurn(char** board, Player* player, Captured* capture, int* plyEnPassa
         {
             printf("Illegal move: King remains in check, Try Again!!!\n");
             
-            // undoLastMove(board, player, move, capture); 
+            // undoMove(board, player, move, capture); 
             continue; 
         }
 
