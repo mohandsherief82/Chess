@@ -27,9 +27,23 @@ void loadPlayerTurn(char** board, Player* player, Move move, Captured* capture
 }
 
 
-void undoLastMove()
+void undoLastMove(char** board, Player* player1, Player* player2, Captured* ply1Captures
+            , Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol)
 {
+    FILE* fptr = fopen(path, "wb+");
 
+    fseek(fptr, 0, SEEK_END);
+    int totalMoves = ftell(fptr) / sizeof(Move);
+
+    Move* backMove = malloc(sizeof(Move) * (totalMoves -1));
+    fseek(fptr, 0, SEEK_SET);
+    fread(backMove, sizeof(Move), totalMoves -1, fptr);
+    fwrite(backMove, sizeof(Move), totalMoves -1, fptr);
+    fclose(fptr);
+    free(backMove);
+
+    loadGame(board, player1, player2, ply1Captures
+            , ply2Captures, whiteEnPassantCol, blackEnPassantCol);
 }
 
 
