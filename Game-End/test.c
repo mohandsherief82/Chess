@@ -49,9 +49,8 @@ char playerTurn(char** board, Player* player, Captured* capture, int* plyEnPassa
         
         if (isChecked(board, player))
         {
-            printf("Illegal move: King remains in check, Try Again!!!\n");
-            
-            continue; 
+            printf("Illegal move: King remains in check, Try Again!!!\n");            
+            return 'i'; 
         }
 
         break; 
@@ -134,11 +133,18 @@ int main ()
             {
                 undoLastMove(board, &ply1, &ply2, &whiteCaptures, &blackCaptures
                             , &whiteEnPassantCol, &blackEnPassantCol);
-                printf("Move undone.\n Returning turn to player 2!!!\n");
+                printf("Move undone.\nReturning turn to player 2!!!\n");
                 currentPlayerTurn = 2;
                 clearScreen();
                 displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
                 
+                continue;
+            }
+            else if (gameState == 'i') 
+            {
+                loadGame(board, &ply1, &ply2, 
+                            &whiteCaptures, &blackCaptures, 
+                                &whiteEnPassantCol, &blackEnPassantCol);
                 continue;
             }
 
@@ -146,11 +152,12 @@ int main ()
             displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
             currentPlayerTurn = 2;
 
-            if (checkMate(board, &ply2))
-            {
-                printf("Game Ended By Checkmate.\n Player 1 wins!!!\n");
-                break;
-            }
+            // if (checkMate(board, &ply2))
+            // {
+            //     printf("Game Ended By Checkmate.\nPlayer 1 wins!!!\n");
+            //     remove(path);
+            //     break;
+            // }
 
             if (blackEnPassantCol != -1) blackEnPassantCol = -1; 
         }
@@ -169,11 +176,18 @@ int main ()
             {
                 undoLastMove(board, &ply1, &ply2, &whiteCaptures, &blackCaptures
                             , &whiteEnPassantCol, &blackEnPassantCol);
-                printf("Move undone.\n Returning turn to player 1!!!\n");
+                printf("Move undone.\nReturning turn to player 1!!!\n");
                 currentPlayerTurn = 1;
                 clearScreen();
                 displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
 
+                continue;
+            }
+            else if (gameState == 'i') 
+            {
+                loadGame(board, &ply1, &ply2, 
+                            &whiteCaptures, &blackCaptures, 
+                                &whiteEnPassantCol, &blackEnPassantCol);
                 continue;
             }
             
@@ -181,11 +195,12 @@ int main ()
             displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
             currentPlayerTurn = 1;
 
-            if (checkMate(board, &ply1))
-            {
-                printf("Game Ended By Checkmate.\n Player 2 wins!!!\n");
-                break;
-            }
+            // if (checkMate(board, &ply1))
+            // {
+            //     printf("Game Ended By Checkmate.\nPlayer 2 wins!!!\n");
+            //     remove(path);
+            //     break;
+            // }
 
             if (whiteEnPassantCol != -1) whiteEnPassantCol = -1; 
         }

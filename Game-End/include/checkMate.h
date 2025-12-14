@@ -1,6 +1,9 @@
 #ifndef CHECKMATE_H
 #define CHECKMATE_H
 
-bool checkMate(char** board, Player* player);
+#include "../../Pieces/include/player.h" 
+#include <stdbool.h>
 
-#endif
+bool checkMate(char** board, Player* currentPlayer);
+
+#endif // CHECKMATE_H

@@ -84,8 +84,7 @@ void displayBoard(char** board, Player player1, Player player2, Captured ply1Cap
     addPieces(board, player1.king, 1, sizeof(King));
     addPieces(board, player2.king, 1, sizeof(King));
 
-    FILE *fptr = fopen("./Game-End/testing/game.bin", "rb"),
-            *f = fopen("test.txt", "wb");
+    FILE *fptr = fopen("./Game-End/testing/game.bin", "rb");
     long fileSize = getFileSize(fptr);
     
     if (fptr == NULL)
@@ -104,10 +103,7 @@ void displayBoard(char** board, Player player1, Player player2, Captured ply1Cap
         for (int j = 0; j < 2; j++)
         {            
             if (fread(&move, sizeof(Move), 1, fptr))
-            {    
                 printf("|  %c: %c%d -> %c%d  ", ((j == 0) ? move.symbol : toupper(move.symbol)), move.colPrev + 'A', 8 - move.rowPrev, move.colNext + 'A', 8 - move.rowNext);
-                fprintf(f, "%d", 1);
-            }
             else printf("|               ");
         }
         
@@ -168,7 +164,6 @@ void displayBoard(char** board, Player player1, Player player2, Captured ply1Cap
             "--------------------------------------------|-----------\n");
 
     fclose(fptr);
-    fclose(f);
 }
 
 

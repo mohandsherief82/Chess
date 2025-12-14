@@ -8,9 +8,8 @@
 #include <stdio.h>
 #include <ctype.h>
 
-static const int dx[8] = {-1,  0,  1, -1, 1, -1, 0, 1};
-static const int dy[8] = {-1, -1, -1,  0, 0,  1, 1, 1};
-
+const int dx[8] = {-1,  0,  1, -1, 1, -1, 0, 1};
+const int dy[8] = {-1, -1, -1,  0, 0,  1, 1, 1};
 
 bool performCastling(char** board, Player* player, Move move)
 {

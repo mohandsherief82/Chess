@@ -85,7 +85,7 @@ Move getMove()
 
     while (true)
     {
-        printf("\nEnter piece symbol(p, r, n, b, q, k), (u for undo): ");
+        printf("\nEnter piece symbol(p, r, n, b, q, k), (u for undo, s for save): ");
         if (scanf(" %c", &symbol) != 1) 
         {
             while ((c = getchar()) != '\n' && c != EOF);
