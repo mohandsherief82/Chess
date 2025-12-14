@@ -55,8 +55,8 @@ Player createPlayer(PieceColor color)
 
 bool isValidPiece(char symbol)
 {
-    return (symbol == 'p' || symbol == 'r' || symbol == 'n' || 
-            symbol == 'b' || symbol == 'q' || symbol == 'k' || symbol == 's');
+    return (symbol == 'p' || symbol == 'r' || symbol == 'n' || symbol == 'u'
+            ||  symbol == 'b' || symbol == 'q' || symbol == 'k' || symbol == 's');
 }
 
 
@@ -103,7 +103,7 @@ Move getMove()
     while ((c = getchar()) != '\n' && c != EOF);
 
     move.symbol = symbol;
-    if (move.symbol == 's') return move;
+    if (move.symbol == 's' || move.symbol == 'u') return move;
 
 
     while (!moveFlag)

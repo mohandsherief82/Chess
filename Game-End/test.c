@@ -20,29 +20,30 @@ extern char *path;
 
 char playerTurn(char** board, Player* player, Captured* capture, int* plyEnPassantCol, int* opponentEnPassantCol)
 {
-    // if (checkStalemate(board, player))
-    // {
-    //     printf("No Valid Moves for this player.\nGame Ended with a Stalemate!!!\n");
-    //     exit(0);
-    // }
+    if (checkStalemate(board, player))
+    {
+        printf("No Valid Moves for this player.\nGame Ended with a Stalemate!!!\n");
+        exit(0);
+    }
 
+    bool legalCheck = false;
     Move move;
     while (true)
     {
         move = getMove();
 
         if (move.symbol == 's') return 's';
-        // else if (move.symbol == 'u') return 'u';
+        else if (move.symbol == 'u') return 'u';
 
         bool pieceMoveValid = false;
         char moveSymbol = tolower(move.symbol);
         
-        if (moveSymbol == 'p') pieceMoveValid = movePawn(board, player, move, capture, plyEnPassantCol, opponentEnPassantCol);
-        else if (moveSymbol == 'r') pieceMoveValid = moveRock(board, player, move, capture);
-        else if (moveSymbol == 'n') pieceMoveValid = moveKnight(board, player, move, capture);
-        else if (moveSymbol == 'b') pieceMoveValid = moveBishop(board, player, move, capture);
-        else if (moveSymbol == 'q') pieceMoveValid = moveQueen(board, player, move, capture);
-        else if (moveSymbol == 'k') pieceMoveValid = moveKing(board, player, move, capture);
+        if (moveSymbol == 'p') pieceMoveValid = movePawn(board, player, move, capture, plyEnPassantCol, opponentEnPassantCol, legalCheck);
+        else if (moveSymbol == 'r') pieceMoveValid = moveRock(board, player, move, capture, legalCheck);
+        else if (moveSymbol == 'n') pieceMoveValid = moveKnight(board, player, move, capture, legalCheck);
+        else if (moveSymbol == 'b') pieceMoveValid = moveBishop(board, player, move, capture, legalCheck);
+        else if (moveSymbol == 'q') pieceMoveValid = moveQueen(board, player, move, capture, legalCheck);
+        else if (moveSymbol == 'k') pieceMoveValid = moveKing(board, player, move, capture, legalCheck);
         
         if (!pieceMoveValid) continue;
         
@@ -135,6 +136,9 @@ int main ()
                             , &whiteEnPassantCol, &blackEnPassantCol);
                 printf("Move undone.\n Returning turn to player 2!!!\n");
                 currentPlayerTurn = 2;
+                clearScreen();
+                displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
+                
                 continue;
             }
 
@@ -167,6 +171,9 @@ int main ()
                             , &whiteEnPassantCol, &blackEnPassantCol);
                 printf("Move undone.\n Returning turn to player 1!!!\n");
                 currentPlayerTurn = 1;
+                clearScreen();
+                displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
+
                 continue;
             }
             

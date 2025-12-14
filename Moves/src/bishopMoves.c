@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <ctype.h>
 
-bool moveBishop(char** board ,Player* player, Move move, Captured* playerCaptures)
+bool moveBishop(char** board ,Player* player, Move move, Captured* playerCaptures, bool legalCheck)
 {
     int dispX, dispY, r, c, rowStep, colStep;
     Bishop* bishop = (Bishop*)checkPromotedPawn(player, move);
@@ -24,12 +24,12 @@ bool moveBishop(char** board ,Player* player, Move move, Captured* playerCapture
 
     if (bishop == NULL) 
     {
-        printf("No Bishop At This Position, Try Again!!!\n");
+        if (!legalCheck) printf("No Bishop At This Position, Try Again!!!\n");
         return false;
     }
     else if (bishop->isPinned)
     {
-        printf("This bishop is pinned, Try Again!!!\n");
+        if (!legalCheck) printf("This bishop is pinned, Try Again!!!\n");
         return false;
     }
 
@@ -42,7 +42,7 @@ bool moveBishop(char** board ,Player* player, Move move, Captured* playerCapture
 
     if(abs(dispX) != abs(dispY)) 
     {
-        printf("Invalid Bishop Move, Try Again!!!\n");
+        if (!legalCheck) printf("Invalid Bishop Move, Try Again!!!\n");
         return false;
     }
 
@@ -56,7 +56,7 @@ bool moveBishop(char** board ,Player* player, Move move, Captured* playerCapture
     {
         if(!isEmpty(board, r, c))
         {
-            printf("Invalid Bishop Move, Try Again!!!\n");
+            if (!legalCheck) printf("Invalid Bishop Move, Try Again!!!\n");
             return false;
         }
 
@@ -68,24 +68,31 @@ bool moveBishop(char** board ,Player* player, Move move, Captured* playerCapture
     {
         if(pieceColorAt(board, move.rowNext, move.colNext) == bishop->color)
         {
-            printf("Can't Capture Friendly piece, Try Again!!!\n");
+            if (!legalCheck) printf("Can't Capture Friendly piece, Try Again!!!\n");
             return false;
         }
 
         // Capture Logic
-        playerCaptures->capturedPiece.color = (isupper(board[move.rowNext][move.colNext])) ? COLOR_BLACK: COLOR_WHITE;
-            
-        playerCaptures->capturedPiece.colPosition = move.colNext;
-        playerCaptures->capturedPiece.rowPosition = move.rowNext;
-        playerCaptures->capturedPiece.symbol = board[move.rowNext][move.colNext];
-            
-        playerCaptures->captureCount++;
-        playerCaptures->newCapture = true;
+        if (!legalCheck) 
+        {
+            playerCaptures->capturedPiece.color = (isupper(board[move.rowNext][move.colNext])) ? COLOR_BLACK: COLOR_WHITE;
+                
+            playerCaptures->capturedPiece.colPosition = move.colNext;
+            playerCaptures->capturedPiece.rowPosition = move.rowNext;
+            playerCaptures->capturedPiece.symbol = board[move.rowNext][move.colNext];
+                
+            playerCaptures->captureCount++;
+            playerCaptures->newCapture = true;
+        }
 
     }
 
-    board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
-    bishop->rowPosition = move.rowNext;
-    bishop->colPosition = move.colNext;
+    if (!legalCheck) 
+    { 
+        board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
+        bishop->rowPosition = move.rowNext;
+        bishop->colPosition = move.colNext;
+    }
+
     return true;
 }

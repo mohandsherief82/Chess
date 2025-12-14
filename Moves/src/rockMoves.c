@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <ctype.h>
 
-bool moveRock(char** board ,Player* player, Move move, Captured* playerCaptures)
+bool moveRock(char** board ,Player* player, Move move, Captured* playerCaptures, bool legalCheck)
 {
     int diffrow, diffcol, rowstep = 0, colstep = 0, r, c;
     Rock* rock = (Rock*)checkPromotedPawn(player, move);
@@ -24,12 +24,12 @@ bool moveRock(char** board ,Player* player, Move move, Captured* playerCaptures)
 
     if (rock == NULL)
     {
-        printf("No Rock At This Position, Try Again!!!\n");
+        if (!legalCheck) printf("No Rock At This Position, Try Again!!!\n");
         return false;
     }
     else if (rock->isPinned)
     {
-        printf("This rock is pinned, Try Again!!!\n");
+        if (!legalCheck) printf("This rock is pinned, Try Again!!!\n");
         return false;
     }
 
@@ -38,7 +38,7 @@ bool moveRock(char** board ,Player* player, Move move, Captured* playerCaptures)
 
     if((diffrow != 0) && (diffcol !=0)) 
     {
-        printf("Invalid Rock Move, Try Agian!!!\n");
+        if (!legalCheck) printf("Invalid Rock Move, Try Agian!!!\n");
         return false;
     }
 
@@ -52,7 +52,7 @@ bool moveRock(char** board ,Player* player, Move move, Captured* playerCaptures)
     {
         if(!isEmpty(board, r, c)) // Blocked path.
         {
-            printf("Invalid Rock Move, Try Agian!!!\n");
+            if (!legalCheck) printf("Invalid Rock Move, Try Agian!!!\n");
             return false;
         }
         r += rowstep;
@@ -63,24 +63,31 @@ bool moveRock(char** board ,Player* player, Move move, Captured* playerCaptures)
     {
         if(pieceColorAt(board, move.rowNext, move.colNext) == rock->color)
         {   
-            printf("Can't Capture Friendly Piece, Try Again!!!\n"); 
+            if (!legalCheck) printf("Can't Capture Friendly Piece, Try Again!!!\n"); 
             return false;
         }
 
         // Capture Logic
-        playerCaptures->capturedPiece.color = (isupper(board[move.rowNext][move.colNext])) ? COLOR_BLACK: COLOR_WHITE;
-            
-        playerCaptures->capturedPiece.colPosition = move.colNext;
-        playerCaptures->capturedPiece.rowPosition = move.rowNext;
-        playerCaptures->capturedPiece.symbol = board[move.rowNext][move.colNext];
-            
-        playerCaptures->captureCount++;
-        playerCaptures->newCapture = true;
+        if (!legalCheck) 
+        {    
+            playerCaptures->capturedPiece.color = (isupper(board[move.rowNext][move.colNext])) ? COLOR_BLACK: COLOR_WHITE;
+                
+            playerCaptures->capturedPiece.colPosition = move.colNext;
+            playerCaptures->capturedPiece.rowPosition = move.rowNext;
+            playerCaptures->capturedPiece.symbol = board[move.rowNext][move.colNext];
+                
+            playerCaptures->captureCount++;
+            playerCaptures->newCapture = true;
+        }
     }
     
-    board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
-    rock->rowPosition = move.rowNext;
-    rock->colPosition = move.colNext;
-    rock->firstMove = false;
+    if (!legalCheck) 
+    {
+        board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
+        rock->rowPosition = move.rowNext;
+        rock->colPosition = move.colNext;
+        rock->firstMove = false;
+    }
+
     return true;
 }

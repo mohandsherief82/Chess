@@ -6,6 +6,6 @@
 
 Piece* checkPromotedPawn(Player* player, Move move);
 bool movePawn(char** board, Player* player, Move move
-        , Captured* playerCaptures, int *plyEnPassantCol, int *oppEnPassantCol);
+        , Captured* playerCaptures, int *plyEnPassantCol, int *oppEnPassantCol, bool legalCheck);
 
 #endif

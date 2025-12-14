@@ -110,17 +110,17 @@ bool performCastling(char** board, Player* player, Move move)
 }
 
 
-bool moveKing(char** board, Player* player, Move move, Captured* playerCaptures)
+bool moveKing(char** board, Player* player, Move move, Captured* playerCaptures, bool legalCheck)
 {
     King *king = player->king; 
 
     if (king->rowPosition != move.rowPrev || king->colPosition != move.colPrev)
     {
-        printf("No King at This Position, Try Again!!!\n");
+        if (!legalCheck) printf("No King at This Position, Try Again!!!\n");
         return false;
     }
     
-    if (performCastling(board, player, move)) return true;
+    if (performCastling(board, player, move) && !legalCheck) return true;
 
     for (int i = 0; i < 8; i++)
     {
@@ -132,7 +132,7 @@ bool moveKing(char** board, Player* player, Move move, Captured* playerCaptures)
             {
                 if(pieceColorAt(board, move.rowNext, move.colNext) == player->color)
                 {
-                    printf("Can't Capture Friendly piece, Try Again!!!\n");
+                    if (!legalCheck) printf("Can't Capture Friendly piece, Try Again!!!\n");
                     return false;
                 }
 
@@ -140,28 +140,34 @@ bool moveKing(char** board, Player* player, Move move, Captured* playerCaptures)
                 capturedSymbol = board[move.rowNext][move.colNext];
             }
 
-            board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
-            board[move.rowNext][move.colNext] = king->symbol;
             
             int oldRow = king->rowPosition;
             int oldCol = king->colPosition;
             
-            king->rowPosition = move.rowNext;
-            king->colPosition = move.colNext;
+            if (!legalCheck) 
+            {
+                board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
+                board[move.rowNext][move.colNext] = king->symbol;
+                king->rowPosition = move.rowNext;
+                king->colPosition = move.colNext;
+            }
 
             if (isChecked(board, player))
             {
-                printf("Invalid King Move: Move leaves King in check, Try Again!!!\n");
+                if (!legalCheck) 
+                {
+                    printf("Invalid King Move: Move leaves King in check, Try Again!!!\n");
 
-                king->rowPosition = oldRow;
-                king->colPosition = oldCol;
-                board[move.rowPrev][move.colPrev] = king->symbol;
-                board[move.rowNext][move.colNext] = capturedSymbol;
+                    king->rowPosition = oldRow;
+                    king->colPosition = oldCol;
+                    board[move.rowPrev][move.colPrev] = king->symbol;
+                    board[move.rowNext][move.colNext] = capturedSymbol;
+                }
 
                 return false;
             }
 
-            if (capturedSymbol != EMPTY_SQUARE)
+            if (capturedSymbol != EMPTY_SQUARE && !legalCheck)
             {
                 playerCaptures->capturedPiece.color = (isupper(capturedSymbol)) ? COLOR_BLACK: COLOR_WHITE;
                 playerCaptures->capturedPiece.colPosition = move.colNext;
@@ -173,11 +179,11 @@ bool moveKing(char** board, Player* player, Move move, Captured* playerCaptures)
                 playerCaptures->newCapture = true;
             }
 
-            king->firstMove = false;
+            if (!legalCheck) king->firstMove = false;
             return true;
         }
     }
 
-    printf("Invalid King Move, Try Again!!!\n");
+    if (!legalCheck) printf("Invalid King Move, Try Again!!!\n");
     return false;
 }

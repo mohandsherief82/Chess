@@ -8,7 +8,7 @@
 #include <stdbool.h>
 #include <ctype.h>
 
-bool moveQueen(char** board, Player* player, Move move, Captured* playerCaptures)
+bool moveQueen(char** board, Player* player, Move move, Captured* playerCaptures, bool legalCheck)
 {
     int dispX, dispY, rowStep = 0, colStep = 0, r, c;
     Queen* queen = (Queen*)checkPromotedPawn(player, move);
@@ -23,12 +23,12 @@ bool moveQueen(char** board, Player* player, Move move, Captured* playerCaptures
     
     if (queen == NULL)
     {
-        printf("No Queen At This Position, Try Again!!!\n");
+        if (!legalCheck) printf("No Queen At This Position, Try Again!!!\n");
         return false;
     }
     else if (queen->isPinned)
     {
-        printf("This queen is pinned, Try Again!!!\n");
+        if (!legalCheck) printf("This queen is pinned, Try Again!!!\n");
         return false;
     }
 
@@ -37,7 +37,7 @@ bool moveQueen(char** board, Player* player, Move move, Captured* playerCaptures
 
     if ((dispX != 0 && dispY != 0) && abs(dispX) != abs(dispY)) 
     {
-        printf("Invalid Queen Move, Try Again!!!\n");
+        if (!legalCheck) printf("Invalid Queen Move, Try Again!!!\n");
         return false; 
     }
 
@@ -53,7 +53,7 @@ bool moveQueen(char** board, Player* player, Move move, Captured* playerCaptures
         {
             if(!isEmpty(board, r, c)) 
             {
-                printf("Invalid Queen Move, Try Again!!!\n");
+                if (!legalCheck) printf("Invalid Queen Move, Try Again!!!\n");
                 return false;
             }
 
@@ -67,7 +67,7 @@ bool moveQueen(char** board, Player* player, Move move, Captured* playerCaptures
         {
             if(!isEmpty(board, r, c))
             {
-                printf("Invalid Queen Move, Try Again!!!\n");
+                if (!legalCheck) printf("Invalid Queen Move, Try Again!!!\n");
                 return false;
             }
 
@@ -80,23 +80,29 @@ bool moveQueen(char** board, Player* player, Move move, Captured* playerCaptures
     {
         if(pieceColorAt(board, move.rowNext, move.colNext) == queen->color)
         {
-            printf("Can't Capture Friendly piece, Try Again!!!\n");
+            if (!legalCheck) printf("Can't Capture Friendly piece, Try Again!!!\n");
             return false;
         }
         
-        playerCaptures->capturedPiece.color = (isupper(board[move.rowNext][move.colNext])) ? COLOR_BLACK: COLOR_WHITE;
-        playerCaptures->capturedPiece.colPosition = move.colNext;
-        playerCaptures->capturedPiece.rowPosition = move.rowNext;
-        playerCaptures->capturedPiece.symbol = board[move.rowNext][move.colNext];
-        playerCaptures->capturedPiece.isActive = false;
-        
-        playerCaptures->captureCount++;
-        playerCaptures->newCapture = true;
+        if (!legalCheck) 
+        {
+            playerCaptures->capturedPiece.color = (isupper(board[move.rowNext][move.colNext])) ? COLOR_BLACK: COLOR_WHITE;
+            playerCaptures->capturedPiece.colPosition = move.colNext;
+            playerCaptures->capturedPiece.rowPosition = move.rowNext;
+            playerCaptures->capturedPiece.symbol = board[move.rowNext][move.colNext];
+            playerCaptures->capturedPiece.isActive = false;
+            
+            playerCaptures->captureCount++;
+            playerCaptures->newCapture = true;
+        }
     }
 
-    board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
-    queen->rowPosition = move.rowNext;
-    queen->colPosition = move.colNext;
+    if (!legalCheck) 
+    {
+        board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
+        queen->rowPosition = move.rowNext;
+        queen->colPosition = move.colNext;
+    }
     
     return true;
 }

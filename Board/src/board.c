@@ -84,39 +84,9 @@ void displayBoard(char** board, Player player1, Player player2, Captured ply1Cap
     addPieces(board, player1.king, 1, sizeof(King));
     addPieces(board, player2.king, 1, sizeof(King));
 
-    FILE *fptr = fopen("./Game-End/testing/game.bin", "rb");
-    Move movesToDisplay[MAX_MOVES_TO_DISPLAY];
-    int actualMovesRead = 0;
-    long file_size = 0;
-    size_t move_size = sizeof(Move);
-
-    if (fptr != NULL)
-    {
-        long total_moves_in_file = 0;
-        
-        file_size = getFileSize(fptr);
-        total_moves_in_file = file_size / move_size;
-
-        long moves_to_skip = 0;
-        
-        if (total_moves_in_file > MAX_MOVES_TO_DISPLAY) 
-        {
-            moves_to_skip = total_moves_in_file - MAX_MOVES_TO_DISPLAY;
-            actualMovesRead = MAX_MOVES_TO_DISPLAY;
-        } 
-        else 
-        {
-            moves_to_skip = 0;
-            actualMovesRead = (int)total_moves_in_file;
-        }
-
-        fseek(fptr, moves_to_skip * move_size, SEEK_SET);
-
-        if (actualMovesRead > 0) fread(movesToDisplay, move_size, actualMovesRead, fptr);
-        
-        fclose(fptr);
-        fptr = NULL;
-    }
+    FILE *fptr = fopen("./Game-End/testing/game.bin", "rb"),
+            *f = fopen("test.txt", "wb");
+    long fileSize = getFileSize(fptr);
     
     if (fptr == NULL)
     {
@@ -124,22 +94,20 @@ void displayBoard(char** board, Player player1, Player player2, Captured ply1Cap
         if (ftemp != NULL) fclose(ftemp);
     }
 
+    if (fileSize > sizeof(Move) *  16) fseek(fptr, -(long)(sizeof(Move) * 16), SEEK_END);
+
     for(int i = 0; i < BOARD_SIZE; i++)
     {
+        Move move;
         printf("\t\t");
         
         for (int j = 0; j < 2; j++)
-        {
-            int move_index = actualMovesRead - 16 + (i * 2) + j;
-            
-            if (move_index >= 0 && move_index < actualMovesRead)
-            {
-                Move move = movesToDisplay[move_index];
-                printf("|  %c: %c%d -> %c%d  ", 
-                       ((j == 0) ? move.symbol : toupper(move.symbol)), 
-                       move.colPrev + 'A', 8 - move.rowPrev, 
-                       move.colNext + 'A', 8 - move.rowNext);
-            } 
+        {            
+            if (fread(&move, sizeof(Move), 1, fptr))
+            {    
+                printf("|  %c: %c%d -> %c%d  ", ((j == 0) ? move.symbol : toupper(move.symbol)), move.colPrev + 'A', 8 - move.rowPrev, move.colNext + 'A', 8 - move.rowNext);
+                fprintf(f, "%d", 1);
+            }
             else printf("|               ");
         }
         
@@ -198,6 +166,9 @@ void displayBoard(char** board, Player player1, Player player2, Captured ply1Cap
     printf("\t\t|\t        |\t        |\t    A   B   C   D   E   F   G   H  \t|\t\t\t\t\t\t\t\t   |\n");
     printf("----------------|---------------|---------------|-----------------------------------------------|----------------------"
             "--------------------------------------------|-----------\n");
+
+    fclose(fptr);
+    fclose(f);
 }
 
 

@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <ctype.h>
 
-bool moveKnight(char** board ,Player* player, Move move, Captured* playerCaptures)
+bool moveKnight(char** board ,Player* player, Move move, Captured* playerCaptures, bool legalCheck)
 {
     int dispX, dispY;
     Knight* knight = (Knight*)checkPromotedPawn(player, move);
@@ -24,12 +24,12 @@ bool moveKnight(char** board ,Player* player, Move move, Captured* playerCapture
 
     if (knight == NULL) 
     {
-        printf("No Knight At This Position, Try Agin!!!\n");
+        if (!legalCheck) printf("No Knight At This Position, Try Agin!!!\n");
         return false;
     }
     else if (knight->isPinned)
     {
-        printf("This knight is pinned, Try Again!!!\n");
+        if (!legalCheck) printf("This knight is pinned, Try Again!!!\n");
         return false;
     }
 
@@ -38,7 +38,7 @@ bool moveKnight(char** board ,Player* player, Move move, Captured* playerCapture
 
     if (!((dispX == 2 && dispY == 1) || (dispX == 1 && dispY == 2))) 
     {
-        printf("Invalid Knight Move, Try Again!!!\n");
+        if (!legalCheck) printf("Invalid Knight Move, Try Again!!!\n");
         return false;
     }
 
@@ -46,24 +46,30 @@ bool moveKnight(char** board ,Player* player, Move move, Captured* playerCapture
     {      
         if(pieceColorAt(board, move.rowNext, move.colNext) == knight->color)
         {
-            printf("Invalid Knight Move, Try Again!!!\n");
+            if (!legalCheck) printf("Invalid Knight Move, Try Again!!!\n");
             return false;
         }
         
         // Capture Logic
-        playerCaptures->capturedPiece.color = (isupper(board[move.rowNext][move.colNext])) ? COLOR_BLACK: COLOR_WHITE;
-            
-        playerCaptures->capturedPiece.colPosition = move.colNext;
-        playerCaptures->capturedPiece.rowPosition = move.rowNext;
-        playerCaptures->capturedPiece.symbol = board[move.rowNext][move.colNext];
-            
-        playerCaptures->captureCount++;
-        playerCaptures->newCapture = true;
+        if (!legalCheck) 
+        {
+            playerCaptures->capturedPiece.color = (isupper(board[move.rowNext][move.colNext])) ? COLOR_BLACK: COLOR_WHITE;
+                
+            playerCaptures->capturedPiece.colPosition = move.colNext;
+            playerCaptures->capturedPiece.rowPosition = move.rowNext;
+            playerCaptures->capturedPiece.symbol = board[move.rowNext][move.colNext];
+                
+            playerCaptures->captureCount++;
+            playerCaptures->newCapture = true;
+        }
     }
 
-    board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
-    knight->rowPosition = move.rowNext;
-    knight->colPosition = move.colNext;
+    if (!legalCheck) 
+    {
+            board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
+        knight->rowPosition = move.rowNext;
+        knight->colPosition = move.colNext;
+    }
     
     return true;
 }

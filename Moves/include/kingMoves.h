@@ -4,7 +4,7 @@
 #include "../../Pieces/include/player.h"
 #include "./captures.h"
 
-bool moveKing(char** board, Player* player, Move move, Captured* playerCaptures);
+bool moveKing(char** board, Player* player, Move move, Captured* playerCaptures, bool legalCheck);
 bool isChecked(char** board, Player* player);
 
 #endif

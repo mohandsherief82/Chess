@@ -17,12 +17,12 @@ const char* path = "./Game-End/testing/game.bin";
 void loadPlayerTurn(char** board, Player* player, Move move, Captured* capture
                          , int *whiteEnPassantCol, int *blackEnPassantCol)
 {
-    if (tolower(move.symbol) == 'p') movePawn(board, player, move, capture, whiteEnPassantCol, blackEnPassantCol);
-    else if (tolower(move.symbol) == 'r') moveRock(board, player, move, capture);
-    else if (tolower(move.symbol) == 'n') moveKnight(board, player, move, capture);
-    else if (tolower(move.symbol) == 'b') moveBishop(board, player, move, capture);
-    else if (tolower(move.symbol) == 'q') moveQueen(board, player, move, capture);
-    else if (tolower(move.symbol) == 'k') moveKing(board, player, move, capture);
+    if (tolower(move.symbol) == 'p') movePawn(board, player, move, capture, whiteEnPassantCol, blackEnPassantCol, false);
+    else if (tolower(move.symbol) == 'r') moveRock(board, player, move, capture, false);
+    else if (tolower(move.symbol) == 'n') moveKnight(board, player, move, capture, false);
+    else if (tolower(move.symbol) == 'b') moveBishop(board, player, move, capture, false);
+    else if (tolower(move.symbol) == 'q') moveQueen(board, player, move, capture, false);
+    else if (tolower(move.symbol) == 'k') moveKing(board, player, move, capture, false);
 
 }
 

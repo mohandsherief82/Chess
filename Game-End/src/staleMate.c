@@ -72,6 +72,7 @@ void freeCopy(Player copyPlayer, char** copyBoard)
 
 bool legalMove(char** board, Player* player)
 {
+    bool legalCheck = true;
     Move testMove;
     Captured tempCapture = {0};
     
@@ -102,12 +103,12 @@ bool legalMove(char** board, Player* player)
                     bool moveSuccessful = false;
                     char pieceType = tolower(testMove.symbol);
                     
-                    if (pieceType == 'p') moveSuccessful = movePawn(cpyBoard , &cpyPlayer, testMove, &tempCapture, &plyEpCol, &oppEpCol);
-                    else if (pieceType == 'r') moveSuccessful = moveRock(cpyBoard , &cpyPlayer, testMove, &tempCapture);
-                    else if (pieceType == 'n') moveSuccessful = moveKnight(cpyBoard , &cpyPlayer, testMove, &tempCapture);
-                    else if (pieceType == 'b') moveSuccessful = moveBishop(cpyBoard , &cpyPlayer, testMove, &tempCapture);
-                    else if (pieceType == 'q') moveSuccessful = moveQueen(cpyBoard , &cpyPlayer, testMove, &tempCapture);
-                    else if (pieceType == 'k') moveSuccessful = moveKing(cpyBoard , &cpyPlayer, testMove, &tempCapture);
+                    if (pieceType == 'p') moveSuccessful = movePawn(cpyBoard , &cpyPlayer, testMove, &tempCapture, &plyEpCol, &oppEpCol, legalCheck);
+                    else if (pieceType == 'r') moveSuccessful = moveRock(cpyBoard , &cpyPlayer, testMove, &tempCapture, legalCheck);
+                    else if (pieceType == 'n') moveSuccessful = moveKnight(cpyBoard , &cpyPlayer, testMove, &tempCapture, legalCheck);
+                    else if (pieceType == 'b') moveSuccessful = moveBishop(cpyBoard , &cpyPlayer, testMove, &tempCapture, legalCheck);
+                    else if (pieceType == 'q') moveSuccessful = moveQueen(cpyBoard , &cpyPlayer, testMove, &tempCapture, legalCheck);
+                    else if (pieceType == 'k') moveSuccessful = moveKing(cpyBoard , &cpyPlayer, testMove, &tempCapture, legalCheck);
 
                     if (moveSuccessful && !isChecked(cpyBoard, &cpyPlayer))
                     {
