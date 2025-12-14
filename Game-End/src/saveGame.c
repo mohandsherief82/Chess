@@ -10,6 +10,8 @@
 #include "../../Moves/include/queenMoves.h"
 #include "../../Moves/include/kingMoves.h"
 #include "../../Moves/include/captures.h"
+#include "../../Board/include/board.h"
+#include "../../Pieces/include/player.h"
 #include "../../chessTypes.h"
 
 const char* path = "./Game-End/testing/game.bin";
@@ -73,7 +75,7 @@ int loadGame(char** board, Player* player1, Player* player2, Captured* ply1Captu
 void undoLastMove(char** board, Player* player1, Player* player2, Captured* ply1Captures
             , Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol)
 {
-    FILE* fptr = fopen(path, "wb+");
+    FILE* fptr = fopen(path, "rb");
 
     fseek(fptr, 0, SEEK_END);
     int totalMoves = ftell(fptr) / sizeof(Move);
@@ -81,9 +83,24 @@ void undoLastMove(char** board, Player* player1, Player* player2, Captured* ply1
     Move* backMove = malloc(sizeof(Move) * (totalMoves -1));
     fseek(fptr, 0, SEEK_SET);
     fread(backMove, sizeof(Move), totalMoves -1, fptr);
+    fclose(fptr);
+    fptr = fopen(path, "wb");
     fwrite(backMove, sizeof(Move), totalMoves -1, fptr);
     fclose(fptr);
     free(backMove);
+
+    for(int i=0; i<BOARD_SIZE; i++)
+    {
+        for(int j =0; j <BOARD_SIZE;j++) board[i][j] = EMPTY_SQUARE;
+    }
+
+    freePlayer(*player1);
+    freePlayer(*player2);
+    *player1 = createPlayer(COLOR_WHITE);
+    *player2 = createPlayer(COLOR_BLACK);
+    
+    *ply1Captures = initializeCapture(COLOR_WHITE);
+    *ply2Captures = initializeCapture(COLOR_BLACK);
 
     loadGame(board, player1, player2, ply1Captures
             , ply2Captures, whiteEnPassantCol, blackEnPassantCol);
