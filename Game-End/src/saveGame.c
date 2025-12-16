@@ -79,7 +79,11 @@ void undoLastMove(char** board, Player* player1, Player* player2, Captured* ply1
 
     fseek(fptr, 0, SEEK_END);
     int totalMoves = ftell(fptr) / sizeof(Move);
-
+    if(totalMoves ==0)
+    {
+        fclose(fptr);
+        return;
+    }
     Move* backMove = malloc(sizeof(Move) * (totalMoves -1));
     fseek(fptr, 0, SEEK_SET);
     fread(backMove, sizeof(Move), totalMoves -1, fptr);
