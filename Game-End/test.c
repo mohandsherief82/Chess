@@ -131,13 +131,15 @@ int main ()
             if (gameState == 's') break;
             else if (gameState == 'u')
             {
-                undoLastMove(board, &ply1, &ply2, &whiteCaptures, &blackCaptures
-                            , &whiteEnPassantCol, &blackEnPassantCol);
+                if(undoLastMove(board, &ply1, &ply2, &whiteCaptures, &blackCaptures
+                            , &whiteEnPassantCol, &blackEnPassantCol))
+                {
                 printf("Move undone.\nReturning turn to player 2!!!\n");
                 currentPlayerTurn = 2;
                 clearScreen();
                 displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
-                
+                }
+                else printf("No moves to undo \n");
                 continue;
             }
             else if (gameState == 'i') 
