@@ -1,7 +1,7 @@
-#include "../Moves/include/kingMoves.h"
+#include "../../Moves/include/kingMoves.h"
 #include "../include/saveGame.h"
-#include "../Board/include/board.h"
-#include "../Pieces/include/player.h"
+#include "../../Board/include/board.h"
+#include "../../Pieces/include/player.h"
 
 #include <stdbool.h>
 #include <stdlib.h>
