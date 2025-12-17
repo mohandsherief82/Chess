@@ -13,6 +13,7 @@
 #include "../../Board/include/board.h"
 #include "../../Pieces/include/player.h"
 #include "../../chessTypes.h"
+#include "../include/check.h"
 
 const char* path = "./Game-End/testing/game.bin";
 
@@ -64,8 +65,8 @@ int loadGame(char** board, Player* player1, Player* player2, Captured* ply1Captu
     
     fclose(fptr);
     
-    isChecked(board, player1);
-    isChecked(board, player2);
+    isChecked(board, player1, false);
+    isChecked(board, player2, false);
     
     if (totalMovesRead == 0 || totalMovesRead % 2 == 0) return 1;
     else return 2;

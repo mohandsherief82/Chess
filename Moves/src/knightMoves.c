@@ -7,15 +7,15 @@
 #include <stdio.h>
 #include <ctype.h>
 
-bool moveKnight(char** board ,Player* player, Move move, Captured* playerCaptures, bool legalCheck)
+bool moveKnight(char** board, Player* player, Move move, Captured* playerCaptures, bool legalCheck) 
 {
     int dispX, dispY;
     Knight* knight = (Knight*)checkPromotedPawn(player, move);
 
-    for (int i = 0; i < NUM_PIECES; i++)
+    for (int i = 0; i < NUM_PIECES; i++) 
     {
         if (player->knights[i].colPosition == move.colPrev && player->knights[i].isActive
-                && player->knights[i].rowPosition == move.rowPrev)
+                && player->knights[i].rowPosition == move.rowPrev) 
         {
             knight = &player->knights[i];
             break;
@@ -27,7 +27,7 @@ bool moveKnight(char** board ,Player* player, Move move, Captured* playerCapture
         if (!legalCheck) printf("No Knight At This Position, Try Agin!!!\n");
         return false;
     }
-    else if (knight->isPinned)
+    if (knight->isPinned) 
     {
         if (!legalCheck) printf("This knight is pinned, Try Again!!!\n");
         return false;
@@ -42,34 +42,26 @@ bool moveKnight(char** board ,Player* player, Move move, Captured* playerCapture
         return false;
     }
 
-    if(!isEmpty(board, move.rowNext, move.colNext))
+    if(!isEmpty(board, move.rowNext, move.colNext)) 
     {      
-        if(pieceColorAt(board, move.rowNext, move.colNext) == knight->color)
+        if(pieceColorAt(board, move.rowNext, move.colNext) == knight->color) 
         {
             if (!legalCheck) printf("Invalid Knight Move, Try Again!!!\n");
             return false;
         }
-        
-        // Capture Logic
+
         if (!legalCheck) 
         {
-            playerCaptures->capturedPiece.color = (isupper(board[move.rowNext][move.colNext])) ? COLOR_BLACK: COLOR_WHITE;
-                
-            playerCaptures->capturedPiece.colPosition = move.colNext;
-            playerCaptures->capturedPiece.rowPosition = move.rowNext;
             playerCaptures->capturedPiece.symbol = board[move.rowNext][move.colNext];
-                
             playerCaptures->captureCount++;
             playerCaptures->newCapture = true;
         }
     }
 
-    if (!legalCheck) 
-    {
-            board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
-        knight->rowPosition = move.rowNext;
-        knight->colPosition = move.colNext;
-    }
+    board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
+    board[move.rowNext][move.colNext] = move.symbol;
+    knight->rowPosition = move.rowNext;
+    knight->colPosition = move.colNext;
     
     return true;
 }

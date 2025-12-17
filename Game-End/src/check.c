@@ -76,17 +76,20 @@ Piece* findPiece(Player* player, Move move)
 }
 
 
-bool isChecked(char** board, Player* player)
+bool isChecked(char** board, Player* player, bool legalCheck)
 {
     King* king = player->king;
     
-    for (int i = 0; i < NUM_PAWNS; i++) player->pawns[i].isPinned = false;
-    for (int i = 0; i < NUM_PIECES; i++) player->rocks[i].isPinned = false;
-    for (int i = 0; i < NUM_PIECES; i++) player->knights[i].isPinned = false;
-    for (int i = 0; i < NUM_PIECES; i++) player->bishops[i].isPinned = false;
-    if (player->queen != NULL) player->queen->isPinned = false; 
+    if (!legalCheck)
+    {
+        for (int i = 0; i < NUM_PAWNS; i++) player->pawns[i].isPinned = false;
+        for (int i = 0; i < NUM_PIECES; i++) player->rocks[i].isPinned = false;
+        for (int i = 0; i < NUM_PIECES; i++) player->knights[i].isPinned = false;
+        for (int i = 0; i < NUM_PIECES; i++) player->bishops[i].isPinned = false;
+        if (player->queen != NULL) player->queen->isPinned = false; 
+        king->isChecked = false; 
+    }
     
-    king->isChecked = false; 
     int r, c;
 
     for (int i = 0; i < 8; i++)
@@ -100,8 +103,11 @@ bool isChecked(char** board, Player* player)
             {
                 if (tolower(board[r][c]) == 'n' && (islower(king->symbol) != islower(board[r][c])))
                 {
-                    king->isChecked = true;
-                    printf("King is checked by a Knight at (%c%d)!!!\n", c + 'A', r);
+                    if (!legalCheck)
+                    {
+                        king->isChecked = true;
+                        printf("King is checked by a Knight at (%c%d)!!!\n", c + 'A', r);
+                    }
                     return true;
                 }
             }
@@ -125,51 +131,60 @@ bool isChecked(char** board, Player* player)
                        
             if (pieceColorAt(board, r, c) != player->color)
             {           
-                // Case A: Opposing piece found
                 if (pinCandidate == NULL)
                 {
                     char piece = tolower(board[r][c]);
 
-                    // Direct check by orthogonal attacker
                     if (isOrthogonal && (piece == 'r' || piece == 'q'))
                     {
-                        king->isChecked = true;
-                        if (piece == 'r') printf("King is checked by a Rook at (%c%d)!!!\n", c + 'A', r);
-                        else printf("King is checked by a Queen at (%c%d)!!!\n", c + 'A', r);
+                        if (!legalCheck)
+                        {
+                            king->isChecked = true;
+                            if (piece == 'r') printf("King is checked by a Rook at (%c%d)!!!\n", c + 'A', r);
+                            else printf("King is checked by a Queen at (%c%d)!!!\n", c + 'A', r);
+                        }
                         return true;
                     }
                     
-                    // Direct check by diagonal attacker
                     if (isDiagonal && (piece == 'b' || piece == 'q'))
                     {
-                        king->isChecked = true;
-                        if (piece == 'b') printf("King is checked by a Bishop at (%c%d)!!!\n", c + 'A', r);
-                        else printf("King is checked by a Queen at (%c%d)!!!\n", c + 'A', r);
+                        if (!legalCheck)
+                        {
+                            king->isChecked = true;
+                            if (piece == 'b') printf("King is checked by a Bishop at (%c%d)!!!\n", c + 'A', r);
+                            else printf("King is checked by a Queen at (%c%d)!!!\n", c + 'A', r);
+                        }
                         return true;
                     }
                     
-                    // Direct check by Pawn (only 1 step away, diagonal)
                     if (step == 1 && isDiagonal && piece == 'p')
                     {
-                        // White King checked by Black Pawn moves up (row -1)
                         if (islower(king->symbol) && movesRBRow[d] == -1)
                         {
-                            king->isChecked = true;
-                            printf("White King is checked by a Black Pawn at (%c%d)!\n", c + 'A', r);
+                            if (!legalCheck)
+                            {
+                                king->isChecked = true;
+                                printf("White King is checked by a Black Pawn at (%c%d)!\n", c + 'A', r);
+                            }
                             return true;
                         }
-                        // Black King checked by White Pawn moves down (row +1)
                         if (isupper(king->symbol) && movesRBRow[d] == 1)
                         {
-                            king->isChecked = true;
-                            printf("Black King is checked by a White Pawn at (%c%d)!\n", c + 'A', r);
+                            if (!legalCheck)
+                            {
+                                king->isChecked = true;
+                                printf("Black King is checked by a White Pawn at (%c%d)!\n", c + 'A', r);
+                            }
                             return true;
                         }
                     }
                     if (step == 1 && piece == 'k')
                     {
-                        king->isChecked = true;
-                        printf("King is checked by the opposing King at (%c%d)!!!\n", c + 'A', r);
+                        if (!legalCheck)
+                        {
+                            king->isChecked = true;
+                            printf("King is checked by the opposing King at (%c%d)!!!\n", c + 'A', r);
+                        }
                         return true;
                     }
                     
@@ -177,15 +192,14 @@ bool isChecked(char** board, Player* player)
                 } 
                 else 
                 {
-                    char pieceType = tolower(board[r][c]);
-                    
-                    bool isPinningAttacker = false;
-                    
-                    if (isOrthogonal && (pieceType == 'r' || pieceType == 'q')) isPinningAttacker = true;
-                    if (isDiagonal && (pieceType == 'b' || pieceType == 'q')) isPinningAttacker = true;
-
-                    if (isPinningAttacker) pinCandidate->isPinned = true;
-                    
+                    if (!legalCheck)
+                    {
+                        char pieceType = tolower(board[r][c]);
+                        bool isPinningAttacker = false;
+                        if (isOrthogonal && (pieceType == 'r' || pieceType == 'q')) isPinningAttacker = true;
+                        if (isDiagonal && (pieceType == 'b' || pieceType == 'q')) isPinningAttacker = true;
+                        if (isPinningAttacker) pinCandidate->isPinned = true;
+                    }
                     break;
                 }
             }
@@ -200,7 +214,6 @@ bool isChecked(char** board, Player* player)
                     };                 
                     
                     pinCandidate = findPiece(player, move);
-                    
                     if (pinCandidate == NULL) break;
                 }
                 else break;

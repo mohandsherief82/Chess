@@ -9,6 +9,7 @@
 #include  "../../Board/include/board.h"
 #include  "../../chessTypes.h"
 #include  "../../Pieces/include/player.h"
+#include "../include/check.h"
 
 #include <stdio.h>
 #include <stdbool.h>
@@ -110,7 +111,7 @@ bool legalMove(char** board, Player* player)
                     else if (pieceType == 'q') moveSuccessful = moveQueen(cpyBoard , &cpyPlayer, testMove, &tempCapture, legalCheck);
                     else if (pieceType == 'k') moveSuccessful = moveKing(cpyBoard , &cpyPlayer, testMove, &tempCapture, legalCheck);
 
-                    if (moveSuccessful && !isChecked(cpyBoard, &cpyPlayer))
+                    if (moveSuccessful && !isChecked(cpyBoard, &cpyPlayer, true))
                     {
                         freeCopy(cpyPlayer, cpyBoard);
                         return true;
@@ -131,6 +132,6 @@ bool legalMove(char** board, Player* player)
 
 bool checkStalemate(char** board, Player* player)
 {
-    if(!legalMove(board, player) && !isChecked(board, player)) return true;
+    if(!legalMove(board, player) && !isChecked(board, player, true)) return true;
     else return false;
 }

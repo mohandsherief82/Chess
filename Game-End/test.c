@@ -15,6 +15,7 @@
 #include "../Pieces/include/player.h"
 #include "./include/staleMate.h"
 #include "./include/checkMate.h"
+#include "./include/check.h"
 
 extern char *path;
 
@@ -47,7 +48,7 @@ char playerTurn(char** board, Player* player, Captured* capture, int* plyEnPassa
         
         if (!pieceMoveValid) continue;
         
-        if (isChecked(board, player))
+        if (isChecked(board, player, legalCheck))
         {
             printf("Illegal move: King remains in check, Try Again!!!\n");            
             return 'i'; 
@@ -123,7 +124,7 @@ int main ()
         {
             printf("Player 1's turn: \n");
 
-            isChecked(board, &ply1);
+            isChecked(board, &ply1, false);
             gameState = playerTurn(board, &ply1, &whiteCaptures, &whiteEnPassantCol, &blackEnPassantCol);
 
             if (whiteCaptures.newCapture == true) capturePiece(ply2, &whiteCaptures);
@@ -152,12 +153,12 @@ int main ()
             displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
             currentPlayerTurn = 2;
 
-            // if (checkMate(board, &ply2))
-            // {
-            //     printf("Game Ended By Checkmate.\nPlayer 1 wins!!!\n");
-            //     remove(path);
-            //     break;
-            // }
+            if (checkMate(board, &ply2))
+            {
+                printf("Game Ended By Checkmate.\nPlayer 1 wins!!!\n");
+                remove(path);
+                break;
+            }
 
             if (blackEnPassantCol != -1) blackEnPassantCol = -1; 
         }
@@ -167,7 +168,7 @@ int main ()
         {
             printf("Player 2's turn: \n");
             
-            isChecked(board, &ply2);
+            isChecked(board, &ply2, false);
             gameState = playerTurn(board, &ply2, &blackCaptures, &blackEnPassantCol, &whiteEnPassantCol);
             if (blackCaptures.newCapture == true) capturePiece(ply1, &blackCaptures);
             
@@ -195,12 +196,12 @@ int main ()
             displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
             currentPlayerTurn = 1;
 
-            // if (checkMate(board, &ply1))
-            // {
-            //     printf("Game Ended By Checkmate.\nPlayer 2 wins!!!\n");
-            //     remove(path);
-            //     break;
-            // }
+            if (checkMate(board, &ply1))
+            {
+                printf("Game Ended By Checkmate.\nPlayer 2 wins!!!\n");
+                remove(path);
+                break;
+            }
 
             if (whiteEnPassantCol != -1) whiteEnPassantCol = -1; 
         }

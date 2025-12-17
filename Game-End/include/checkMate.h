@@ -6,4 +6,4 @@
 
 bool checkMate(char** board, Player* currentPlayer);
 
-#endif // CHECKMATE_H
+#endif

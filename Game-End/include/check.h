@@ -5,6 +5,6 @@
 
 #include "../../Pieces/include/player.h"
 
-bool isChecked(char** board, Player* player);
+bool isChecked(char** board, Player* player, bool legalCheck);
 
 #endif
