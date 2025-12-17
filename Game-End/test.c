@@ -48,9 +48,9 @@ char playerTurn(char** board, Player* player, Captured* capture, int* plyEnPassa
         
         if (!pieceMoveValid) continue;
         
-        if (isChecked(board, player, legalCheck))
+        if (isChecked(board, player, !legalCheck))
         {
-            printf("Illegal move: King remains in check, Try Again!!!\n");            
+            printf("Illegal move: King remains in check, Try Again!!!\n\n");            
             return 'i'; 
         }
 
@@ -135,19 +135,24 @@ int main ()
                 if(undoLastMove(board, &ply1, &ply2, &whiteCaptures, &blackCaptures
                             , &whiteEnPassantCol, &blackEnPassantCol))
                 {
-                printf("Move undone.\nReturning turn to player 2!!!\n");
-                currentPlayerTurn = 2;
-                clearScreen();
-                displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
+                    printf("Move undone.\nReturning turn to player 2!!!\n");
+                    currentPlayerTurn = 2;
+                    clearScreen();
+                    displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
                 }
-                else printf("No moves to undo \n");
-                continue;
+                else 
+                {
+                    printf("No moves to undo, Try Again!!!\n");
+                    continue;
+                }
             }
-            else if (gameState == 'i') 
+            else if (gameState == 'i')
             {
+                clearScreen();
                 loadGame(board, &ply1, &ply2, 
                             &whiteCaptures, &blackCaptures, 
                                 &whiteEnPassantCol, &blackEnPassantCol);
+                displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
                 continue;
             }
 
