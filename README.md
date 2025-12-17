@@ -132,7 +132,7 @@ typedef struct
 
 * The rock moves in a *straight line* shape so that the difference between two cells should not be equal to *zero* in one direction, and the difference should be equal to *zero* in the other direction.
 
-* The *moveKRock* function starts by finding the required rock that we want to move and then checks if it can be moved (e.g., pinned) and then checks the *straight-shaped* condition by calculating the difference between the current cell and the required cell in the X and Y directions. If the diagonal shape is valid, it checks each cell on the way. If there exists any piece on the way, the move cannot be done until it reaches the destination cell. If there exists a piece, it captures it in case it's an enemy one; if it's friendly, then the move cannot be done.
+* The *moveRock* function starts by finding the required rock that we want to move and then checks if it can be moved (e.g., pinned) and then checks the *straight-shaped* condition by calculating the difference between the current cell and the required cell in the X and Y directions. If the diagonal shape is valid, it checks each cell on the way. If there exists any piece on the way, the move cannot be done until it reaches the destination cell. If there exists a piece, it captures it in case it's an enemy one; if it's friendly, then the move cannot be done.
 
 #### Bishop Movement
 
