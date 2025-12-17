@@ -10,7 +10,8 @@
 
 ### Pieces
 
-* Since Each piece represents its own entity, so for each type of piece has its own structure that follow a general piece structure.
+* Since Each piece represents its own entity, so for each type of piece has its own structure that follow a general piece st
+    *promotionSymbol = pawn->symbol;ructure.
 
 ~~~
 typedef struct
@@ -133,6 +134,17 @@ typedef struct
 
 #### King Movement
 
+* The king moves in the 8 cells around him, so his movement pattern can be done using a direction matrices one for the x axis and one for the y axis, the logic was implemented by moveing the king then checking whether he is checked or not.
+* Also the king can castle, if it is his first move and there is no enemy piece cutting it of, the logic for castling has been implemented by mutliple king moves then checking if the king is checked in each position and if he is checked the castling act is stopped.
+* The most important piece for the king motion is the isChecked function, which checks whether the king is checked by looking out for enemy pieces on their move patterns for example the rock on the horizontal and vertical axis around it, this function also is responisble for piece pinning, and it works by finding a friendly piece then continue traversing in the direction to see if an enemy piece that can be blocked is in the way and if it finds a friendly piece it stops checking.
+
 #### Captures
 
 ### Game end states
+
+#### Stalemate
+
+#### Checkmate
+
+* It depends on the isChecked function and legalMove function that is implemented alone and with the stalemate logic respectively, and the logic flags a checkmate if the king is in check and there is no legal moves that can be done.
+* The legal move function covers all types of piece moves including blocks, which make this logic possible.
