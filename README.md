@@ -124,9 +124,21 @@ typedef struct
 
 #### Knight Movement
 
+* The knight moves in an *L* shape so that the difference between two cells equals 2 in one direction, and the difference equals 1 in the other direction.
+
+* The *moveKnight* function starts by finding the required knight that we want to move and then checks if it can be moved (e.g., pinned), then checks the L-shaped condition by calculating the difference between the current cell and the required cell in the X and Y directions. If the *L* shape is valid, it checks the destination cell; if there is an enemy piece, it captures it, but if it is a friendly piece, then the move cannot be done.
+
 #### Rock Movement
 
+* The rock moves in a *straight line* shape so that the difference between two cells should not be equal to *zero* in one direction, and the difference should be equal to *zero* in the other direction.
+
+* The *moveKRock* function starts by finding the required rock that we want to move and then checks if it can be moved (e.g., pinned) and then checks the *straight-shaped* condition by calculating the difference between the current cell and the required cell in the X and Y directions. If the diagonal shape is valid, it checks each cell on the way. If there exists any piece on the way, the move cannot be done until it reaches the destination cell. If there exists a piece, it captures it in case it's an enemy one; if it's friendly, then the move cannot be done.
+
 #### Bishop Movement
+
+* The bishop moves in a *diagonal* shape so that the difference between two cells should be equal in both X and Y directions.
+
+* The *moveKBishop* function starts by finding the required bishop that we want to move and then checks if it can be moved (e.g., pinned), then checks the *diagonally* shaped condition by calculating the difference between the current cell and the required cell in X and Y directions. If the diagonal shape is valid, it checks each cell on the way. If there exists any piece on the way, the move cannot be done until it reaches the destination cell. If there exists a piece, it captures it in case it's an enemy one; if it's friendly, then the move cannot be done.
 
 #### Queen Movement
 
@@ -142,9 +154,21 @@ typedef struct
 
 ### Game end states
 
+* The game could end by *Stalemate* or *Checkmate*, each of these has its own function and logic in implementation.
+
 #### Stalemate
+
+* When the king is not in check, and the player whose turn it is has no legal moves available, the game ends with a draw.
+
+* The *checkStalemate* function checks if there exists at least one legal move and the king is not in check; this happens with helper functions.
+
+* The copy board/player functions, which are auxiliary functions helping us to copy all the content of the player/board.
+
+* The *legalMove* function, which is an essential helping function in stalemate, checks every possible move that can happen by iterating through every piece and trying to move it around all the cells of the board. This happens on the copied board/player, which happens in the background of the game while it's being played without affecting it, as we are working on a deep copy of the board and player. If the function finds a legal move, it stops immediately; if not, it continues searching until it completes the iteration. The true/false value returning from this function is helping us check for stalemate, which happens in the *checkStalemate* function.
+
 
 #### Checkmate
 
 * It depends on the isChecked function and legalMove function that is implemented alone and with the stalemate logic respectively, and the logic flags a checkmate if the king is in check and there is no legal moves that can be done.
+
 * The legal move function covers all types of piece moves including blocks, which make this logic possible.
