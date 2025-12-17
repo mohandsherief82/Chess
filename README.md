@@ -138,7 +138,7 @@ typedef struct
 
 * The bishop moves in a *diagonal* shape so that the difference between two cells should be equal in both X and Y directions.
 
-* The *moveKBishop* function starts by finding the required bishop that we want to move and then checks if it can be moved (e.g., pinned), then checks the *diagonally* shaped condition by calculating the difference between the current cell and the required cell in X and Y directions. If the diagonal shape is valid, it checks each cell on the way. If there exists any piece on the way, the move cannot be done until it reaches the destination cell. If there exists a piece, it captures it in case it's an enemy one; if it's friendly, then the move cannot be done.
+* The *moveBishop* function starts by finding the required bishop that we want to move and then checks if it can be moved (e.g., pinned), then checks the *diagonally* shaped condition by calculating the difference between the current cell and the required cell in X and Y directions. If the diagonal shape is valid, it checks each cell on the way. If there exists any piece on the way, the move cannot be done until it reaches the destination cell. If there exists a piece, it captures it in case it's an enemy one; if it's friendly, then the move cannot be done.
 
 #### Queen Movement
 
