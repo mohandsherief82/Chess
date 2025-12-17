@@ -73,7 +73,7 @@ int loadGame(char** board, Player* player1, Player* player2, Captured* ply1Captu
 }
 
 
-void undoLastMove(char** board, Player* player1, Player* player2, Captured* ply1Captures
+bool undoLastMove(char** board, Player* player1, Player* player2, Captured* ply1Captures
             , Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol)
 {
     FILE* fptr = fopen(path, "rb");
@@ -83,7 +83,7 @@ void undoLastMove(char** board, Player* player1, Player* player2, Captured* ply1
     if(totalMoves ==0)
     {
         fclose(fptr);
-        return;
+        return false;
     }
     Move* backMove = malloc(sizeof(Move) * (totalMoves -1));
     fseek(fptr, 0, SEEK_SET);
@@ -109,6 +109,7 @@ void undoLastMove(char** board, Player* player1, Player* player2, Captured* ply1
 
     loadGame(board, player1, player2, ply1Captures
             , ply2Captures, whiteEnPassantCol, blackEnPassantCol);
+    return true;
 }
 
 
