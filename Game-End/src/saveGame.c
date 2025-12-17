@@ -17,16 +17,19 @@
 
 const char* path = "./Game-End/testing/game.bin";
 
-void loadPlayerTurn(char** board, Player* player, Move move, Captured* capture
-                         , int *whiteEnPassantCol, int *blackEnPassantCol)
+bool loadPlayerTurn(char** board, Player* player, Move move, Captured* capture, int *whiteEnPassantCol, int *blackEnPassantCol) 
 {
-    if (tolower(move.symbol) == 'p') movePawn(board, player, move, capture, whiteEnPassantCol, blackEnPassantCol, false);
-    else if (tolower(move.symbol) == 'r') moveRock(board, player, move, capture, false);
-    else if (tolower(move.symbol) == 'n') moveKnight(board, player, move, capture, false);
-    else if (tolower(move.symbol) == 'b') moveBishop(board, player, move, capture, false);
-    else if (tolower(move.symbol) == 'q') moveQueen(board, player, move, capture, false);
-    else if (tolower(move.symbol) == 'k') moveKing(board, player, move, capture, false);
+    bool state;
+    char sym = tolower(move.symbol);
 
+    if (sym == 'p') state = movePawn(board, player, move, capture, whiteEnPassantCol, blackEnPassantCol, false);
+    else if (sym == 'r') state = moveRock(board, player, move, capture, false);
+    else if (sym == 'n') state = moveKnight(board, player, move, capture, false);
+    else if (sym == 'b') state = moveBishop(board, player, move, capture, false);
+    else if (sym == 'q') state = moveQueen(board, player, move, capture, false);
+    else if (sym == 'k') state = moveKing(board, player, move, capture, false);
+    
+    return state;
 }
 
 
@@ -58,18 +61,16 @@ int loadGame(char** board, Player* player1, Player* player2, Captured* ply1Captu
         {
             loadPlayerTurn(board, player2, move[1], ply2Captures, blackEnPassantCol, whiteEnPassantCol);
             if (ply2Captures->newCapture == true) capturePiece(*player1, ply2Captures);
-            totalMovesRead++;
-        } 
+        totalMovesRead++;
+    }    
         else break; 
     }    
     
     fclose(fptr);
-    
     isChecked(board, player1, false);
     isChecked(board, player2, false);
     
-    if (totalMovesRead == 0 || totalMovesRead % 2 == 0) return 1;
-    else return 2;
+    return (totalMovesRead % 2 == 0) ? 1 : 2;
 }
 
 
@@ -86,12 +87,12 @@ bool undoLastMove(char** board, Player* player1, Player* player2, Captured* ply1
         return false;
     }
     Move* backMove = malloc(sizeof(Move) * (totalMoves -1));
-    fseek(fptr, 0, SEEK_SET);
+            fseek(fptr, 0, SEEK_SET);
     fread(backMove, sizeof(Move), totalMoves -1, fptr);
     fclose(fptr);
     fptr = fopen(path, "wb");
     fwrite(backMove, sizeof(Move), totalMoves -1, fptr);
-    fclose(fptr);
+        fclose(fptr);
     free(backMove);
 
     for(int i=0; i<BOARD_SIZE; i++)
@@ -103,7 +104,6 @@ bool undoLastMove(char** board, Player* player1, Player* player2, Captured* ply1
     freePlayer(*player2);
     *player1 = createPlayer(COLOR_WHITE);
     *player2 = createPlayer(COLOR_BLACK);
-    
     *ply1Captures = initializeCapture(COLOR_WHITE);
     *ply2Captures = initializeCapture(COLOR_BLACK);
 
@@ -116,9 +116,9 @@ bool undoLastMove(char** board, Player* player1, Player* player2, Captured* ply1
 void saveMove(Move move)
 {
     FILE* fptr = fopen(path, "ab");
-    
-    fwrite(&move, sizeof(Move), 1, fptr);
-    
-    fclose(fptr);
-    return;
+    if (fptr)
+    {
+        fwrite(&move, sizeof(Move), 1, fptr);
+        fclose(fptr);
+    }
 }

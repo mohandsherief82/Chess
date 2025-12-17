@@ -13,7 +13,7 @@ const int dy[8] = {-1, -1, -1,  0, 0,  1, 1, 1};
 
 bool performCastling(char** board, Player* player, Move move, bool legalCheck)
 {
-    if (isChecked(board, player, legalCheck)) 
+    if (isChecked(board, player, true)) 
     {
         if (!legalCheck) printf("Invalid Castling: King is currently in check.\n");
         return false;
@@ -30,7 +30,7 @@ bool performCastling(char** board, Player* player, Move move, bool legalCheck)
                 board[move.rowPrev][4] = EMPTY_SQUARE; 
                 player->king->colPosition = 3;
                 
-                if (isChecked(board, player, legalCheck)) 
+                if (isChecked(board, player, true)) 
                 {
                     if (!legalCheck) printf("Invalid Castling: King passes through an attacked square (D-file)!\n");
 
@@ -43,7 +43,7 @@ bool performCastling(char** board, Player* player, Move move, bool legalCheck)
                 board[move.rowPrev][2] = player->king->symbol;
                 board[move.rowPrev][3] = EMPTY_SQUARE;
                 player->king->colPosition = 2;
-                if (isChecked(board, player, legalCheck)) 
+                if (isChecked(board, player, true)) 
                 {
                     if (!legalCheck) printf("Invalid Castling: King lands on an attacked square (C-file)!\n");
 
@@ -79,7 +79,7 @@ bool performCastling(char** board, Player* player, Move move, bool legalCheck)
                 board[move.rowPrev][4] = EMPTY_SQUARE; 
                 player->king->colPosition = 5;
                 
-                if (isChecked(board, player, legalCheck))
+                if (isChecked(board, player, true))
                 {
                     if (!legalCheck) printf("Invalid Castling: King passes through an attacked square (F-file)!\n");
                     
@@ -92,7 +92,7 @@ bool performCastling(char** board, Player* player, Move move, bool legalCheck)
                 board[move.rowPrev][6] = player->king->symbol;
                 board[move.rowPrev][5] = EMPTY_SQUARE;
                 player->king->colPosition = 6;
-                if (isChecked(board, player, legalCheck)) 
+                if (isChecked(board, player, true)) 
                 {
                     if (!legalCheck) printf("Invalid Castling: King lands on an attacked square (G-file)!\n");
                     

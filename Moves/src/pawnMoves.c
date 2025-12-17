@@ -58,7 +58,7 @@ void promotePawn(Pawn* pawn)
         
         pawn->symbol = (pawn->color == COLOR_BLACK) ? toupper(newSymbol) : newSymbol;
     }
-
+    
     return;
 }
 
@@ -77,7 +77,12 @@ bool movePawn(char** board, Player* player, Move move, Captured* playerCaptures
         }
     }    
     
-    if (pawn == NULL || pawn->isPinned) return false;
+    if (pawn == NULL) return false;
+    if (pawn->isPinned)
+    {
+        if (!legalCheck) printf("This pawn is pinned, Try Agin!!!\n");
+        return false;
+    }
 
     int moveDirection = (pawn->color == COLOR_WHITE) ? -1 : 1; 
     int rowDiff = move.rowNext - move.rowPrev;
@@ -92,10 +97,28 @@ bool movePawn(char** board, Player* player, Move move, Captured* playerCaptures
     {
         if (!legalCheck) 
         {
-            if (isCapture || isEnPassant) 
+            if (isCapture) 
             {
-                playerCaptures->newCapture = true;
+                playerCaptures->capturedPiece.color = (isupper(board[move.rowNext][move.colNext])) ? COLOR_BLACK: COLOR_WHITE;
+                playerCaptures->capturedPiece.colPosition = move.colNext;
+                playerCaptures->capturedPiece.rowPosition = move.rowNext;
+                playerCaptures->capturedPiece.symbol = board[move.rowNext][move.colNext];
+                playerCaptures->capturedPiece.isActive = false;
+                
                 playerCaptures->captureCount++;
+                playerCaptures->newCapture = true;
+            }
+
+            if (isEnPassant)
+            {
+                playerCaptures->capturedPiece.color = (isupper(board[move.rowPrev][move.colNext])) ? COLOR_BLACK: COLOR_WHITE;
+                playerCaptures->capturedPiece.colPosition = move.colNext;
+                playerCaptures->capturedPiece.rowPosition = move.rowPrev;
+                playerCaptures->capturedPiece.symbol = board[move.rowPrev][move.colNext];
+                playerCaptures->capturedPiece.isActive = false;
+                
+                playerCaptures->captureCount++;
+                playerCaptures->newCapture = true;
             }
 
             if (isJump) *plyEnPassantCol = move.colNext;

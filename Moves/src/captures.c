@@ -42,6 +42,7 @@ void capturePiece(Player player, Captured* captureData)
             {
                 player.pawns[i].isActive = false;
                 captureData->capturedSymbols[captureData->captureCount - 1] = player.pawns[i].symbol;
+                captureData->newCapture = false;
                 break;
             }
         }
@@ -56,7 +57,23 @@ void capturePiece(Player player, Captured* captureData)
             {
                 player.rocks[i].isActive = false;
                 captureData->capturedSymbols[captureData->captureCount - 1] = player.rocks[i].symbol;
+                captureData->newCapture = false;
                 break;
+            }
+        }
+        if (captureData->newCapture)
+        {    
+            for (int i = 0; i < NUM_PAWNS; i++)
+            {
+                if (captureData->capturedPiece.colPosition == player.pawns[i].colPosition 
+                        && captureData->capturedPiece.rowPosition == player.pawns[i].rowPosition 
+                            && captureData->capturedPiece.symbol == player.pawns[i].symbol
+                                && captureData->newCapture == true )
+                {
+                    player.pawns[i].isActive = false;
+                    captureData->capturedSymbols[captureData->captureCount] = player.pawns[i].symbol;
+                    captureData->newCapture = false;
+                }
             }
         }
     }
@@ -70,7 +87,23 @@ void capturePiece(Player player, Captured* captureData)
             {
                 player.knights[i].isActive = false;
                 captureData->capturedSymbols[captureData->captureCount - 1] = player.knights[i].symbol;
+                captureData->newCapture = false;
                 break;
+            }
+        }
+        if (captureData->newCapture)
+        {    
+            for (int i = 0; i < NUM_PAWNS; i++)
+            {
+                if (captureData->capturedPiece.colPosition == player.pawns[i].colPosition 
+                        && captureData->capturedPiece.rowPosition == player.pawns[i].rowPosition 
+                            && captureData->capturedPiece.symbol == player.pawns[i].symbol
+                                && captureData->newCapture == true )
+                {
+                    player.pawns[i].isActive = false;
+                    captureData->capturedSymbols[captureData->captureCount] = player.pawns[i].symbol;
+                    captureData->newCapture = false;
+                }
             }
         }
     }
@@ -84,7 +117,23 @@ void capturePiece(Player player, Captured* captureData)
             {
                 player.bishops[i].isActive = false;
                 captureData->capturedSymbols[captureData->captureCount - 1] = player.bishops[i].symbol;
+                captureData->newCapture = false;
                 break;
+            }
+        }
+        if (captureData->newCapture)
+        {    
+            for (int i = 0; i < NUM_PAWNS; i++)
+            {
+                if (captureData->capturedPiece.colPosition == player.pawns[i].colPosition 
+                        && captureData->capturedPiece.rowPosition == player.pawns[i].rowPosition 
+                            && captureData->capturedPiece.symbol == player.pawns[i].symbol
+                                && captureData->newCapture == true )
+                {
+                    player.pawns[i].isActive = false;
+                    captureData->capturedSymbols[captureData->captureCount] = player.pawns[i].symbol;
+                    captureData->newCapture = false;
+                }
             }
         }
     }
@@ -96,21 +145,21 @@ void capturePiece(Player player, Captured* captureData)
         {
             player.queen->isActive = false;
             captureData->capturedSymbols[captureData->captureCount - 1] = player.queen->symbol;
+            captureData->newCapture = false;
         }
-    }
-
-    // Check if the capture is a promoted Pawn
-    else
-    {
-        for (int i = 0; i < NUM_PAWNS; i++)
-        {
-            if (captureData->capturedPiece.colPosition == player.pawns[i].colPosition 
-                    && captureData->capturedPiece.rowPosition == player.pawns[i].rowPosition 
-                        && captureData->capturedPiece.symbol == player.pawns[i].symbol
-                            && captureData->newCapture == true )
+        if (captureData->newCapture)
+        {    
+            for (int i = 0; i < NUM_PAWNS; i++)
             {
-                player.pawns[i].isActive = false;
-                captureData->capturedSymbols[captureData->captureCount] = player.pawns[i].symbol;
+                if (captureData->capturedPiece.colPosition == player.pawns[i].colPosition 
+                        && captureData->capturedPiece.rowPosition == player.pawns[i].rowPosition 
+                            && captureData->capturedPiece.symbol == player.pawns[i].symbol
+                                && captureData->newCapture == true )
+                {
+                    player.pawns[i].isActive = false;
+                    captureData->capturedSymbols[captureData->captureCount] = player.pawns[i].symbol;
+                    captureData->newCapture = false;
+                }
             }
         }
     }

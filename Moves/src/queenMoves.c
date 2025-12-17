@@ -45,8 +45,14 @@ bool moveQueen(char** board, Player* player, Move move, Captured* playerCaptures
         if(pieceColorAt(board, move.rowNext, move.colNext) == queen->color) return false;
         if (!legalCheck) 
         {
-            playerCaptures->newCapture = true;
+            playerCaptures->capturedPiece.color = (isupper(board[move.rowNext][move.colNext])) ? COLOR_BLACK: COLOR_WHITE;
+            playerCaptures->capturedPiece.colPosition = move.colNext;
+            playerCaptures->capturedPiece.rowPosition = move.rowNext;
+            playerCaptures->capturedPiece.symbol = board[move.rowNext][move.colNext];
+            playerCaptures->capturedPiece.isActive = false;
+            
             playerCaptures->captureCount++;
+            playerCaptures->newCapture = true;
         }
     }
 

@@ -74,7 +74,6 @@ bool moveBishop(char** board, Player* player, Move move, Captured* playerCapture
         }
     }
 
-    // UPDATED: Move the piece on the board so isChecked() can see it
     board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
     board[move.rowNext][move.colNext] = move.symbol;
     bishop->rowPosition = move.rowNext;

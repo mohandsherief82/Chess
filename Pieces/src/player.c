@@ -175,6 +175,8 @@ void freePlayer(Player player)
     free(player.bishops);
     free(player.knights);
     free(player.rocks);
+    free(player.queen);
+    free(player.king);
 
     return;
 }

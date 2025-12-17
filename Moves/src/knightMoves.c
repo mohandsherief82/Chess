@@ -52,7 +52,12 @@ bool moveKnight(char** board, Player* player, Move move, Captured* playerCapture
 
         if (!legalCheck) 
         {
+            playerCaptures->capturedPiece.color = (isupper(board[move.rowNext][move.colNext])) ? COLOR_BLACK: COLOR_WHITE;
+            playerCaptures->capturedPiece.colPosition = move.colNext;
+            playerCaptures->capturedPiece.rowPosition = move.rowNext;
             playerCaptures->capturedPiece.symbol = board[move.rowNext][move.colNext];
+            playerCaptures->capturedPiece.isActive = false;
+            
             playerCaptures->captureCount++;
             playerCaptures->newCapture = true;
         }

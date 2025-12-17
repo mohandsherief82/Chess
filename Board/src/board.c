@@ -175,7 +175,9 @@ bool isEmpty(char** board, int r, int c)
 
 void clearScreen()
 {
-    system("clear");
+    // system("clear");
+    printf("\033[2J\033[H");
+    fflush(stdout);
 
     return;
 }
@@ -183,6 +185,7 @@ void clearScreen()
 
 void freeBoard(char** board, Player player1, Player player2)
 {
+    for (int i = 0; i < BOARD_SIZE; i++) free(board);
     free(board);
     freePlayer(player1);
     freePlayer(player2);
