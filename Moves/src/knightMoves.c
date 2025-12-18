@@ -7,15 +7,14 @@
 #include <stdio.h>
 #include <ctype.h>
 
-bool moveKnight(char** board, Player* player, Move move, Captured* playerCaptures, bool legalCheck) 
+bool moveKnight(char** board ,Player* player, Move move, Captured* playerCaptures, bool legalCheck)
 {
     int dispX, dispY;
     Knight* knight = (Knight*)checkPromotedPawn(player, move);
 
-    for (int i = 0; i < NUM_PIECES; i++) 
+    for (int i = 0; i < NUM_PIECES; i++)
     {
-        if (player->knights[i].colPosition == move.colPrev && player->knights[i].isActive
-                && player->knights[i].rowPosition == move.rowPrev) 
+        if (player->knights[i].colPosition == move.colPrev && player->knights[i].rowPosition == move.rowPrev)
         {
             knight = &player->knights[i];
             break;
@@ -24,49 +23,53 @@ bool moveKnight(char** board, Player* player, Move move, Captured* playerCapture
 
     if (knight == NULL) 
     {
-        if (!legalCheck) printf("No Knight At This Position, Try Agin!!!\n");
+        if (!legalCheck) printf("No Knight At This Position, Try Again!!!\n");
         return false;
     }
-    if (knight->isPinned) 
+    if (knight->isPinned)
     {
-        if (!legalCheck) printf("This knight is pinned, Try Again!!!\n");
+        if (!legalCheck) printf("This knight is Pinned, Try Again!!!\n");
         return false;
     }
 
     dispX = abs(move.rowNext - move.rowPrev);
     dispY = abs(move.colNext - move.colPrev);
 
+    // Fix: Corrected the logical expression to validate the L-shape movement.
     if (!((dispX == 2 && dispY == 1) || (dispX == 1 && dispY == 2))) 
     {
         if (!legalCheck) printf("Invalid Knight Move, Try Again!!!\n");
         return false;
     }
 
-    if(!isEmpty(board, move.rowNext, move.colNext)) 
+    if(!isEmpty(board, move.rowNext, move.colNext))
     {      
-        if(pieceColorAt(board, move.rowNext, move.colNext) == knight->color) 
+        if(pieceColorAt(board, move.rowNext, move.colNext) == knight->color)
         {
             if (!legalCheck) printf("Invalid Knight Move, Try Again!!!\n");
             return false;
         }
-
-        if (!legalCheck) 
+        
+        // Capture Logic
+        if (!legalCheck)
         {
             playerCaptures->capturedPiece.color = (isupper(board[move.rowNext][move.colNext])) ? COLOR_BLACK: COLOR_WHITE;
+                
             playerCaptures->capturedPiece.colPosition = move.colNext;
             playerCaptures->capturedPiece.rowPosition = move.rowNext;
             playerCaptures->capturedPiece.symbol = board[move.rowNext][move.colNext];
-            playerCaptures->capturedPiece.isActive = false;
-            
+                
             playerCaptures->captureCount++;
             playerCaptures->newCapture = true;
         }
     }
 
-    board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
-    board[move.rowNext][move.colNext] = move.symbol;
-    knight->rowPosition = move.rowNext;
-    knight->colPosition = move.colNext;
+    if (!legalCheck)
+    {
+        board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
+        knight->rowPosition = move.rowNext;
+        knight->colPosition = move.colNext;
+    }
     
     return true;
 }

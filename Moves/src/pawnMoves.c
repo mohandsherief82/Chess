@@ -13,9 +13,8 @@ Piece* checkPromotedPawn(Player* player, Move move)
 
     for (int i = 0; i < NUM_PAWNS; i++)
     {
-        if (move.colPrev == player->pawns[i].colPosition && player->pawns[i].isActive
-                && move.rowPrev == player->pawns[i].rowPosition && !player->pawns[i].isPinned 
-                    && player->pawns[i].promoted == true && tolower(player->pawns[i].symbol) == move.symbol) 
+        if (move.colPrev == player->pawns[i].colPosition && move.rowPrev == player->pawns[i].rowPosition
+            && player->pawns[i].promoted == true && tolower(player->pawns[i].symbol) == move.symbol) 
         {
             promotedPawn = (Piece*)&player->pawns[i];
             break;
@@ -58,48 +57,95 @@ void promotePawn(Pawn* pawn)
         
         pawn->symbol = (pawn->color == COLOR_BLACK) ? toupper(newSymbol) : newSymbol;
     }
-    
+
     return;
 }
 
 
 bool movePawn(char** board, Player* player, Move move, Captured* playerCaptures
-                , int *plyEnPassantCol, int *oppEnPassantCol, bool legalCheck) 
+    , int *plyEnPassantCol, int *oppEnPassantCol, bool legalCheck)
 {
     Pawn* pawn = NULL;
-    for (int i = 0; i < NUM_PAWNS; i++) 
+    int moveDirection; // 1 for Black (0->7), -1 for White (7->0)
+
+    // Locate the correct Pawn object
+    for (int i = 0; i < NUM_PAWNS; i++)
     {
-        if (move.colPrev == player->pawns[i].colPosition 
-                && player->pawns[i].isActive && move.rowPrev == player->pawns[i].rowPosition) 
+        if (move.colPrev == player->pawns[i].colPosition && move.rowPrev == player->pawns[i].rowPosition) 
         {
             pawn = &player->pawns[i];
             break;
         }
     }    
     
-    if (pawn == NULL) return false;
-    if (pawn->isPinned)
+    if (pawn == NULL || pawn->isActive == false)
     {
-        if (!legalCheck) printf("This pawn is pinned, Try Agin!!!\n");
+        if (!legalCheck) printf("No Pawn At This Position, Try Again!!!\n");
+        return false;
+    }
+    else if (pawn->isPinned)
+    {
+        if (!legalCheck) printf("This Pawn is pinned, Try Again!!!\n");
         return false;
     }
 
-    int moveDirection = (pawn->color == COLOR_WHITE) ? -1 : 1; 
+    // Determine direction
+    moveDirection = (pawn->color == COLOR_WHITE) ? -1 : 1; 
+
     int rowDiff = move.rowNext - move.rowPrev;
     int colDiff = move.colNext - move.colPrev;
 
-    bool isStep = (colDiff == 0 && rowDiff == moveDirection && isEmpty(board, move.rowNext, move.colNext));
-    bool isJump = (colDiff == 0 && rowDiff == (moveDirection * 2) && pawn->firstMove && isEmpty(board, move.rowPrev + moveDirection, move.colNext) && isEmpty(board, move.rowNext, move.colNext));
-    bool isCapture = (abs(colDiff) == 1 && rowDiff == moveDirection && !isEmpty(board, move.rowNext, move.colNext) && pieceColorAt(board, move.rowNext, move.colNext) != pawn->color);
-    bool isEnPassant = (abs(colDiff) == 1 && rowDiff == moveDirection && isEmpty(board, move.rowNext, move.colNext) && move.colNext == *oppEnPassantCol);
-
-    if (isStep || isJump || isCapture || isEnPassant) 
+    // Single Square Advance
+    if (colDiff == 0 && rowDiff == moveDirection)
     {
-        if (!legalCheck) 
+        if (isEmpty(board, move.rowNext, move.colNext)) 
         {
-            if (isCapture) 
+            if (!legalCheck)
+            {
+                board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;            
+                pawn->rowPosition = move.rowNext;
+                if (pawn->firstMove) pawn->firstMove = false;
+                promotePawn(pawn);
+            }
+
+            return true;
+        }
+    }
+
+    // Two Square Advance
+    if (colDiff == 0 && rowDiff == (moveDirection * 2) && pawn->firstMove)
+    {
+        int midRow = move.rowPrev + moveDirection;
+        
+        if (isEmpty(board, midRow, move.colNext) && isEmpty(board, move.rowNext, move.colNext)) 
+        {
+            if (!legalCheck)
+            {
+                board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
+                pawn->rowPosition = move.rowNext;
+                pawn->firstMove = false;
+                *plyEnPassantCol = move.colNext;
+            }
+
+            return true;
+        }
+    }
+
+    // Pawn Captures
+    if (abs(colDiff) == 1 && rowDiff == moveDirection)
+    {
+        if (!isEmpty(board, move.rowNext, move.colNext)) 
+        { 
+            if (pieceColorAt(board, move.rowNext, move.colNext) == pawn->color)
+            {
+                if (!legalCheck) printf("Can't Capture Friendly Piece, Try Again!!!\n");
+                return false;
+            }
+
+            if (!legalCheck)
             {
                 playerCaptures->capturedPiece.color = (isupper(board[move.rowNext][move.colNext])) ? COLOR_BLACK: COLOR_WHITE;
+                
                 playerCaptures->capturedPiece.colPosition = move.colNext;
                 playerCaptures->capturedPiece.rowPosition = move.rowNext;
                 playerCaptures->capturedPiece.symbol = board[move.rowNext][move.colNext];
@@ -107,11 +153,24 @@ bool movePawn(char** board, Player* player, Move move, Captured* playerCaptures
                 
                 playerCaptures->captureCount++;
                 playerCaptures->newCapture = true;
+
+                board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
+                pawn->rowPosition = move.rowNext;
+                pawn->colPosition = move.colNext;
+                
+                if (pawn->firstMove) pawn->firstMove = false;
             }
 
-            if (isEnPassant)
+            return true;
+        }
+
+        // For En Passant Capturing
+        if (tolower(board[move.rowPrev][move.colNext]) == 'p' && (move.rowPrev == 4 || move.rowPrev == 3) && *oppEnPassantCol == move.colNext)
+        {
+            if (!legalCheck)
             {
                 playerCaptures->capturedPiece.color = (isupper(board[move.rowPrev][move.colNext])) ? COLOR_BLACK: COLOR_WHITE;
+                
                 playerCaptures->capturedPiece.colPosition = move.colNext;
                 playerCaptures->capturedPiece.rowPosition = move.rowPrev;
                 playerCaptures->capturedPiece.symbol = board[move.rowPrev][move.colNext];
@@ -119,26 +178,18 @@ bool movePawn(char** board, Player* player, Move move, Captured* playerCaptures
                 
                 playerCaptures->captureCount++;
                 playerCaptures->newCapture = true;
+
+                board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
+                pawn->rowPosition = move.rowPrev;
+                pawn->colPosition = move.colNext;
+                
+                if (pawn->firstMove) pawn->firstMove = false;
             }
 
-            if (isJump) *plyEnPassantCol = move.colNext;
-            if (isEnPassant) board[move.rowPrev][move.colNext] = EMPTY_SQUARE;
-            
-            pawn->firstMove = false;
+            return true;
         }
-
-        board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
-        board[move.rowNext][move.colNext] = pawn->symbol;
-        pawn->rowPosition = move.rowNext;
-        pawn->colPosition = move.colNext;
-
-        if (!legalCheck && (pawn->rowPosition == 0 || pawn->rowPosition == 7)) 
-        {
-            promotePawn(pawn);
-            board[move.rowNext][move.colNext] = pawn->symbol;
-        }
-        return true;
     }
-
+    
+    if (!legalCheck) printf("Invalid Pawn Move, Try Again!!!\n");
     return false;
 }
