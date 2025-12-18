@@ -4,16 +4,13 @@
 
 ## Overview
 
-* 
-
-## Features
+* ## Features
 
 ### Pieces
 
-* Since Each piece represents its own entity, so for each type of piece has its own structure that follow a general piece st
-    *promotionSymbol = pawn->symbol;ructure.
+* Since each piece represents its own entity, each type of piece has its own structure that follows a general piece structure.
 
-~~~
+~~~c
 typedef struct
 {
     char symbol;
@@ -25,17 +22,17 @@ typedef struct
 } Piece;
 ~~~
 
-* The idea behind this desgin: as pieces have different positions during the game so using the rowPosition and colPosition members we stored its position on the chess board.
-* Also we need an indicator for the state of the piece as it can be captured by the opponent or is pinned, for this reason two flags has been add for each piece.
-* All pieces follow this design schema. However, there are some pieces that needed extra data.
-* Each piece has its own initializor function for creating its initial position and data.
-* This general piece structure will be useful later as it will be used for the addition of the pieces to the board.
+* The idea behind this design: as pieces have different positions during the game, we use the `rowPosition` and `colPosition` members to store their position on the chess board.
+* Also, we need an indicator for the state of the piece as it can be captured by the opponent or pinned; for this reason, two flags have been added for each piece.
+* All pieces follow this design schema. However, there are some pieces that require extra data.
+* Each piece has its own initializer function for creating its initial position and data.
+* This general piece structure will be useful later as it will be used for adding pieces to the board.
 
 #### Pawn Piece
 
-* The pawn piece have some special memebers that makes it different from the other pieces as it can get promoted or for its first move it can move two cells forward, so we have two extra special members that are indicators for promotion and first move.
+* The pawn piece has some special members that make it different from other pieces; it can be promoted, and for its first move, it can move two cells forward. Therefore, we have two extra special members that serve as indicators for promotion and the first move.
 
-~~~
+~~~c
 typedef struct 
 {
     char symbol;
@@ -51,9 +48,9 @@ typedef struct
 
 #### King Piece
 
-* The king piece also have some special members, where it can castle on its first move and it needs an indicator for its check state. As a result, a member for its first move for castling and a check flag.
+* The king piece also has some special members, as it can castle on its first move and needs an indicator for its check state. As a result, it includes a member for its first move (for castling) and a check flag.
 
-~~~
+~~~c
 typedef struct 
 {
     char symbol;
@@ -68,16 +65,16 @@ typedef struct
 
 ### Player
 
-* To store the player data, we choose to create a struct with 7 members, where 2 of them are pointers to a dynamically allocated memory block, 4 are dynamically allocated arries, which made the manipulation of piece data easier later on, and a member that act as a color indicator.
-* The player also has its own initializor function, which assign and initialize each piece and store there addresses in their respective members and correct positions.
-* For memroy leakage, we created a function that clears the dynamically allocated members.
+* To store the player data, we chose to create a struct with 7 members. Two of them are pointers to a dynamically allocated memory block and four are dynamically allocated arrays, which makes the manipulation of piece data easier later on. There is also a member that acts as a color indicator.
+* The player also has its own initializer function, which assigns and initializes each piece and stores their addresses in their respective members and correct positions.
+* To prevent memory leaks, we created a function that clears the dynamically allocated members.
 
-~~~
+~~~c
 typedef struct
 {
     const PieceColor color;
     Pawn *pawns;
-    Rock *rocks;
+    Rook *rooks;
     Knight *knights;
     Bishop *bishops;
     Queen *queen;
@@ -87,19 +84,19 @@ typedef struct
 
 ### Board
 
-* The board is created as a normal 2D array that stores the symbols of the pieces, a white square represented by **"-"** or a black square represented by **"."**.
+* The board is created as a standard 2D array that stores the symbols of the pieces; a white square is represented by **"-"** and a black square is represented by **"."**.
 * White pieces are represented by lowercase letters, while black pieces are represented by uppercase letters.
-* The board array has its own initializor function, which will dynamically allocate the board, and a freeing function to empty the board at the end of the game.
-* The board will be initialized with empty squares/ spaces that will be used later to determine if the cell is white or black.
-* The *addPiece* function has been created to add the pieces to the board, using the base piece structure which acts as an adaptable data type for different pieces.
-* The *displayBoard* function prints the board in the center of the terminal with the move log on its left and the captured piece list on the right. It also shows the white captures in the right lower corner of the display, while the black captures on top of the white captures.
-* A clear screen function was added to the clear the screen after each move (Reference: https://www.geeksforgeeks.org/c/clear-console-c-language/).
+* The board array has its own initializer function, which dynamically allocates the board, and a freeing function to empty the board at the end of the game.
+* The board will be initialized with empty squares/spaces that will be used later to determine if a cell is white or black.
+* The `addPiece` function has been created to add pieces to the board using the base piece structure, which acts as an adaptable data type for different pieces.
+* The `displayBoard` function prints the board in the center of the terminal with the move log on its left and the captured piece list on the right. It also shows the white captures in the bottom-right corner of the display, while the black captures are shown above the white captures.
+* A clear screen function was added to clear the screen after each move (Reference: https://www.geeksforgeeks.org/c/clear-console-c-language/).
 
 ### Moves
 
-* Each move has its own important data that is unique to it, so a structure has been created to store the piece symbol to move, its previous position and where to move the piece.
+* Each move has unique data, so a structure has been created to store the piece symbol being moved, its previous position, and its destination.
 
-~~~
+~~~c
 typedef struct
 {
     char symbol;
@@ -110,65 +107,69 @@ typedef struct
 } Move;
 ~~~
 
-* As most pieces have their own special way of motion, each type of piece will need its own function for motion.
+* As most pieces have a unique way of moving, each type of piece requires its own function for motion.
 
 #### Pawn Movement
 
-* The pawn has a couple of different moves, as it can either step one cell ahead with nothing in front of it, or in case of that it is the pawns first move, it can move two cells ahead without anything in its path.
-* The *movePawn* function starts with a linear search in the player pawns array to find the pawn at the specified position.
-* After finding the correct pawn, it checks the pawn's color to determine in which direction it actually can move and starts to check if the move can be performed.
-* As pawn can only capture on its diagonals, capture logic is different from its main movement pattern. Therefore, it needed an extra check which involves a check for empty cells and if the piece is of the oppisite color.
-* Also the pawn has the funcionality for promotion, which involves a check for it reaching either the row 1 or 8 and checking the color to check.
-* After the promotion, the player will be directly asked on which type of piece he wants to promote his pawn to and change the pawn symbol to the respective symbol based on the color of the player.
-* The pawn promotion might cause a problem later on as the promoted pawn won't be moving as a pawn anymore, so the function *checkPromotedPawn* was created to allow with other piece calls to check whether the piece the playe wants to move is a promoted pawn first then continue the logic to move the piece whether its is a promoted pawn or the actual piece itself.
+* The pawn has a couple of different moves: it can either step one cell ahead if nothing is in front of it, or, if it is the pawn's first move, it can move two cells ahead provided nothing is in its path.
+* The `movePawn` function starts with a linear search in the player's pawns array to find the pawn at the specified position.
+* After finding the correct pawn, it checks the pawn's color to determine its allowed direction and verifies if the move can be performed.
+* As pawns can only capture on their diagonals, the capture logic is different from the main movement pattern. Therefore, it requires an extra check for empty cells and to see if the target piece is of the opposite color.
+* Additionally, the pawn has promotion functionality, which involves checking if it has reached row 1 or 8.
+* After promotion, the player is prompted to choose the piece type for promotion, and the pawn symbol is changed to the respective symbol based on the player's color.
+* Pawn promotion might cause a problem later on as the promoted pawn will no longer move like a pawn; thus, the function `checkPromotedPawn` was created to determine if a piece is a promoted pawn before executing movement logic.
 
 #### Knight Movement
 
-* The knight moves in an *L* shape so that the difference between two cells equals 2 in one direction, and the difference equals 1 in the other direction.
+* The knight moves in an *L* shape where the difference between two cells equals 2 in one direction and 1 in the other direction.
+* The `moveKnight` function starts by finding the required knight and checks if it can be moved (e.g., if it is pinned). It then validates the L-shaped condition by calculating the difference between the current cell and the target cell in the X and Y directions. If the *L* shape is valid, it checks the destination cell; if there is an enemy piece, it is captured, but if it is a friendly piece, the move is invalid.
 
-* The *moveKnight* function starts by finding the required knight that we want to move and then checks if it can be moved (e.g., pinned), then checks the L-shaped condition by calculating the difference between the current cell and the required cell in the X and Y directions. If the *L* shape is valid, it checks the destination cell; if there is an enemy piece, it captures it, but if it is a friendly piece, then the move cannot be done.
+#### Rook Movement
 
-#### Rock Movement
-
-* The rock moves in a *straight line* shape so that the difference between two cells should not be equal to *zero* in one direction, and the difference should be equal to *zero* in the other direction.
-
-* The *moveRock* function starts by finding the required rock that we want to move and then checks if it can be moved (e.g., pinned) and then checks the *straight-shaped* condition by calculating the difference between the current cell and the required cell in the X and Y directions. If the diagonal shape is valid, it checks each cell on the way. If there exists any piece on the way, the move cannot be done until it reaches the destination cell. If there exists a piece, it captures it in case it's an enemy one; if it's friendly, then the move cannot be done.
+* The rook moves in a *straight line* where the difference between two cells is non-zero in one direction and zero in the other.
+* The `moveRock` function finds the required rook and checks if it can be moved (e.g., if it is pinned). It then validates the *straight-line* condition. If the path is valid, it checks each cell along the way. If any piece is in the path, the move cannot be performed. At the destination, it captures the piece if it is an enemy; if it is friendly, the move is invalid.
 
 #### Bishop Movement
 
-* The bishop moves in a *diagonal* shape so that the difference between two cells should be equal in both X and Y directions.
-
-* The *moveBishop* function starts by finding the required bishop that we want to move and then checks if it can be moved (e.g., pinned), then checks the *diagonally* shaped condition by calculating the difference between the current cell and the required cell in X and Y directions. If the diagonal shape is valid, it checks each cell on the way. If there exists any piece on the way, the move cannot be done until it reaches the destination cell. If there exists a piece, it captures it in case it's an enemy one; if it's friendly, then the move cannot be done.
+* The bishop moves in a *diagonal* shape where the difference between two cells is equal in both X and Y directions.
+* The `moveBishop` function finds the required bishop and checks if it can be moved. It validates the *diagonal* condition by calculating the difference between the current and target cells. If the path is clear, it checks the destination. It captures enemy pieces at the destination cell but prevents moving onto a friendly piece.
 
 #### Queen Movement
 
-* As the queen is basically a combination between the rock and the bishop, it inherited the logic of their movements.
+* As the queen is a combination of the rook and the bishop, it inherits the logic of their movements.
 
 #### King Movement
 
-* The king moves in the 8 cells around him, so his movement pattern can be done using a direction matrices one for the x axis and one for the y axis, the logic was implemented by moveing the king then checking whether he is checked or not.
-* Also the king can castle, if it is his first move and there is no enemy piece cutting it of, the logic for castling has been implemented by mutliple king moves then checking if the king is checked in each position and if he is checked the castling act is stopped.
-* The most important piece for the king motion is the isChecked function, which checks whether the king is checked by looking out for enemy pieces on their move patterns for example the rock on the horizontal and vertical axis around it, this function also is responisble for piece pinning, and it works by finding a friendly piece then continue traversing in the direction to see if an enemy piece that can be blocked is in the way and if it finds a friendly piece it stops checking.
+* The king moves to the 8 adjacent cells. This is implemented using direction matrices for the X and Y axes. The logic moves the king and then checks whether he is in check.
+* The king can also castle if it is his first move and no enemy piece is attacking the path. Castling logic involves checking if the king is in check at each step of the process.
+* The most important part of king movement is the `isChecked` function, which determines if the king is under attack by looking for enemy pieces in their respective move patterns. This function is also responsible for identifying pinned pieces; it works by finding a friendly piece and continuing in that direction to see if an enemy piece is targeting the king.
 
 #### Captures
 
-### Game end states
+### Game End States
 
-* The game could end by *Stalemate* or *Checkmate*, each of these has its own function and logic in implementation.
+* The game can end in *Stalemate* or *Checkmate*. Each has its own implementation logic.
 
 #### Stalemate
 
-* When the king is not in check, and the player whose turn it is has no legal moves available, the game ends with a draw.
-
-* The *checkStalemate* function checks if there exists at least one legal move and the king is not in check; this happens with helper functions.
-
-* The copy board/player functions, which are auxiliary functions helping us to copy all the content of the player/board.
-
-* The *legalMove* function, which is an essential helping function in stalemate, checks every possible move that can happen by iterating through every piece and trying to move it around all the cells of the board. This happens on the copied board/player, which happens in the background of the game while it's being played without affecting it, as we are working on a deep copy of the board and player. If the function finds a legal move, it stops immediately; if not, it continues searching until it completes the iteration. The true/false value returning from this function is helping us check for stalemate, which happens in the *checkStalemate* function.
-
+* When the king is not in check and the player whose turn it is has no legal moves available, the game ends in a draw.
+* The `checkStalemate` function checks if at least one legal move exists while the king is not in check using helper functions.
+* Copy functions for the board and player are used to create deep copies of the game state for background validation.
+* The `legalMove` function is an essential helper for stalemate; it iterates through every piece and attempts every possible move on the board using a copied state. If it finds a legal move, it stops immediately.
 
 #### Checkmate
 
-* It depends on the isChecked function and legalMove function that is implemented alone and with the stalemate logic respectively, and the logic flags a checkmate if the king is in check and there is no legal moves that can be done.
+* Checkmate logic flags a game over if the king is in check and no legal moves are available (using the `legalMove` and `isChecked` functions).
+* The legal move function covers all types of piece moves, including blocks, which makes this logic possible.
 
-* The legal move function covers all types of piece moves including blocks, which make this logic possible.
+### Save, Load, and Undo
+
+#### Save
+
+* The save function writes each validated move into a binary file (Reference: https://www.programiz.com/c-programming/c-file-input-output).
+
+#### Load
+
+* The load function reads moves from the game file. It determines whose turn it is by counting the moves read; if an odd number of moves is read, it is the second player's turn, whereas a completed pair of moves returns the turn to the first player(Reference: https://www.programiz.com/c-programming/c-file-input-output).
+
+#### Undo
