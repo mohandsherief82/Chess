@@ -173,3 +173,11 @@ typedef struct
 * The load function reads moves from the game file. It determines whose turn it is by counting the moves read; if an odd number of moves is read, it is the second player's turn, whereas a completed pair of moves returns the turn to the first player(Reference: https://www.programiz.com/c-programming/c-file-input-output).
 
 #### Undo
+
+* The `undoLastMove` function removes the last move from the save file and then loads the game after the removal of the last move (Reference: https://www.geeksforgeeks.org/c/basics-file-handling-c/).
+
+### User Manual
+
+* The game starts with a starting menu that asks the players if they want to play a new game or load a saved one. After choosing, the game screen appears with three sections: the left one displaying the moves made during the game, the middle section being the game board on which the pieces exist, and the right section displaying the captured pieces during the game. Then the game asks the first player to choose a piece to move; he can choose (p, n, q, b, k, or r) and then write the index of the piece and the destination cell (e.g., a2a4). After making the move, he can write (u) to undo the move he did and return to the same position. At any time he can write (s) to save the game and load it again later. The same happens for the second player, as after each move, the players take turns.
+
+### Sample runs
