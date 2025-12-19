@@ -36,10 +36,22 @@ bool loadPlayerTurn(char** board, Player* player, Move move, Captured* capture, 
 int loadGame(char** board, Player* player1, Player* player2, Captured* ply1Captures
     , Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol)
 {
+    freeBoard(board, *player1, *player2);
+
+    board = initializeBoard();
+    *player1 = createPlayer(COLOR_WHITE);
+    *player2 = createPlayer(COLOR_BLACK);
+    *whiteEnPassantCol = -1;
+    *blackEnPassantCol = -1;
+    *ply1Captures = initializeCapture(COLOR_WHITE);
+    *ply2Captures = initializeCapture(COLOR_BLACK);
+
     FILE* fptr = fopen(path, "rb");
     if (fptr == NULL)
     {
         printf("No Game to Load, Starting a New Game!!!\n");
+        fptr = fopen(path, "wb");
+        fclose(fptr);
         return 1;
     }
 
@@ -54,21 +66,23 @@ int loadGame(char** board, Player* player1, Player* player2, Captured* ply1Captu
         if (readData == 0) break;
 
         loadPlayerTurn(board, player1, move[0], ply1Captures, whiteEnPassantCol, blackEnPassantCol);
-        if (ply1Captures->newCapture == true) capturePiece(*player2, ply1Captures);
-        totalMovesRead++; 
+        if (ply1Captures->newCapture == true) capturePiece(player2, ply1Captures);
+        totalMovesRead++;
+        updateBoard(board, *player1, *player2, *ply1Captures, *ply2Captures, false);
         
         if (readData == 2) 
         {
             loadPlayerTurn(board, player2, move[1], ply2Captures, blackEnPassantCol, whiteEnPassantCol);
-            if (ply2Captures->newCapture == true) capturePiece(*player1, ply2Captures);
-        totalMovesRead++;
-    }    
+            if (ply2Captures->newCapture == true) capturePiece(player1, ply2Captures);
+            totalMovesRead++;
+            updateBoard(board, *player1, *player2, *ply1Captures, *ply2Captures, false);
+        }    
         else break; 
     }    
     
     fclose(fptr);
-    isChecked(board, player1, false);
-    isChecked(board, player2, false);
+    isChecked(board, player1, true);
+    isChecked(board, player2, true);
     
     return (totalMovesRead % 2 == 0) ? 1 : 2;
 }

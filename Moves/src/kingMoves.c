@@ -11,6 +11,7 @@
 const int dx[8] = {-1,  0,  1, -1, 1, -1, 0, 1};
 const int dy[8] = {-1, -1, -1,  0, 0,  1, 1, 1};
 
+
 bool performCastling(char** board, Player* player, Move move, bool legalCheck)
 {
     if (isChecked(board, player, legalCheck)) 
@@ -24,33 +25,37 @@ bool performCastling(char** board, Player* player, Move move, bool legalCheck)
     {
         int row = move.rowPrev;
 
-        // --- QUEENSIDE ---
         if (move.colNext == 2 && player->rocks[0].firstMove == true)
         {
             if (isEmpty(board, row, 1) && isEmpty(board, row, 2) && isEmpty(board, row, 3))
             {
-                // Test D-file
                 board[row][3] = player->king->symbol;
                 board[row][4] = EMPTY_SQUARE; 
                 player->king->colPosition = 3;
+
                 if (isChecked(board, player, legalCheck)) 
                 {
                     if (!legalCheck) printf("Invalid Castling: King passes through (D-file)!\n");
+                    
                     board[row][4] = player->king->symbol;
                     board[row][3] = EMPTY_SQUARE;
                     player->king->colPosition = 4;
+
                     return false;
                 }
                 
                 board[row][2] = player->king->symbol;
                 board[row][3] = EMPTY_SQUARE;
                 player->king->colPosition = 2;
+
                 if (isChecked(board, player, legalCheck)) 
                 {
                     if (!legalCheck) printf("Invalid Castling: King lands on (C-file)!\n");
+                    
                     board[row][4] = player->king->symbol;
                     board[row][2] = EMPTY_SQUARE;
                     player->king->colPosition = 4;
+
                     return false;
                 }
                 
@@ -65,13 +70,15 @@ bool performCastling(char** board, Player* player, Move move, bool legalCheck)
 
                 board[row][3] = board[row][0];
                 board[row][0] = EMPTY_SQUARE;
+               
                 player->rocks[0].colPosition = 3;
                 player->rocks[0].firstMove = false;
                 player->king->firstMove = false;
+
                 return true;
             }
         }
-        
+
         else if (move.colNext == 6 && player->rocks[1].firstMove == true)
         {
             if (isEmpty(board, row, 5) && isEmpty(board, row, 6))
@@ -83,21 +90,26 @@ bool performCastling(char** board, Player* player, Move move, bool legalCheck)
                 if (isChecked(board, player, legalCheck))
                 {
                     if (!legalCheck) printf("Invalid Castling: King passes through (F-file)!\n");
+                    
                     board[row][4] = player->king->symbol;
                     board[row][5] = EMPTY_SQUARE;
                     player->king->colPosition = 4;
+
                     return false;
                 }
                 
                 board[row][6] = player->king->symbol;
                 board[row][5] = EMPTY_SQUARE;
                 player->king->colPosition = 6;
+
                 if (isChecked(board, player, legalCheck)) 
                 {
                     if (!legalCheck) printf("Invalid Castling: King lands on (G-file)!\n");
+                    
                     board[row][4] = player->king->symbol;
                     board[row][6] = EMPTY_SQUARE;
                     player->king->colPosition = 4;
+
                     return false;
                 }
 
@@ -112,14 +124,16 @@ bool performCastling(char** board, Player* player, Move move, bool legalCheck)
 
                 board[row][5] = board[row][7];
                 board[row][7] = EMPTY_SQUARE;
+                
                 player->rocks[1].colPosition = 5;
                 player->rocks[1].firstMove = false;
                 player->king->firstMove = false;
+
                 return true;
             }
         }
     }
-    
+
     return false;
 }
 
@@ -144,48 +158,40 @@ bool moveKing(char** board, Player* player, Move move, Captured* playerCaptures,
 
             if (!isEmpty(board, move.rowNext, move.colNext))
             {
-                if(pieceColorAt(board, move.rowNext, move.colNext) == player->color)
+                if (pieceColorAt(board, move.rowNext, move.colNext) == player->color)
                 {
-                    if (!legalCheck)  printf("Can't Capture Friendly piece, Try Again!!!\n");
+                    if (!legalCheck) printf("Can't Capture Friendly piece, Try Again!!!\n");
                     return false;
                 }
-
-                // Store the captured piece symbol for potential rollback
                 capturedSymbol = board[move.rowNext][move.colNext];
             }
 
-            board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
-            board[move.rowNext][move.colNext] = king->symbol;
-            
             int oldRow = king->rowPosition;
             int oldCol = king->colPosition;
-            
+
+            board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
+            board[move.rowNext][move.colNext] = king->symbol;
             king->rowPosition = move.rowNext;
             king->colPosition = move.colNext;
 
             if (isChecked(board, player, legalCheck))
             {
-                if (!legalCheck) 
-                {
-                    printf("Invalid King Move: Move leaves King in check, Try Again!!!\n");
+                if (!legalCheck) printf("Invalid King Move: Move leaves King in check, Try Again!!!\n");
 
-                    king->rowPosition = oldRow;
-                    king->colPosition = oldCol;
-                    board[move.rowPrev][move.colPrev] = king->symbol;
-                    board[move.rowNext][move.colNext] = capturedSymbol;
-                }
-
+                king->rowPosition = oldRow;
+                king->colPosition = oldCol;
+                board[move.rowPrev][move.colPrev] = king->symbol;
+                board[move.rowNext][move.colNext] = capturedSymbol;
                 return false;
             }
 
             if (capturedSymbol != EMPTY_SQUARE && !legalCheck)
             {
-                playerCaptures->capturedPiece.color = (isupper(capturedSymbol)) ? COLOR_BLACK: COLOR_WHITE;
+                playerCaptures->capturedPiece.color = (isupper(capturedSymbol)) ? COLOR_BLACK : COLOR_WHITE;
                 playerCaptures->capturedPiece.colPosition = move.colNext;
                 playerCaptures->capturedPiece.rowPosition = move.rowNext;
                 playerCaptures->capturedPiece.symbol = capturedSymbol;
                 playerCaptures->capturedPiece.isActive = false;
-                
                 playerCaptures->captureCount++;
                 playerCaptures->newCapture = true;
             }

@@ -16,7 +16,7 @@ game_end:
 	$(CC) $(FLAGS) ./Pieces/src/*.c ./Board/src/board.c ./Moves/src/*.c ./Game-End/src/*.c ./Game-End/test.c -o ./Game-End/bin/test.o
 
 compile:
-	$(CC) $(FLAGS) ./Pieces/src/*.c ./Board/src/board.c ./Moves/src/*.c ./Game-End/src/*.c ./Game-End/test.c -o ./run.o
+	$(CC) $(FLAGS) ./Pieces/src/*.c ./Board/src/board.c ./Moves/src/*.c ./Game-End/src/*.c ./main.c -o ./run.o
 
 test_board: board
 	./Board/bin/test.o

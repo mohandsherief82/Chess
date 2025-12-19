@@ -7,18 +7,23 @@
 #include <stdio.h>
 #include <ctype.h>
 
-bool moveBishop(char** board ,Player* player, Move move, Captured* playerCaptures, bool legalCheck)
+
+bool moveBishop(char** board, Player* player, Move move, Captured* playerCaptures, bool legalCheck)
 {
     int dispX, dispY, r, c, rowStep, colStep;
     Bishop* bishop = (Bishop*)checkPromotedPawn(player, move);
 
-    for (int i = 0; i < NUM_PIECES; i++)
+    if (bishop == NULL)
     {
-        if (player->bishops[i].colPosition == move.colPrev 
-            && player->bishops[i].rowPosition == move.rowPrev && player->bishops[i].isActive)
+        for (int i = 0; i < NUM_PIECES; i++)
         {
-            bishop = &player->bishops[i];
-            break;
+            if (player->bishops[i].colPosition == move.colPrev && 
+                player->bishops[i].rowPosition == move.rowPrev && 
+                player->bishops[i].isActive)
+            {
+                bishop = &player->bishops[i];
+                break;
+            }
         }
     }
 
@@ -28,14 +33,17 @@ bool moveBishop(char** board ,Player* player, Move move, Captured* playerCapture
         return false;
     }
 
-    int currentrow = bishop->rowPosition;
-    int currentcol = bishop->colPosition;
+    if (bishop->isPinned)
+    {
+        if (!legalCheck) printf("This bishop is Pinned, Try Again!!!\n");
+        return false;
+    }
 
-    // Bishop move logic: abs(difference) of rows = abs(difference) of columns
-    dispX = move.rowNext - currentrow;
-    dispY = move.colNext - currentcol;
+    // Bishop move logic: abs(difference) of rows must equal abs(difference) of columns
+    dispX = move.rowNext - move.rowPrev;
+    dispY = move.colNext - move.colPrev;
 
-    if(abs(dispX) != abs(dispY)) 
+    if (abs(dispX) != abs(dispY) || dispX == 0) 
     {
         if (!legalCheck) printf("Invalid Bishop Move, Try Again!!!\n");
         return false;
@@ -44,49 +52,46 @@ bool moveBishop(char** board ,Player* player, Move move, Captured* playerCapture
     rowStep = (dispX > 0) ? 1 : -1;
     colStep = (dispY > 0) ? 1 : -1;
 
-    r = currentrow + rowStep;
-    c = currentcol + colStep;
+    r = move.rowPrev + rowStep;
+    c = move.colPrev + colStep;
 
+    // Check for blocking pieces along the path
     while (r != move.rowNext)
     {
-        if(!isEmpty(board, r, c))
+        if (!isEmpty(board, r, c))
         {
             if (!legalCheck) printf("Invalid Bishop Move, Try Again!!!\n");
             return false;
         }
-
         r += rowStep;
         c += colStep;
     }
 
-    if(!isEmpty(board, move.rowNext, move.colNext))
+    // Handle Capture logic
+    if (!isEmpty(board, move.rowNext, move.colNext))
     {
-        if(pieceColorAt(board, move.rowNext, move.colNext) == bishop->color)
+        if (pieceColorAt(board, move.rowNext, move.colNext) == bishop->color)
         {
             if (!legalCheck) printf("Can't Capture Friendly piece, Try Again!!!\n");
             return false;
         }
 
-        // Capture Logic
         if (!legalCheck)
         {
-            playerCaptures->capturedPiece.color = (isupper(board[move.rowNext][move.colNext])) ? COLOR_BLACK: COLOR_WHITE;
-                
+            playerCaptures->capturedPiece.color = (isupper(board[move.rowNext][move.colNext])) ? COLOR_BLACK : COLOR_WHITE;
             playerCaptures->capturedPiece.colPosition = move.colNext;
             playerCaptures->capturedPiece.rowPosition = move.rowNext;
             playerCaptures->capturedPiece.symbol = board[move.rowNext][move.colNext];
-                
+            
             playerCaptures->captureCount++;
             playerCaptures->newCapture = true;
         }
-
     }
 
-    if (!legalCheck)
-    {
-        board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
-        bishop->rowPosition = move.rowNext;
-        bishop->colPosition = move.colNext;
-    }
+    board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
+    board[move.rowNext][move.colNext] = bishop->symbol;
+    bishop->rowPosition = move.rowNext;
+    bishop->colPosition = move.colNext;
+
     return true;
 }

@@ -12,13 +12,15 @@ bool moveRock(char** board ,Player* player, Move move, Captured* playerCaptures,
     int diffrow, diffcol, rowstep = 0, colstep = 0, r, c;
     Rock* rock = (Rock*)checkPromotedPawn(player, move);
 
-    for (int i = 0; i < NUM_PIECES; i++)
+    if (rock == NULL)
     {
-        if (player->rocks[i].colPosition == move.colPrev 
-            && player->rocks[i].rowPosition == move.rowPrev && player->rocks[i].isActive)
+        for (int i = 0; i < NUM_PIECES; i++)
         {
-            rock = &player->rocks[i];
-            break;
+            if (player->rocks[i].colPosition == move.colPrev && player->rocks[i].rowPosition == move.rowPrev && player->rocks[i].isActive)
+            {
+                rock = &player->rocks[i];
+                break;
+            }
         }
     }
 
@@ -27,6 +29,7 @@ bool moveRock(char** board ,Player* player, Move move, Captured* playerCaptures,
         if (!legalCheck) printf("No Rock At This Position, Try Again!!!\n");
         return false;
     }
+
     if (rock->isPinned) 
     {
         if (!legalCheck) printf("This rock is pinned, Try Again!!!\n");
@@ -36,58 +39,53 @@ bool moveRock(char** board ,Player* player, Move move, Captured* playerCaptures,
     diffrow = move.rowNext - move.rowPrev;
     diffcol = move.colNext - move.colPrev;
 
-    if((diffrow != 0) && (diffcol !=0)) 
+    if (diffrow != 0 && diffcol != 0) 
     {
-        if (!legalCheck) printf("Invalid Rock Move, Try Agian!!!\n");
+        if (!legalCheck) printf("Invalid Rock Move, Try Again!!!\n");
         return false;
     }
 
-    if(diffrow != 0) rowstep = (diffrow > 0) ? 1 : -1;
+    if (diffrow != 0) rowstep = (diffrow > 0) ? 1 : -1;
     else colstep = (diffcol > 0) ? 1 : -1;
 
     r = move.rowPrev + rowstep;
     c = move.colPrev + colstep;
 
-    while ((r != move.rowNext) || (c != move.colNext))
+    while (r != move.rowNext || c != move.colNext)
     {
-        if(!isEmpty(board, r, c)) // Blocked path.
+        if (!isEmpty(board, r, c)) 
         {
-            if (!legalCheck) printf("Invalid Rock Move, Try Agian!!!\n");
+            if (!legalCheck) printf("Invalid Rock Move, Try Again!!!\n");
             return false;
         }
-
         r += rowstep;
         c += colstep;
     }
 
-    if(!isEmpty(board, move.rowNext, move.colNext))
+    if (!isEmpty(board, move.rowNext, move.colNext))
     {
-        if(pieceColorAt(board, move.rowNext, move.colNext) == rock->color)
+        if (pieceColorAt(board, move.rowNext, move.colNext) == rock->color)
         {   
             if (!legalCheck) printf("Can't Capture Friendly Piece, Try Again!!!\n"); 
             return false;
         }
 
-        // Capture Logic
         if (!legalCheck)
         {
-            playerCaptures->capturedPiece.color = (isupper(board[move.rowNext][move.colNext])) ? COLOR_BLACK: COLOR_WHITE;
-            
+            playerCaptures->capturedPiece.color = (isupper(board[move.rowNext][move.colNext])) ? COLOR_BLACK : COLOR_WHITE;
             playerCaptures->capturedPiece.colPosition = move.colNext;
             playerCaptures->capturedPiece.rowPosition = move.rowNext;
             playerCaptures->capturedPiece.symbol = board[move.rowNext][move.colNext];
-                
             playerCaptures->captureCount++;
             playerCaptures->newCapture = true;
         }
     }
-    
-    if (!legalCheck)
-    {
-        board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
-        rock->rowPosition = move.rowNext;
-        rock->colPosition = move.colNext;
-        rock->firstMove = false;
-    }
+
+    board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
+    board[move.rowNext][move.colNext] = rock->symbol;
+    rock->rowPosition = move.rowNext;
+    rock->colPosition = move.colNext;
+    rock->firstMove = false;
+
     return true;
 }

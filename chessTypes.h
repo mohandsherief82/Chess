@@ -23,9 +23,10 @@ typedef struct
 {
     char symbol;
     int colPrev;
-    int colNext;
     int rowPrev;
+    int colNext;
     int rowNext;
+    char promotedPawn;
 } Move;
 
 #endif

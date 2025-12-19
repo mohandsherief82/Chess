@@ -48,11 +48,7 @@ char playerTurn(char** board, Player* player, Captured* capture, int* plyEnPassa
         
         if (!pieceMoveValid) continue;
         
-        if (isChecked(board, player, !legalCheck))
-        {
-            printf("Illegal move: King remains in check, Try Again!!!\n\n");            
-            return 'i'; 
-        }
+        if (isChecked(board, player, !legalCheck)) return 'i'; 
 
         break; 
     }
@@ -115,7 +111,7 @@ int main ()
     
     while ((c = getchar()) != '\n' && c != EOF);
 
-    displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
+    updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures, true);
 
     while (true && gameState != 's')
     {
@@ -127,7 +123,7 @@ int main ()
             isChecked(board, &ply1, false);
             gameState = playerTurn(board, &ply1, &whiteCaptures, &whiteEnPassantCol, &blackEnPassantCol);
 
-            if (whiteCaptures.newCapture == true) capturePiece(ply2, &whiteCaptures);
+            if (whiteCaptures.newCapture == true) capturePiece(&ply2, &whiteCaptures);
             
             if (gameState == 's') break;
             else if (gameState == 'u')
@@ -138,13 +134,11 @@ int main ()
                     printf("Move undone.\nReturning turn to player 2!!!\n");
                     currentPlayerTurn = 2;
                     clearScreen();
-                    displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
+                    updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures, true);
                 }
-                else 
-                {
-                    printf("No moves to undo, Try Again!!!\n");
-                    continue;
-                }
+                else printf("No moves to undo, Try Again!!!\n");
+
+                continue;
             }
             else if (gameState == 'i')
             {
@@ -152,12 +146,13 @@ int main ()
                 loadGame(board, &ply1, &ply2, 
                             &whiteCaptures, &blackCaptures, 
                                 &whiteEnPassantCol, &blackEnPassantCol);
-                displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
+                updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures, true);
+                printf("Illegal move: King remains in check, Try Again!!!\n\n");
                 continue;
             }
 
             clearScreen();
-            displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
+            updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures, true);
             currentPlayerTurn = 2;
 
             if (checkMate(board, &ply2))
@@ -177,30 +172,36 @@ int main ()
             
             isChecked(board, &ply2, false);
             gameState = playerTurn(board, &ply2, &blackCaptures, &blackEnPassantCol, &whiteEnPassantCol);
-            if (blackCaptures.newCapture == true) capturePiece(ply1, &blackCaptures);
+            if (blackCaptures.newCapture == true) capturePiece(&ply1, &blackCaptures);
             
             if (gameState == 's') break;
             else if (gameState == 'u')
             {
-                undoLastMove(board, &ply1, &ply2, &whiteCaptures, &blackCaptures
-                            , &whiteEnPassantCol, &blackEnPassantCol);
-                printf("Move undone.\nReturning turn to player 1!!!\n");
-                currentPlayerTurn = 1;
-                clearScreen();
-                displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
-
+                if(undoLastMove(board, &ply1, &ply2, &whiteCaptures, &blackCaptures
+                            , &whiteEnPassantCol, &blackEnPassantCol))
+                {
+                    printf("Move undone.\nReturning turn to player 1!!!\n");
+                    currentPlayerTurn = 1;
+                    clearScreen();
+                    updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures, true);
+                }
+                else printf("No moves to undo, Try Again!!!\n");
+                
                 continue;
             }
-            else if (gameState == 'i') 
+            else if (gameState == 'i')
             {
+                clearScreen();
                 loadGame(board, &ply1, &ply2, 
                             &whiteCaptures, &blackCaptures, 
                                 &whiteEnPassantCol, &blackEnPassantCol);
+                updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures, true);
+                printf("Illegal move: King remains in check, Try Again!!!\n\n");
                 continue;
             }
             
             clearScreen();
-            displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
+            updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures, true);
             currentPlayerTurn = 1;
 
             if (checkMate(board, &ply1))

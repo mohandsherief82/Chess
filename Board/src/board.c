@@ -54,17 +54,20 @@ void addPieces(char** board, void* piecesArray, int numPieces, size_t piece_size
 }
 
 
-void displayBoard(char** board, Player player1, Player player2, Captured ply1Captures, Captured ply2Captures)
+void updateBoard(char** board, Player player1, Player player2, Captured ply1Captures, Captured ply2Captures, bool PRINT)
 {
     clearScreen();
-    printf("----------------|-------------------------------|-----------------------------------------------|----------------------"
-            "--------------------------------------------|-----------\n");
-    printf("\t\t|             Moves             |\t\t\t Board \t\t\t|\t\t\t Captures \t\t\t\t   |\n");
-    printf("\t\t|---------------|---------------|-----------------------------------------------|--------------------"
-                "----------------------------------------------|\n");
-    printf("\t\t|     White     |     Black     |\t    A   B   C   D   E   F   G   H  \t|\t\t\t Black Captures \t\t\t   |\n");
-    printf("\t\t|---------------|---------------|\t  |---|---|---|---|---|---|---|---|\t|"
-            "------------------------------------------------------------------|\n");
+    if (PRINT)
+    {
+        printf("----------------|-------------------------------|-----------------------------------------------|----------------------"
+                "--------------------------------------------|-----------\n");
+        printf("\t\t|             Moves             |\t\t\t Board \t\t\t|\t\t\t Captures \t\t\t\t   |\n");
+        printf("\t\t|---------------|---------------|-----------------------------------------------|--------------------"
+                    "----------------------------------------------|\n");
+        printf("\t\t|     White     |     Black     |\t    A   B   C   D   E   F   G   H  \t|\t\t\t Black Captures \t\t\t   |\n");
+        printf("\t\t|---------------|---------------|\t  |---|---|---|---|---|---|---|---|\t|"
+                "------------------------------------------------------------------|\n");
+    }
 
     addPieces(board, player1.pawns, NUM_PAWNS, sizeof(Pawn));
     addPieces(board, player2.pawns, NUM_PAWNS, sizeof(Pawn));
@@ -98,70 +101,73 @@ void displayBoard(char** board, Player player1, Player player2, Captured ply1Cap
     for(int i = 0; i < BOARD_SIZE; i++)
     {
         Move move;
-        printf("\t\t");
+        if (PRINT) printf("\t\t");
         
         for (int j = 0; j < 2; j++)
         {            
-            if (fread(&move, sizeof(Move), 1, fptr))
+            if (fread(&move, sizeof(Move), 1, fptr) && PRINT)
                 printf("|  %c: %c%d -> %c%d  ", ((j == 0) ? move.symbol : toupper(move.symbol)), move.colPrev + 'A', 8 - move.rowPrev, move.colNext + 'A', 8 - move.rowNext);
-            else printf("|               ");
+            else if (PRINT) printf("|               ");
         }
         
-        printf("|\t%d", BOARD_SIZE - i);
+        if (PRINT) printf("|\t%d", BOARD_SIZE - i);
 
         for (int j = 0; j < BOARD_SIZE; j++) 
         {
             if (board[i][j] == EMPTY_SQUARE)
                 board[i][j] = ((i + j) % 2 == 0) ? WHITE_SQUARE : BLACK_SQUARE;
-            printf(" | %c", board[i][j]);
+            if (PRINT) printf(" | %c", board[i][j]);
         }
         
-        printf(" |%d\t|", BOARD_SIZE - i);
-        if (i == 4) printf("\t\t\t White Captures \t\t\t   |");
+        if (PRINT) printf(" |%d\t|", BOARD_SIZE - i);
+        if (i == 4 && PRINT) printf("\t\t\t White Captures \t\t\t   |");
         else if (i == 1 || i == 2)
         {
             int startIndex = (i % 5 == 1) ? 0 : 8
                 , endIndex = startIndex + 8;
             
-            printf("                 ");
+            if (PRINT) printf("                 ");
 
             for (int k = startIndex; k < endIndex; k++)
             {
-                printf("| %c ", ply2Captures.capturedSymbols[k]);
-                if (ply2Captures.capturedSymbols[k] == 'X') printf("|   ");
+                if (PRINT) printf("| %c ", ply2Captures.capturedSymbols[k]);
+                if (ply2Captures.capturedSymbols[k] == 'X' && PRINT) printf("|   ");
             }
 
-            if (i == 1) printf("|                |");
-            else printf("             |");
+            if (i == 1 && PRINT) printf("|                |");
+            else if (PRINT) printf("             |");
         }
         else if (i == 6 || i == 7)
         {
             int startIndex = (i % 5 == 1) ? 0 : 8
                 , endIndex = startIndex + 8;            
-            printf("                 ");
+            if (PRINT) printf("                 ");
 
             for (int k = startIndex; k < endIndex; k++)
             {
-                printf("| %c ", ply1Captures.capturedSymbols[k]);
-                if (ply1Captures.capturedSymbols[k] == 'X') printf("|   ");
+                if (PRINT) printf("| %c ", ply1Captures.capturedSymbols[k]);
+                if (ply1Captures.capturedSymbols[k] == 'X' && PRINT) printf("|   ");
             }
 
-            if (i == 6) printf("|                |");
-            else printf("             |");
+            if (i == 6 && PRINT) printf("|                |");
+            else if (PRINT) printf("             |");
         }
-        else printf("                                                                  |");
-        printf("\n");
+        else if (PRINT) printf("                                                                  |");
+        if (PRINT) printf("\n");
 
-        printf("\t\t|---------------|---------------|\t  |---|---|---|---|---|---|---|---|\t|");
-        if (i == 3 || i == 4) printf("------------------------------------------------------------------|");
-        else if (i % 5 >= 0 && i % 5 <= 2) printf("                 |---|---|---|---|---|---|---|---|                |");
-        else printf("                                                                  |");
-        printf("\n");
+        if (PRINT) printf("\t\t|---------------|---------------|\t  |---|---|---|---|---|---|---|---|\t|");
+        if ((i == 3 || i == 4) && PRINT) printf("------------------------------------------------------------------|");
+        else if (i % 5 >= 0 && i % 5 <= 2 && PRINT) printf("                 |---|---|---|---|---|---|---|---|                |");
+        else if (PRINT) printf("                                                                  |");
+        if (PRINT) printf("\n");
     }
 
-    printf("\t\t|\t        |\t        |\t    A   B   C   D   E   F   G   H  \t|\t\t\t\t\t\t\t\t   |\n");
-    printf("----------------|---------------|---------------|-----------------------------------------------|----------------------"
-            "--------------------------------------------|-----------\n");
+    if (PRINT)
+    {
+        printf("\t\t|\t        |\t        |\t    A   B   C   D   E   F   G   H  \t|\t\t\t\t\t\t\t\t   |\n");
+        printf("----------------|---------------|---------------|-----------------------------------------------|----------------------"
+                "--------------------------------------------|-----------\n");
+    }
 
     fclose(fptr);
 }
@@ -185,7 +191,7 @@ void clearScreen()
 
 void freeBoard(char** board, Player player1, Player player2)
 {
-    for (int i = 0; i < BOARD_SIZE; i++) free(board);
+    for (int i = 0; i < BOARD_SIZE; i++) free(board[i]);
     free(board);
     freePlayer(player1);
     freePlayer(player2);

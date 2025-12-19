@@ -107,7 +107,7 @@ int main ()
     
     while ((c = getchar()) != '\n' && c != EOF);
 
-    displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
+    updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
 
     while (true && !saveGame)
     {
@@ -124,7 +124,7 @@ int main ()
             if (saveGame) break;
 
             clearScreen();
-            displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
+            updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
             currentPlayerTurn = 2;
 
             if (blackEnPassantCol != -1) blackEnPassantCol = -1; 
@@ -142,7 +142,7 @@ int main ()
             if (saveGame) break;
             
             clearScreen();
-            displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
+            updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
             currentPlayerTurn = 1;
 
             if (whiteEnPassantCol != -1) whiteEnPassantCol = -1; 

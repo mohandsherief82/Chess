@@ -115,7 +115,7 @@ int main ()
     
     while ((c = getchar()) != '\n' && c != EOF);
 
-    displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
+    updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
 
     while (true && gameState != 's')
     {
@@ -138,7 +138,7 @@ int main ()
                     printf("Move undone.\nReturning turn to player 2!!!\n");
                     currentPlayerTurn = 2;
                     clearScreen();
-                    displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
+                    updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
                 }
                 else 
                 {
@@ -152,12 +152,12 @@ int main ()
                 loadGame(board, &ply1, &ply2, 
                             &whiteCaptures, &blackCaptures, 
                                 &whiteEnPassantCol, &blackEnPassantCol);
-                displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
+                updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
                 continue;
             }
 
             clearScreen();
-            displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
+            updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
             currentPlayerTurn = 2;
 
             if (checkMate(board, &ply2))
@@ -187,7 +187,7 @@ int main ()
                 printf("Move undone.\nReturning turn to player 1!!!\n");
                 currentPlayerTurn = 1;
                 clearScreen();
-                displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
+                updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
 
                 continue;
             }
@@ -200,7 +200,7 @@ int main ()
             }
             
             clearScreen();
-            displayBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
+            updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
             currentPlayerTurn = 1;
 
             if (checkMate(board, &ply1))

@@ -17,62 +17,47 @@ static const int knightCol[8] = {-1, 1, -2, 2, -2, 2, -1, 1};
 
 Piece* findPiece(Player* player, Move move)
 {
-    Piece* piece = NULL;
+    char symbol = tolower(move.symbol);
 
-    if (move.symbol == 'p')
+    if (symbol == 'p')
     {
         for (int i = 0; i < NUM_PAWNS; i++)
         {
-            if (move.colPrev == player->pawns[i].colPosition && player->pawns[i].isActive
-                    && move.rowPrev == player->pawns[i].rowPosition) 
-            {
-                piece = (Piece*)&player->pawns[i];
-                break;
-            }
+            if (move.colPrev == player->pawns[i].colPosition && move.rowPrev == player->pawns[i].rowPosition && player->pawns[i].isActive) 
+                return (Piece*)&player->pawns[i];
         } 
     }
-    else if (move.symbol == 'r')
+    else if (symbol == 'r')
     {
         for (int i = 0; i < NUM_PIECES; i++)
         {
-            if (player->rocks[i].colPosition == move.colPrev 
-                && player->rocks[i].rowPosition == move.rowPrev && player->rocks[i].isActive)
-            {
-                piece = (Piece*)&player->rocks[i];
-                break;
-            }
+            if (player->rocks[i].colPosition == move.colPrev && player->rocks[i].rowPosition == move.rowPrev && player->rocks[i].isActive)
+                return (Piece*)&player->rocks[i];
         }
     }
-    else if (move.symbol == 'n')
+    else if (symbol == 'n')
     {
         for (int i = 0; i < NUM_PIECES; i++)
         {
-            if (player->knights[i].colPosition == move.colPrev && player->knights[i].isActive
-                    && player->knights[i].rowPosition == move.rowPrev)
-            {
-                piece = (Piece*)&player->knights[i];
-                break;
-            }
+            if (player->knights[i].colPosition == move.colPrev && player->knights[i].rowPosition == move.rowPrev && player->knights[i].isActive)
+                return (Piece*)&player->knights[i];
         }
     }
-    else if (move.symbol == 'b')
+    else if (symbol == 'b')
     {
         for (int i = 0; i < NUM_PIECES; i++)
         {
-            if (player->bishops[i].colPosition == move.colPrev 
-                && player->bishops[i].rowPosition == move.rowPrev && player->bishops[i].isActive)
-            {
-                piece = (Piece*)&player->bishops[i];
-                break;
-            }
+            if (player->bishops[i].colPosition == move.colPrev && player->bishops[i].rowPosition == move.rowPrev && player->bishops[i].isActive)
+                return (Piece*)&player->bishops[i];
         }
     }
-    else if (move.symbol == 'q' && player->queen->colPosition == move.colPrev && player->queen->isActive
-                && player->queen->rowPosition == move.rowPrev) piece = (Piece*)player->queen;
+    else if (symbol == 'q')
+    {
+        if (player->queen != NULL && player->queen->colPosition == move.colPrev && player->queen->rowPosition == move.rowPrev && player->queen->isActive)
+            return (Piece*)player->queen;
+    }
 
-    if (piece == NULL) piece = checkPromotedPawn(player, move);
-
-    return piece;
+    return checkPromotedPawn(player, move);
 }
 
 
@@ -103,11 +88,12 @@ bool isChecked(char** board, Player* player, bool legalCheck)
             {
                 if (tolower(board[r][c]) == 'n' && (islower(king->symbol) != islower(board[r][c])))
                 {
-                    if (!legalCheck)
+                    if (!legalCheck) 
                     {
                         king->isChecked = true;
-                        printf("King is checked by a Knight at (%c%d)!!!\n", c + 'A', r);
+                        printf("King is checked by a Knight at (%c%d)!!!\n", c + 'A', 8 - r);
                     }
+
                     return true;
                 }
             }
@@ -117,89 +103,64 @@ bool isChecked(char** board, Player* player, bool legalCheck)
     for (int d = 0; d < 8; d++)
     {
         Piece* pinCandidate = NULL;
-        
         bool isDiagonal = (movesRBRow[d] != 0 && movesRBCol[d] != 0);
         bool isOrthogonal = (movesRBRow[d] == 0 || movesRBCol[d] == 0) && (!isDiagonal);
+
         for (int step = 1; step < BOARD_SIZE; step++)
         {
-            r = king->rowPosition + movesRBRow[d] * step;
-            c = king->colPosition + movesRBCol[d] * step;
+            r = king->rowPosition + (movesRBRow[d] * step);
+            c = king->colPosition + (movesRBCol[d] * step);
 
             if (r < 0 || r >= BOARD_SIZE || c < 0 || c >= BOARD_SIZE) break;
-
             if (isEmpty(board, r, c)) continue;
                        
             if (pieceColorAt(board, r, c) != player->color)
             {           
+                char pType = tolower(board[r][c]);
+
                 if (pinCandidate == NULL)
                 {
-                    char piece = tolower(board[r][c]);
+                    if ((isOrthogonal && (pType == 'r' || pType == 'q')) || (isDiagonal && (pType == 'b' || pType == 'q')))
+                    {
+                        if (!legalCheck) 
+                        {
+                            king->isChecked = true;
+                            printf("King is checked by a %s at (%c%d)!!!\n", (pType == 'q' ? "Queen" : (pType == 'r' ? "Rook" : "Bishop")), c + 'A', 8 - r);
+                        }
 
-                    if (isOrthogonal && (piece == 'r' || piece == 'q'))
-                    {
-                        if (!legalCheck)
-                        {
-                            king->isChecked = true;
-                            if (piece == 'r') printf("King is checked by a Rook at (%c%d)!!!\n", c + 'A', r);
-                            else printf("King is checked by a Queen at (%c%d)!!!\n", c + 'A', r);
-                        }
                         return true;
                     }
                     
-                    if (isDiagonal && (piece == 'b' || piece == 'q'))
+                    if (step == 1 && isDiagonal && pType == 'p')
                     {
-                        if (!legalCheck)
+                        if ((islower(king->symbol) && movesRBRow[d] == -1) || (isupper(king->symbol) && movesRBRow[d] == 1))
                         {
-                            king->isChecked = true;
-                            if (piece == 'b') printf("King is checked by a Bishop at (%c%d)!!!\n", c + 'A', r);
-                            else printf("King is checked by a Queen at (%c%d)!!!\n", c + 'A', r);
-                        }
-                        return true;
-                    }
-                    
-                    if (step == 1 && isDiagonal && piece == 'p')
-                    {
-                        if (islower(king->symbol) && movesRBRow[d] == -1)
-                        {
-                            if (!legalCheck)
+                            if (!legalCheck) 
                             {
                                 king->isChecked = true;
-                                printf("White King is checked by a Black Pawn at (%c%d)!\n", c + 'A', r);
+                                printf("King checked by Pawn at (%c%d)!\n", c + 'A', 8 - r);
                             }
-                            return true;
-                        }
-                        if (isupper(king->symbol) && movesRBRow[d] == 1)
-                        {
-                            if (!legalCheck)
-                            {
-                                king->isChecked = true;
-                                printf("Black King is checked by a White Pawn at (%c%d)!\n", c + 'A', r);
-                            }
+
                             return true;
                         }
                     }
-                    if (step == 1 && piece == 'k')
+
+                    if (step == 1 && pType == 'k')
                     {
-                        if (!legalCheck)
-                        {
-                            king->isChecked = true;
-                            printf("King is checked by the opposing King at (%c%d)!!!\n", c + 'A', r);
-                        }
+                        if (!legalCheck) king->isChecked = true;
                         return true;
                     }
-                    
+
                     break;
                 } 
-                else 
+                else
                 {
                     if (!legalCheck)
                     {
-                        char pieceType = tolower(board[r][c]);
-                        bool isPinningAttacker = false;
-                        if (isOrthogonal && (pieceType == 'r' || pieceType == 'q')) isPinningAttacker = true;
-                        if (isDiagonal && (pieceType == 'b' || pieceType == 'q')) isPinningAttacker = true;
-                        if (isPinningAttacker) pinCandidate->isPinned = true;
+                        if ((isOrthogonal && (pType == 'r' || pType == 'q')) || (isDiagonal && (pType == 'b' || pType == 'q')))
+                            pinCandidate->isPinned = true;
                     }
+
                     break;
                 }
             }
@@ -207,15 +168,11 @@ bool isChecked(char** board, Player* player, bool legalCheck)
             {
                 if (pinCandidate == NULL)
                 {
-                    Move move = {
-                        .symbol = tolower(board[r][c]),
-                        .colPrev = c,
-                        .rowPrev = r
-                    };                 
-                    
-                    pinCandidate = findPiece(player, move);
-                    if (pinCandidate == NULL) break;
+                    Move m = { .symbol = tolower(board[r][c]), .colPrev = c, .rowPrev = r };                 
+                    pinCandidate = findPiece(player, m);
+                    if (pinCandidate == NULL) break; 
                 }
+
                 else break;
             }
         }
