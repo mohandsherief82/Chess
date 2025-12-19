@@ -88,15 +88,23 @@ void updateBoard(char** board, Player player1, Player player2, Captured ply1Capt
     addPieces(board, player2.king, 1, sizeof(King));
 
     FILE *fptr = fopen("./Game-End/testing/game.bin", "rb");
-    long fileSize = getFileSize(fptr);
     
     if (fptr == NULL)
     {
         FILE* ftemp = fopen("./Game-End/testing/game.bin", "wb");
         if (ftemp != NULL) fclose(ftemp);
+        fptr = fopen("./Game-End/testing/game.bin", "rb");
     }
 
-    if (fileSize > sizeof(Move) *  16) fseek(fptr, -(long)(sizeof(Move) * 16), SEEK_END);
+    long fileSize = getFileSize(fptr);
+    int totalMoves = (int)(fileSize / sizeof(Move));
+    
+    if (totalMoves > 16) 
+    {
+        int startMove = totalMoves - 16;
+        if (startMove % 2 != 0) startMove++;
+        fseek(fptr, (long)(startMove * sizeof(Move)), SEEK_SET);
+    }
 
     for(int i = 0; i < BOARD_SIZE; i++)
     {
