@@ -35,7 +35,7 @@ char playerTurn(char** board, Player* player, Captured* capture, int* plyEnPassa
 
         if (move.symbol == 's') return 's';
         else if (move.symbol == 'u') return 'u';
-        else if (move.symbol == 'r') return 'r';
+        else if (move.symbol == 'e') return 'e';
 
         bool pieceMoveValid = false;
         char moveSymbol = tolower(move.symbol);
@@ -151,7 +151,7 @@ int main ()
                 printf("Illegal move: King remains in check, Try Again!!!\n\n");
                 continue;
             }
-            else if (gameState == 'r')
+            else if (gameState == 'e')
             {
                 printf("Game Ends!!!\nPlayer 2 wins by Resignation!!!\n");
                 break;
@@ -161,9 +161,24 @@ int main ()
             updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures, true);
             currentPlayerTurn = 2;
 
-            if (checkMate(board, &ply2))
+            if (checkMate(board, &ply1))
             {
                 printf("Game Ended By Checkmate.\nPlayer 1 wins!!!\n");
+                printf("Do you want to undo last move(u, press any key to end game)? ");
+                if (scanf("%c", &gameState) == 1)
+                {
+                    if (gameState == 'u')
+                    {    
+                        undoLastMove(board, &ply1, &ply2, &whiteCaptures, &blackCaptures, &whiteEnPassantCol, &blackEnPassantCol);
+                        currentPlayerTurn = 1;
+                        clearScreen();
+                        updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures, true);
+                    
+                        continue;
+                    }
+                }
+
+                printf("Game Ended, Good Game!!!\n");
                 remove(path);
                 break;
             }
@@ -205,7 +220,7 @@ int main ()
                 printf("Illegal move: King remains in check, Try Again!!!\n\n");
                 continue;
             }
-            else if (gameState == 'r')
+            else if (gameState == 'e')
             {
                 printf("Game Ends!!!\nPlayer 1 wins by Resignation!!!\n");
                 break;
@@ -218,6 +233,21 @@ int main ()
             if (checkMate(board, &ply1))
             {
                 printf("Game Ended By Checkmate.\nPlayer 2 wins!!!\n");
+                printf("Do you want to undo last move(u, press any key to end game)? ");
+                if (scanf("%c", &gameState) == 1)
+                {
+                    if (gameState == 'u')
+                    {    
+                        undoLastMove(board, &ply1, &ply2, &whiteCaptures, &blackCaptures, &whiteEnPassantCol, &blackEnPassantCol);
+                        currentPlayerTurn = 2;
+                        clearScreen();
+                        updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures, true);
+                    
+                        continue;
+                    }
+                }
+
+                printf("Game Ended, Good Game!!!\n");
                 remove(path);
                 break;
             }

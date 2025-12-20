@@ -108,8 +108,6 @@ bool movePawn(char** board, Player* player, Move* move, Captured* playerCaptures
                 if (pawn->firstMove) pawn->firstMove = false;
                 promotePawn(pawn, move, load);
                 board[move->rowNext][move->colNext] = pawn->symbol;
-
-                printf("%c\n", move->promotedPawn);
             }
             
             return true;
