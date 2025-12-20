@@ -103,7 +103,7 @@ bool legalMove(char** board, Player* player)
                     bool moveSuccessful = false;
                     char pieceType = tolower(testMove.symbol);
                     
-                    if (pieceType == 'p') moveSuccessful = movePawn(cpyB, &cpyP, testMove, &tempCapture, &plyEpCol, &oppEpCol, legalCheck);
+                    if (pieceType == 'p') moveSuccessful = movePawn(cpyB, &cpyP, &testMove, &tempCapture, &plyEpCol, &oppEpCol, legalCheck, false);
                     else if (pieceType == 'r') moveSuccessful = moveRock(cpyB, &cpyP, testMove, &tempCapture, legalCheck);
                     else if (pieceType == 'n') moveSuccessful = moveKnight(cpyB, &cpyP, testMove, &tempCapture, legalCheck);
                     else if (pieceType == 'b') moveSuccessful = moveBishop(cpyB, &cpyP, testMove, &tempCapture, legalCheck);

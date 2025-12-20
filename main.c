@@ -40,7 +40,7 @@ char playerTurn(char** board, Player* player, Captured* capture, int* plyEnPassa
         bool pieceMoveValid = false;
         char moveSymbol = tolower(move.symbol);
         
-        if (moveSymbol == 'p') pieceMoveValid = movePawn(board, player, move, capture, plyEnPassantCol, opponentEnPassantCol, legalCheck);
+        if (moveSymbol == 'p') pieceMoveValid = movePawn(board, player, &move, capture, plyEnPassantCol, opponentEnPassantCol, legalCheck, false);
         else if (moveSymbol == 'r') pieceMoveValid = moveRock(board, player, move, capture, legalCheck);
         else if (moveSymbol == 'n') pieceMoveValid = moveKnight(board, player, move, capture, legalCheck);
         else if (moveSymbol == 'b') pieceMoveValid = moveBishop(board, player, move, capture, legalCheck);

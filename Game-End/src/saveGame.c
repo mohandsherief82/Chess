@@ -22,7 +22,7 @@ bool loadPlayerTurn(char** board, Player* player, Move move, Captured* capture, 
     bool state;
     char sym = tolower(move.symbol);
 
-    if (sym == 'p') state = movePawn(board, player, move, capture, whiteEnPassantCol, blackEnPassantCol, false);
+    if (sym == 'p') state = movePawn(board, player, &move, capture, whiteEnPassantCol, blackEnPassantCol, false, true);
     else if (sym == 'r') state = moveRock(board, player, move, capture, false);
     else if (sym == 'n') state = moveKnight(board, player, move, capture, false);
     else if (sym == 'b') state = moveBishop(board, player, move, capture, false);
@@ -132,6 +132,7 @@ void saveMove(Move move)
     FILE* fptr = fopen(path, "ab");
     if (fptr)
     {
+        if (move.symbol == 'p') printf("%c\n", move.promotedPawn);
         fwrite(&move, sizeof(Move), 1, fptr);
         fclose(fptr);
     }
