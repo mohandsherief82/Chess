@@ -157,8 +157,11 @@ To ensure games can be resumed, every validated move is appended to a binary fil
 ## 8. Snapshots of the Game
 
 1. **Main Menu Interface**
+![Alt Text](./image.png)
 2. **Active Gameplay with Board Rendering**
+![Alt Text](./image-1.png)
 3. **End of Game: Checkmate State**
+![Alt Text](./image-2.png)
 
 ---
 
