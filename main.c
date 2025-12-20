@@ -35,6 +35,7 @@ char playerTurn(char** board, Player* player, Captured* capture, int* plyEnPassa
 
         if (move.symbol == 's') return 's';
         else if (move.symbol == 'u') return 'u';
+        else if (move.symbol == 'r') return 'r';
 
         bool pieceMoveValid = false;
         char moveSymbol = tolower(move.symbol);
@@ -150,6 +151,11 @@ int main ()
                 printf("Illegal move: King remains in check, Try Again!!!\n\n");
                 continue;
             }
+            else if (gameState == 'r')
+            {
+                printf("Game Ends!!!\nPlayer 2 wins by Resignation!!!\n");
+                break;
+            }
 
             clearScreen();
             updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures, true);
@@ -198,6 +204,11 @@ int main ()
                 updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures, true);
                 printf("Illegal move: King remains in check, Try Again!!!\n\n");
                 continue;
+            }
+            else if (gameState == 'r')
+            {
+                printf("Game Ends!!!\nPlayer 1 wins by Resignation!!!\n");
+                break;
             }
             
             clearScreen();

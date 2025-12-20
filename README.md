@@ -1,75 +1,59 @@
-# Terminal Chess Engine
+# Terminal Chess Engine Technical Report
 
-- Added a copy function for board and player (Reference: https://www.geeksforgeeks.org/cpp/memcpy-in-cc/)
+## Table of Contents
 
-## Overview
+1. [Overview](https://www.google.com/search?q=%231-overview)
+2. [Technical Features](https://www.google.com/search?q=%232-technical-features)
+3. [Build System](https://www.google.com/search?q=%233-build-system)
+4. [Movement Logic](https://www.google.com/search?q=%234-movement-logic)
+5. [Game End States](https://www.google.com/search?q=%235-game-end-states)
+6. [Persistence](https://www.google.com/search?q=%236-persistence)
+7. [User Manual](https://www.google.com/search?q=%237-user-manual)
+8. [Snapshots](https://www.google.com/search?q=%238-snapshots)
+9. [Project Contributors & Supervision](https://www.google.com/search?q=%239-project-contributors--supervision)
+10. [References](https://www.google.com/search?q=%2310-references)
 
-* ## Features
+---
 
-### Pieces
+## 1. Overview
 
-* Since each piece represents its own entity, each type of piece has its own structure that follows a general piece structure.
+The **Terminal Chess Engine** is a comprehensive board game application implemented in C. It translates the high-level complexity of Chess into a modular, command-line interface. The engine supports full FIDE rules, including specialized movements like castling, en passant, and pawn promotion.
 
-~~~c
+Key technical highlights include a recursive-style move validation system, binary file persistence for saving and loading game states, and a robust "Undo" feature that uses file truncation to safely revert moves back to the starting position.
+
+---
+
+## 2. Technical Features & Data Structures
+
+### 2.1 Piece Architecture
+
+To maintain a high level of abstraction, each chess piece is represented by a `struct`. This allows the movement logic to treat different pieces through a unified interface.
+
+```c
 typedef struct
 {
-    char symbol;
-    PieceColor color;
+    char symbol;      // e.g., 'p', 'r', 'N'
+    PieceColor color; // Enum for WHITE or BLACK
     int rowPosition; 
     int colPosition;
-    bool isActive;
-    bool isPinned;
+    bool isActive;    // Tracks if the piece is still on the board
+    bool isPinned;    // Flag used by Check-detection
 } Piece;
-~~~
 
-* The idea behind this design: as pieces have different positions during the game, we use the `rowPosition` and `colPosition` members to store their position on the chess board.
-* Also, we need an indicator for the state of the piece as it can be captured by the opponent or pinned; for this reason, two flags have been added for each piece.
-* All pieces follow this design schema. However, there are some pieces that require extra data.
-* Each piece has its own initializer function for creating its initial position and data.
-* This general piece structure will be useful later as it will be used for adding pieces to the board.
+```
 
-#### Pawn Piece
+#### Specialized Pieces
 
-* The pawn piece has some special members that make it different from other pieces; it can be promoted, and for its first move, it can move two cells forward. Therefore, we have two extra special members that serve as indicators for promotion and the first move.
+Certain pieces require state-tracking beyond the base structure:
 
-~~~c
-typedef struct 
-{
-    char symbol;
-    PieceColor color;
-    int rowPosition;
-    int colPosition;
-    bool isActive;
-    bool isPinned;
-    bool promoted;
-    bool firstMove;
-} Pawn;
-~~~
+* **Pawn Piece**: Includes promoted (to handle movement changes) and firstMove (to allow the initial 2-square jump and En Passant logic).
+* **King Piece**: Includes isChecked for UI alerts and firstMove to validate castling rights.
 
-#### King Piece
+### 2.2 Player Management
 
-* The king piece also has some special members, as it can castle on its first move and needs an indicator for its check state. As a result, it includes a member for its first move (for castling) and a check flag.
+The `Player` structure acts as a container for all 16 pieces belonging to a user, utilizing dynamic memory allocation to manage the piece arrays.
 
-~~~c
-typedef struct 
-{
-    char symbol;
-    PieceColor color;
-    int rowPosition;
-    int colPosition;
-    bool isActive;
-    bool isChecked;
-    bool firstMove;
-} King;
-~~~
-
-### Player
-
-* To store the player data, we chose to create a struct with 7 members. Two of them are pointers to a dynamically allocated memory block and four are dynamically allocated arrays, which makes the manipulation of piece data easier later on. There is also a member that acts as a color indicator.
-* The player also has its own initializer function, which assigns and initializes each piece and stores their addresses in their respective members and correct positions.
-* To prevent memory leaks, we created a function that clears the dynamically allocated members.
-
-~~~c
+```c
 typedef struct
 {
     const PieceColor color;
@@ -80,104 +64,128 @@ typedef struct
     Queen *queen;
     King *king;
 } Player;
-~~~
 
-### Board
+```
 
-* The board is created as a standard 2D array that stores the symbols of the pieces; a white square is represented by **"-"** and a black square is represented by **"."**.
-* White pieces are represented by lowercase letters, while black pieces are represented by uppercase letters.
-* The board array has its own initializer function, which dynamically allocates the board, and a freeing function to empty the board at the end of the game.
-* The board will be initialized with empty squares/spaces that will be used later to determine if a cell is white or black.
-* The `addPiece` function has been created to add pieces to the board using the base piece structure, which acts as an adaptable data type for different pieces.
-* The `displayBoard` function prints the board in the center of the terminal with the move log on its left and the captured piece list on the right. It also shows the white captures in the bottom-right corner of the display, while the black captures are shown above the white captures.
-* A clear screen function was added to clear the screen after each move (Reference: https://www.geeksforgeeks.org/c/clear-console-c-language/).
+### 2.3 The Chessboard
 
-### Moves
+* The board is represented as a dynamic 2D char array of size . Visual Styling: White squares are rendered using "-" and black squares using ".".
+* **Updating**: The addPiece function serves as the primary interface for updating the board array based on the current state of the Player structures.
+* **UI/UX**: The displayBoard function handles the complex task of centered rendering. It utilizes terminal escape codes to clear the screen, providing a seamless "animation-like" feel. The interface is split into three zones: the Move Log (left), the Active Board (center), and Captured Pieces (right).
 
-* Each move has unique data, so a structure has been created to store the piece symbol being moved, its previous position, and its destination.
+---
 
-~~~c
-typedef struct
-{
-    char symbol;
-    int colPrev;
-    int colNext;
-    int rowPrev;
-    int rowNext;
-} Move;
-~~~
+## 3. The Build System (Makefile)
 
-* As most pieces have a unique way of moving, each type of piece requires its own function for motion.
+The project uses a modular `Makefile` to manage compilation. In addition to the primary game targets, several internal targets exist to test specific logic modules (Pieces, Board, Moves, etc.) independently during development.
 
-#### Pawn Movement
+> **Note:** Targets marked as *Internal/Testing* were used during intermediate development phases. Some may require specific directory structures or mock data to execute correctly and may not be as stable as the primary `run` target.
 
-* The pawn has a couple of different moves: it can either step one cell ahead if nothing is in front of it, or, if it is the pawn's first move, it can move two cells ahead provided nothing is in its path.
-* The `movePawn` function starts with a linear search in the player's pawns array to find the pawn at the specified position.
-* After finding the correct pawn, it checks the pawn's color to determine its allowed direction and verifies if the move can be performed.
-* As pawns can only capture on their diagonals, the capture logic is different from the main movement pattern. Therefore, it requires an extra check for empty cells and to see if the target piece is of the opposite color.
-* Additionally, the pawn has promotion functionality, which involves checking if it has reached row 1 or 8.
-* After promotion, the player is prompted to choose the piece type for promotion, and the pawn symbol is changed to the respective symbol based on the player's color.
-* Pawn promotion might cause a problem later on as the promoted pawn will no longer move like a pawn; thus, the function `checkPromotedPawn` was created to determine if a piece is a promoted pawn before executing movement logic.
+| Target | Command | Category | Purpose |
+| --- | --- | --- | --- |
+| **run** | `make run` | **Primary** | Compiles all modules and launches the full Chess game. |
+| **compile** | `make compile` | **Primary** | Links all source files and generates the `run.o` executable. |
+| **clean** | `make clean` | **Utility** | Wipes all binaries in subdirectories and the root, then clears the terminal. |
+| **game_end** | `make game_end` | Internal | Builds the test suite for Checkmate and Stalemate detection logic. |
+| **moves** | `make moves` | Internal | Compiles move-generation and validation logic for unit testing. |
+| **board** | `make board` | Internal | Compiles board rendering and coordinate mapping modules. |
+| **pieces** | `make pieces` | Internal | Tests individual piece behavior and structure initialization. |
+| **test_[module]** | `make test_board` etc. | Testing | Automated targets that compile *and* execute the corresponding internal test binaries. |
 
-#### Knight Movement
+---
 
-* The knight moves in an *L* shape where the difference between two cells equals 2 in one direction and 1 in the other direction.
-* The `moveKnight` function starts by finding the required knight and checks if it can be moved (e.g., if it is pinned). It then validates the L-shaped condition by calculating the difference between the current cell and the target cell in the X and Y directions. If the *L* shape is valid, it checks the destination cell; if there is an enemy piece, it is captured, but if it is a friendly piece, the move is invalid.
+## 4. Movement Logic
 
-#### Rook Movement
+### 3.1 Pawn Movement & Promotion
 
-* The rook moves in a *straight line* where the difference between two cells is non-zero in one direction and zero in the other.
-* The `moveRock` function finds the required rook and checks if it can be moved (e.g., if it is pinned). It then validates the *straight-line* condition. If the path is valid, it checks each cell along the way. If any piece is in the path, the move cannot be performed. At the destination, it captures the piece if it is an enemy; if it is friendly, the move is invalid.
+* The movePawn function is the most complex movement module.
+* It validates:
+* Forward Steps: 1-square or 2-square jumps (only on firstMove).
+* Diagonal Captures: Only valid if an opponent occupies the target square.
+* Promotion: Triggered when a pawn reaches the terminal ranks (Row 0 or 7).
+* The checkPromotedPawn helper ensures that once a pawn is promoted to a Queen or Rook, it adopts the movement logic of that new piece type.
 
-#### Bishop Movement
 
-* The bishop moves in a *diagonal* shape where the difference between two cells is equal in both X and Y directions.
-* The `moveBishop` function finds the required bishop and checks if it can be moved. It validates the *diagonal* condition by calculating the difference between the current and target cells. If the path is clear, it checks the destination. It captures enemy pieces at the destination cell but prevents moving onto a friendly piece.
 
-#### Queen Movement
+### 3.2 Sliding Pieces (Rook, Bishop, Queen)
 
-* As the queen is a combination of the rook and the bishop, it inherits the logic of their movements.
+* These pieces use Ray-Casting logic. The functions check every square along a chosen vector (orthogonal for Rooks, diagonal for Bishops). If any piece — friendly or enemy — is encountered before the destination, the move is flagged as invalid.
 
-#### King Movement
+### 3.3 The Knight's Leap
 
-* The king moves to the 8 adjacent cells. This is implemented using direction matrices for the X and Y axes. The logic moves the king and then checks whether he is in check.
-* The king can also castle if it is his first move and no enemy piece is attacking the path. Castling logic involves checking if the king is in check at each step of the process.
-* The most important part of king movement is the `isChecked` function, which determines if the king is under attack by looking for enemy pieces in their respective move patterns. This function is also responsible for identifying pinned pieces; it works by finding a friendly piece and continuing in that direction to see if an enemy piece is targeting the king.
+* Unlike sliding pieces, the Knight ignores intervening units. The logic strictly validates the 2 x 1 or 1 x 2 coordinate displacement.
 
-#### Captures
+### 3.4 King Safety & Castling
 
-### Game End States
+* The moveKing function integrates with isChecked.
+* **Castling**: Validates that neither the King nor the chosen Rook has moved, and crucially, ensures the King does not pass through "check" during the transition.
+* **Check Detection**: The isChecked function performs an "inverse scan" from the King's position to see if any enemy piece has a line of sight to the King.
 
-* The game can end in *Stalemate* or *Checkmate*. Each has its own implementation logic.
 
-#### Stalemate
 
-* When the king is not in check and the player whose turn it is has no legal moves available, the game ends in a draw.
-* The `checkStalemate` function checks if at least one legal move exists while the king is not in check using helper functions.
-* Copy functions for the board and player are used to create deep copies of the game state for background validation.
-* The `legalMove` function is an essential helper for stalemate; it iterates through every piece and attempts every possible move on the board using a copied state. If it finds a legal move, it stops immediately.
+---
 
-#### Checkmate
+## 5. Game End States
 
-* Checkmate logic flags a game over if the king is in check and no legal moves are available (using the `legalMove` and `isChecked` functions).
-* The legal move function covers all types of piece moves, including blocks, which makes this logic possible.
+* **Stalemate**: occurs when a player has no legal moves but is not in check. The engine detects this by simulating every possible move for every active piece using copyBoard and copyPlayer. If none of these simulated moves result in a state where the King is safe, and the King wasn't in check to begin with, a draw is declared. `copyBoard` is used to simulate every possible move to validate this state.
+* **Checkmate**: is confirmed using the legalMove helper. If the King is currently under attack (isChecked == true) and all simulated escape moves, blocks, or captures still leave the King in check, the game ends and the winner is announced.
 
-### Save, Load, and Undo
+---
 
-#### Save
+## 6. Persistence: Save, Load, and Undo
 
-* The save function writes each validated move into a binary file (Reference: https://www.programiz.com/c-programming/c-file-input-output).
+To ensure games can be resumed, every validated move is appended to a binary file. This is more space-efficient than a text file and prevents user tampering.
 
-#### Load
+* **Save**: Commits the Move struct to disk immediately after a successful turn.
+* **Load**: Reads the move history sequentially. By replaying the moves on a fresh board, the engine reconstructs the game state perfectly.
+* **Undo**: This is implemented by truncating the last `sizeof(Move)` bytes from the binary file and then triggering a "Reload." This allows the player to revert their state all the way back to the opening move.
 
-* The load function reads moves from the game file. It determines whose turn it is by counting the moves read; if an odd number of moves is read, it is the second player's turn, whereas a completed pair of moves returns the turn to the first player(Reference: https://www.programiz.com/c-programming/c-file-input-output).
+---
 
-#### Undo
+## 7. User Manual
 
-* The `undoLastMove` function removes the last move from the save file and then loads the game after the removal of the last move (Reference: https://www.geeksforgeeks.org/c/basics-file-handling-c/).
+* **Start**: Enter `p` to play a new game or `l` to load a game.
+* **Movement**: Enter moves as `[Piece][Source][Destination]` (e.g., `pe2e4`).
+* **Undo**: Type `u` to revert the last turn.
+* **Save**: Type `s` to save progress and exit the application.
+* **Promotion**: You will be prompted to enter `q`, `r`, `b`, or `n`.
 
-### User Manual
+**Note**: Most of the game's logic is case-insensitive, where you can input upper or lower case characters; it will not make a difference.
 
-* The game starts with a starting menu that asks the players if they want to play a new game or load a saved one. After choosing, the game screen appears with three sections: the left one displaying the moves made during the game, the middle section being the game board on which the pieces exist, and the right section displaying the captured pieces during the game. Then the game asks the first player to choose a piece to move; he can choose (p, n, q, b, k, or r) and then write the index of the piece and the destination cell (e.g., a2a4). After making the move, he can write (u) to undo the move he did and return to the same position. At any time he can write (s) to save the game and load it again later. The same happens for the second player, as after each move, the players take turns.
+---
 
-### Sample runs
+## 8. Snapshots of the Game
+
+1. **Main Menu Interface**
+2. **Active Gameplay with Board Rendering**
+3. **End of Game: Checkmate State**
+
+---
+
+## 9. Project Contributors & Supervision
+
+### Contributors
+
+This project was developed by the following students from Alexandria University:
+
+* **Mohand Sherief Mohamed Ali** (ID: 24010758)
+* **Moaz Gaballah Ahmed** (ID: 24010732)
+
+### Supervision
+
+* **Prof. Dr. Marwan Torki**
+* **Eng. Karim Alaa**
+
+---
+
+## 10. References
+
+* **C memcpy Documentation**: [GeeksforGeeks](https://www.geeksforgeeks.org/cpp/memcpy-in-cc/)
+* **Clear Console in C**: [GeeksforGeeks](https://www.geeksforgeeks.org/c/clear-console-c-language/)
+* **C File I/O (Binary)**: [Programiz](https://www.programiz.com/c-programming/c-file-input-output)
+
+**Note**: Anything that has been used in the implementation of this project was either found in the course material or inquired about in person.
+
+---
+
+**Alexandria University, Faculty of Engineering** **CS221: Computer Programming 1** © 2025 Terminal Chess Engine Project

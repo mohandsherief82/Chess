@@ -115,7 +115,7 @@ int main ()
     
     while ((c = getchar()) != '\n' && c != EOF);
 
-    updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
+    updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures, true);
 
     while (true && gameState != 's')
     {
@@ -127,7 +127,7 @@ int main ()
             isChecked(board, &ply1, false);
             gameState = playerTurn(board, &ply1, &whiteCaptures, &whiteEnPassantCol, &blackEnPassantCol);
 
-            if (whiteCaptures.newCapture == true) capturePiece(ply2, &whiteCaptures);
+            if (whiteCaptures.newCapture == true) capturePiece(&ply2, &whiteCaptures);
             
             if (gameState == 's') break;
             else if (gameState == 'u')
@@ -138,7 +138,7 @@ int main ()
                     printf("Move undone.\nReturning turn to player 2!!!\n");
                     currentPlayerTurn = 2;
                     clearScreen();
-                    updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
+                    updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures, true);
                 }
                 else 
                 {
@@ -152,12 +152,12 @@ int main ()
                 loadGame(board, &ply1, &ply2, 
                             &whiteCaptures, &blackCaptures, 
                                 &whiteEnPassantCol, &blackEnPassantCol);
-                updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
+                updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures, true);
                 continue;
             }
 
             clearScreen();
-            updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
+            updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures, true);
             currentPlayerTurn = 2;
 
             if (checkMate(board, &ply2))
@@ -177,7 +177,7 @@ int main ()
             
             isChecked(board, &ply2, false);
             gameState = playerTurn(board, &ply2, &blackCaptures, &blackEnPassantCol, &whiteEnPassantCol);
-            if (blackCaptures.newCapture == true) capturePiece(ply1, &blackCaptures);
+            if (blackCaptures.newCapture == true) capturePiece(&ply1, &blackCaptures);
             
             if (gameState == 's') break;
             else if (gameState == 'u')
@@ -187,7 +187,7 @@ int main ()
                 printf("Move undone.\nReturning turn to player 1!!!\n");
                 currentPlayerTurn = 1;
                 clearScreen();
-                updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
+                updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures, true);
 
                 continue;
             }
@@ -200,7 +200,7 @@ int main ()
             }
             
             clearScreen();
-            updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
+            updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures, true);
             currentPlayerTurn = 1;
 
             if (checkMate(board, &ply1))
