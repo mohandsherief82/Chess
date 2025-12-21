@@ -109,7 +109,7 @@ Move getMove()
     while (!moveFlag)
     {
         printf("\nEnter move (e.g., e2e4): ");
-        if (scanf(" %4s", moveInput) != 1) 
+        if (scanf(" %s", moveInput) != 1) 
         {
             while ((c = getchar()) != '\n' && c != EOF);
             printf("Invalid move format, Try Again!!!!\n");
