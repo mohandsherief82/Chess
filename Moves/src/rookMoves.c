@@ -30,12 +30,6 @@ bool moveRook(char** board ,Player* player, Move move, Captured* playerCaptures,
         return false;
     }
 
-    if (rock->isPinned) 
-    {
-        if (!legalCheck) printf("This rock is pinned, Try Again!!!\n");
-        return false;
-    }
-
     diffrow = move.rowNext - move.rowPrev;
     diffcol = move.colNext - move.colPrev;
 

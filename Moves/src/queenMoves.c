@@ -28,12 +28,6 @@ bool moveQueen(char** board, Player* player, Move move, Captured* playerCaptures
         return false;
     }
 
-    if (queen->isPinned) 
-    {
-        if (!legalCheck) printf("This queen is pinned, Try Again!!!\n");
-        return false;
-    }
-
     dispX = move.rowNext - move.rowPrev;
     dispY = move.colNext - move.colPrev;
 

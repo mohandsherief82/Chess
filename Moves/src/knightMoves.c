@@ -31,12 +31,6 @@ bool moveKnight(char** board ,Player* player, Move move, Captured* playerCapture
         return false;
     }
 
-    if (knight->isPinned)
-    {
-        if (!legalCheck) printf("This knight is Pinned, Try Again!!!\n");
-        return false;
-    }
-
     dispX = abs(move.rowNext - move.rowPrev);
     dispY = abs(move.colNext - move.colPrev);
 

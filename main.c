@@ -71,7 +71,9 @@ int main ()
     int c, currentPlayerTurn = 1;
 
     
-    printf("|-------------------------------------------------------------------------------------------------------------------------------------------------------------|\n");
+    clearScreen();
+    printf("|----------------------------------------------------------------------------------------------------------------------"
+            "-------------------------------------------------------|\n");
     printf("\t\t\t\t\t\t\t\t Welcome To Terminal Chess\n");
     printf("- In our game, we represent white pieces with lowercase letters and black pieces with uppercase letters.\n\
         - Each piece has a different letter, where: \n \t- p: white pawn\n\t- r: white rock.\n\t- N: black knight.\n\t- b: white bishop\n\
@@ -148,7 +150,7 @@ int main ()
                             &whiteCaptures, &blackCaptures, 
                                 &whiteEnPassantCol, &blackEnPassantCol);
                 updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures, true);
-                printf("Illegal move: King remains in check, Try Again!!!\n\n");
+                printf("Illegal move: King is in check, Try Again!!!\n\n");
                 continue;
             }
             else if (gameState == 'e')
@@ -161,7 +163,7 @@ int main ()
             updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures, true);
             currentPlayerTurn = 2;
 
-            if (checkMate(board, &ply1))
+            if (checkMate(board, &ply2))
             {
                 printf("Game Ended By Checkmate.\nPlayer 1 wins!!!\n");
                 printf("Do you want to undo last move(u, press any key to end game)? ");
@@ -217,7 +219,7 @@ int main ()
                             &whiteCaptures, &blackCaptures, 
                                 &whiteEnPassantCol, &blackEnPassantCol);
                 updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures, true);
-                printf("Illegal move: King remains in check, Try Again!!!\n\n");
+                printf("Illegal move: King is in check, Try Again!!!\n\n");
                 continue;
             }
             else if (gameState == 'e')

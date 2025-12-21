@@ -112,6 +112,7 @@ bool legalMove(char** board, Player* player)
 
                     if (moveSuccessful && !isChecked(cpyB, &cpyP, true))
                     {
+                        if (!legalCheck) scanf("%c");
                         freeCopy(cpyP, cpyB);
                         return true;
                     } 

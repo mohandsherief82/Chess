@@ -33,12 +33,6 @@ bool moveBishop(char** board, Player* player, Move move, Captured* playerCapture
         return false;
     }
 
-    if (bishop->isPinned)
-    {
-        if (!legalCheck) printf("This bishop is Pinned, Try Again!!!\n");
-        return false;
-    }
-
     // Bishop move logic: abs(difference) of rows must equal abs(difference) of columns
     dispX = move.rowNext - move.rowPrev;
     dispY = move.colNext - move.colPrev;

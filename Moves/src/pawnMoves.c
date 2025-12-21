@@ -72,22 +72,16 @@ bool movePawn(char** board, Player* player, Move* move, Captured* playerCaptures
     for (int i = 0; i < NUM_PAWNS; i++)
     {
         if (move->colPrev == player->pawns[i].colPosition && move->rowPrev == player->pawns[i].rowPosition 
-                    && player->pawns[i].isActive && !player->pawns[i].isPinned && !player->pawns[i].promoted) 
+                    && player->pawns[i].isActive && !player->pawns[i].promoted) 
         {
             pawn = &player->pawns[i];
             break;
         }
     }    
     
-    if (pawn == NULL || pawn->isActive == false)
+    if (pawn == NULL || !pawn->isActive)
     {
         if (!legalCheck) printf("No Pawn At This Position, Try Again!!!\n");
-        return false;
-    }
-
-    if (pawn->isPinned)
-    {
-        if (!legalCheck) printf("This Pawn is pinned, Try Again!!!\n");
         return false;
     }
 
@@ -95,6 +89,7 @@ bool movePawn(char** board, Player* player, Move* move, Captured* playerCaptures
     int rowDiff = move->rowNext - move->rowPrev;
     int colDiff = move->colNext - move->colPrev;
 
+    // One Square Advance
     if (colDiff == 0 && rowDiff == moveDirection)
     {
         if (isEmpty(board, move->rowNext, move->colNext)) 
@@ -102,6 +97,12 @@ bool movePawn(char** board, Player* player, Move* move, Captured* playerCaptures
             board[move->rowPrev][move->colPrev] = EMPTY_SQUARE;            
             pawn->rowPosition = move->rowNext;
             board[move->rowNext][move->colNext] = pawn->symbol;
+
+            // if (pawn->isPinned)
+            // {
+            //     if (!legalCheck) printf("This Pawn is pinned, Try Again!!!\n");
+            //     return false;
+            // }
 
             if (!legalCheck)
             {
@@ -114,6 +115,7 @@ bool movePawn(char** board, Player* player, Move* move, Captured* playerCaptures
         }
     }
 
+    // Two Square Advance
     if (colDiff == 0 && rowDiff == (moveDirection * 2) && pawn->firstMove)
     {
         int midRow = move->rowPrev + moveDirection;
@@ -129,6 +131,12 @@ bool movePawn(char** board, Player* player, Move* move, Captured* playerCaptures
                 pawn->firstMove = false;
                 *plyEnPassantCol = move->colNext;
             }
+
+            // if (pawn->isPinned)
+            // {
+            //     if (!legalCheck) printf("This Pawn is pinned, Try Again!!!\n");
+            //     return false;
+            // }
             
             return true;
         }

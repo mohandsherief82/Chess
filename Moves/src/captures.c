@@ -16,6 +16,7 @@ Captured initializeCapture(PieceColor color)
     }
     
     captures.capturedSymbols[MAXCAPTNUM - 1] = 'X';
+    captures.captureCount = 0;
 
     return captures;
 }
@@ -36,21 +37,22 @@ void capturePiece(Player* player, Captured* captureData)
     char sym = tolower(captureData->capturedPiece.symbol);
     bool found = false;
 
-    if (sym == 'p')
-    {
-        for (int i = 0; i < NUM_PAWNS; i++)
-        {
-            if (captureData->capturedPiece.colPosition == player->pawns[i].colPosition 
-                && captureData->capturedPiece.rowPosition == player->pawns[i].rowPosition 
-                && player->pawns[i].isActive)
-            {
-                player->pawns[i].isActive = false;
-                found = true;
-                break;
-            }
-        }
-    }
-    else if (sym == 'r')
+    // if (sym == 'p')
+    // {
+    //     for (int i = 0; i < NUM_PAWNS; i++)
+    //     {
+    //         if (captureData->capturedPiece.colPosition == player->pawns[i].colPosition 
+    //             && captureData->capturedPiece.rowPosition == player->pawns[i].rowPosition 
+    //             && player->pawns[i].isActive)
+    //         {
+    //             player->pawns[i].isActive = false;
+    //             found = true;
+    //             break;
+    //         }
+    //     }
+    //     captureData->captureCount++;
+    // }
+    if (sym == 'r')
     {
         for (int i = 0; i < NUM_PIECES; i++)
         {
@@ -63,6 +65,7 @@ void capturePiece(Player* player, Captured* captureData)
                 break;
             }
         }
+        captureData->captureScore += 5;
     }
     else if (sym == 'n')
     {
@@ -77,6 +80,7 @@ void capturePiece(Player* player, Captured* captureData)
                 break;
             }
         }
+        captureData->captureScore += 3;
     }
     else if (sym == 'b')
     {
@@ -91,8 +95,8 @@ void capturePiece(Player* player, Captured* captureData)
                 break;
             }
         }
+        captureData->captureScore += 3;
     }
-
     else if (sym == 'q')
     {
         if (captureData->capturedPiece.colPosition == player->queen->colPosition 
@@ -102,6 +106,7 @@ void capturePiece(Player* player, Captured* captureData)
             player->queen->isActive = false;
             found = true;
         }
+        captureData->captureScore += 9;
     }
 
     if (!found)
@@ -114,15 +119,28 @@ void capturePiece(Player* player, Captured* captureData)
             {
                 player->pawns[i].isActive = false;
                 found = true;
+                switch (tolower(player->pawns[i].symbol))
+                {
+                    case 'n':
+                    case 'b':
+                        captureData->captureScore += 3;
+                        break;
+                    case 'r':
+                        captureData->captureScore += 5;
+                        break;
+                    case 'q':
+                        captureData->captureScore += 9;
+                        break;
+                    default:
+                        captureData->captureScore++;
+                        break;
+                }
                 break;
             }
         }
     }
 
-    if (found)
-    {
-        captureData->capturedSymbols[captureData->captureCount - 1] = captureData->capturedPiece.symbol;
-    }
+    if (found) captureData->capturedSymbols[captureData->captureCount - 1] = captureData->capturedPiece.symbol;
 
     captureData->newCapture = false;
 }
