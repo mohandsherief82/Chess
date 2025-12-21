@@ -189,7 +189,7 @@ bool isEmpty(char** board, int r, int c)
 
 void clearScreen()
 {
-    system("clear");
+    printf("\033[1;1H\033[2J\033[3J");
 
     return;
 }
