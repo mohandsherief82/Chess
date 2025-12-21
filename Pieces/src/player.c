@@ -27,8 +27,8 @@ Player createPlayer(PieceColor color)
     Knight *knights = (Knight*)malloc(NUM_PIECES * sizeof(Knight));
     for (int i = 0; i < NUM_PIECES; i++) knights[i] = createKnight(color, backRank, i);
 
-    Rock *rocks = (Rock*)malloc(NUM_PIECES * sizeof(Rock));
-    for (int i = 0; i < NUM_PIECES; i++) rocks[i] = createRock(color, backRank, i);
+    Rook *rocks = (Rook*)malloc(NUM_PIECES * sizeof(Rook));
+    for (int i = 0; i < NUM_PIECES; i++) rocks[i] = createRook(color, backRank, i);
 
     Pawn *pawns = (Pawn*)malloc(NUM_PAWNS * sizeof(Pawn));
     for (int i = 0; i < NUM_PAWNS; i++) pawns[i] = createPawn(color, pawnRank, i);

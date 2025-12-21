@@ -1,6 +1,6 @@
 #include  "../include/staleMate.h"
 #include "../../Moves/include/pawnMoves.h"
-#include "../../Moves/include/rockMoves.h"
+#include "../../Moves/include/rookMoves.h"
 #include "../../Moves/include/knightMoves.h"
 #include "../../Moves/include/bishopMoves.h"
 #include "../../Moves/include/queenMoves.h"
@@ -41,8 +41,8 @@ Player copyPlayer(Player* player)
     cpy.knights = malloc(NUM_PIECES * sizeof(Knight));
     memcpy(cpy.knights, player->knights, NUM_PIECES * sizeof(Knight));
 
-    cpy.rocks = malloc(NUM_PIECES * sizeof(Rock));
-    memcpy(cpy.rocks, player->rocks, NUM_PIECES * sizeof(Rock));
+    cpy.rocks = malloc(NUM_PIECES * sizeof(Rook));
+    memcpy(cpy.rocks, player->rocks, NUM_PIECES * sizeof(Rook));
 
     cpy.pawns = malloc(NUM_PAWNS * sizeof(Pawn));
     memcpy(cpy.pawns, player->pawns, NUM_PAWNS * sizeof(Pawn));
@@ -104,7 +104,7 @@ bool legalMove(char** board, Player* player)
                     char pieceType = tolower(testMove.symbol);
                     
                     if (pieceType == 'p') moveSuccessful = movePawn(cpyB, &cpyP, &testMove, &tempCapture, &plyEpCol, &oppEpCol, legalCheck, false);
-                    else if (pieceType == 'r') moveSuccessful = moveRock(cpyB, &cpyP, testMove, &tempCapture, legalCheck);
+                    else if (pieceType == 'r') moveSuccessful = moveRook(cpyB, &cpyP, testMove, &tempCapture, legalCheck);
                     else if (pieceType == 'n') moveSuccessful = moveKnight(cpyB, &cpyP, testMove, &tempCapture, legalCheck);
                     else if (pieceType == 'b') moveSuccessful = moveBishop(cpyB, &cpyP, testMove, &tempCapture, legalCheck);
                     else if (pieceType == 'q') moveSuccessful = moveQueen(cpyB, &cpyP, testMove, &tempCapture, legalCheck);

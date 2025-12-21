@@ -72,8 +72,8 @@ void updateBoard(char** board, Player player1, Player player2, Captured ply1Capt
     addPieces(board, player1.pawns, NUM_PAWNS, sizeof(Pawn));
     addPieces(board, player2.pawns, NUM_PAWNS, sizeof(Pawn));
 
-    addPieces(board, player1.rocks, NUM_PIECES, sizeof(Rock));
-    addPieces(board, player2.rocks, NUM_PIECES, sizeof(Rock));
+    addPieces(board, player1.rocks, NUM_PIECES, sizeof(Rook));
+    addPieces(board, player2.rocks, NUM_PIECES, sizeof(Rook));
 
     addPieces(board, player1.knights, NUM_PIECES, sizeof(Knight));
     addPieces(board, player2.knights, NUM_PIECES, sizeof(Knight));

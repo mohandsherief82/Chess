@@ -4,7 +4,7 @@
 #include <ctype.h>
 
 #include "../../Moves/include/pawnMoves.h"
-#include "../../Moves/include/rockMoves.h"
+#include "../../Moves/include/rookMoves.h"
 #include "../../Moves/include/knightMoves.h"
 #include "../../Moves/include/bishopMoves.h"
 #include "../../Moves/include/queenMoves.h"
@@ -23,7 +23,7 @@ bool loadPlayerTurn(char** board, Player* player, Move move, Captured* capture, 
     char sym = tolower(move.symbol);
 
     if (sym == 'p') state = movePawn(board, player, &move, capture, whiteEnPassantCol, blackEnPassantCol, false, true);
-    else if (sym == 'r') state = moveRock(board, player, move, capture, false);
+    else if (sym == 'r') state = moveRook(board, player, move, capture, false);
     else if (sym == 'n') state = moveKnight(board, player, move, capture, false);
     else if (sym == 'b') state = moveBishop(board, player, move, capture, false);
     else if (sym == 'q') state = moveQueen(board, player, move, capture, false);

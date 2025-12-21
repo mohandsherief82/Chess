@@ -7,10 +7,10 @@
 #include <stdio.h>
 #include <ctype.h>
 
-bool moveRock(char** board ,Player* player, Move move, Captured* playerCaptures, bool legalCheck)
+bool moveRook(char** board ,Player* player, Move move, Captured* playerCaptures, bool legalCheck)
 {
     int diffrow, diffcol, rowstep = 0, colstep = 0, r, c;
-    Rock* rock = (Rock*)checkPromotedPawn(player, move);
+    Rook* rock = (Rook*)checkPromotedPawn(player, move);
 
     if (rock == NULL)
     {
@@ -26,7 +26,7 @@ bool moveRock(char** board ,Player* player, Move move, Captured* playerCaptures,
 
     if (rock == NULL)
     {
-        if (!legalCheck) printf("No Rock At This Position, Try Again!!!\n");
+        if (!legalCheck) printf("No Rook At This Position, Try Again!!!\n");
         return false;
     }
 
@@ -41,7 +41,7 @@ bool moveRock(char** board ,Player* player, Move move, Captured* playerCaptures,
 
     if (diffrow != 0 && diffcol != 0) 
     {
-        if (!legalCheck) printf("Invalid Rock Move, Try Again!!!\n");
+        if (!legalCheck) printf("Invalid Rook Move, Try Again!!!\n");
         return false;
     }
 
@@ -55,7 +55,7 @@ bool moveRock(char** board ,Player* player, Move move, Captured* playerCaptures,
     {
         if (!isEmpty(board, r, c)) 
         {
-            if (!legalCheck) printf("Invalid Rock Move, Try Again!!!\n");
+            if (!legalCheck) printf("Invalid Rook Move, Try Again!!!\n");
             return false;
         }
         r += rowstep;

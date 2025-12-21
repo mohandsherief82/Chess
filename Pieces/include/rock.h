@@ -13,8 +13,8 @@ typedef struct
     bool isActive;
     bool isPinned;
     bool firstMove;
-} Rock;
+} Rook;
 
-Rock createRock(PieceColor color, int row, int col);
+Rook createRook(PieceColor color, int row, int col);
 
 #endif

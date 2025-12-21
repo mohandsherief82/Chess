@@ -6,7 +6,7 @@
 #include "./Board/include/board.h"
 #include "./Pieces/include/player.h"
 #include "./Moves/include/pawnMoves.h"
-#include "./Moves/include/rockMoves.h"
+#include "./Moves/include/rookMoves.h"
 #include "./Moves/include/knightMoves.h"
 #include "./Moves/include/bishopMoves.h"
 #include "./Moves/include/queenMoves.h"
@@ -41,7 +41,7 @@ char playerTurn(char** board, Player* player, Captured* capture, int* plyEnPassa
         char moveSymbol = tolower(move.symbol);
         
         if (moveSymbol == 'p') pieceMoveValid = movePawn(board, player, &move, capture, plyEnPassantCol, opponentEnPassantCol, legalCheck, false);
-        else if (moveSymbol == 'r') pieceMoveValid = moveRock(board, player, move, capture, legalCheck);
+        else if (moveSymbol == 'r') pieceMoveValid = moveRook(board, player, move, capture, legalCheck);
         else if (moveSymbol == 'n') pieceMoveValid = moveKnight(board, player, move, capture, legalCheck);
         else if (moveSymbol == 'b') pieceMoveValid = moveBishop(board, player, move, capture, legalCheck);
         else if (moveSymbol == 'q') pieceMoveValid = moveQueen(board, player, move, capture, legalCheck);

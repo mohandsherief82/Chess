@@ -16,7 +16,7 @@ typedef struct
 {
     PieceColor color;
     Pawn *pawns;
-    Rock *rocks;
+    Rook *rocks;
     Knight *knights;
     Bishop *bishops;
     Queen *queen;

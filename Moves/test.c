@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 #include "../Moves/include/pawnMoves.h"
-#include "../Moves/include/rockMoves.h"
+#include "../Moves/include/rookMoves.h"
 #include "../Moves/include/knightMoves.h"
 #include "../Moves/include/bishopMoves.h"
 #include "../Moves/include/queenMoves.h"
@@ -13,6 +13,7 @@
 #include "../Game-End/include/saveGame.h"
 #include "../Board/include/board.h"
 #include "../Pieces/include/player.h"
+#include "../Game-End/include/check.h"
 
 extern char *path;
 
@@ -29,16 +30,16 @@ bool playerTurn(char** board, Player* player, Captured* capture, int* plyEnPassa
         bool pieceMoveValid = false;
         char moveSymbol = tolower(move.symbol);
         
-        if (moveSymbol == 'p') pieceMoveValid = movePawn(board, player, move, capture, plyEnPassantCol, opponentEnPassantCol);
-        else if (moveSymbol == 'r') pieceMoveValid = moveRock(board, player, move, capture);
-        else if (moveSymbol == 'n') pieceMoveValid = moveKnight(board, player, move, capture);
-        else if (moveSymbol == 'b') pieceMoveValid = moveBishop(board, player, move, capture);
-        else if (moveSymbol == 'q') pieceMoveValid = moveQueen(board, player, move, capture);
-        else if (moveSymbol == 'k') pieceMoveValid = moveKing(board, player, move, capture);
+        if (moveSymbol == 'p') pieceMoveValid = movePawn(board, player, &move, capture, plyEnPassantCol, opponentEnPassantCol, false, false);
+        else if (moveSymbol == 'r') pieceMoveValid = moveRook(board, player, move, capture, false);
+        else if (moveSymbol == 'n') pieceMoveValid = moveKnight(board, player, move, capture, false);
+        else if (moveSymbol == 'b') pieceMoveValid = moveBishop(board, player, move, capture, false);
+        else if (moveSymbol == 'q') pieceMoveValid = moveQueen(board, player, move, capture, false);
+        else if (moveSymbol == 'k') pieceMoveValid = moveKing(board, player, move, capture, false);
         
         if (!pieceMoveValid) continue;
         
-        if (isChecked(board, player))
+        if (isChecked(board, player, true))
         {
             printf("Illegal move: King remains in check, Try Again!!!\n");
             
@@ -107,7 +108,7 @@ int main ()
     
     while ((c = getchar()) != '\n' && c != EOF);
 
-    updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
+    updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures, true);
 
     while (true && !saveGame)
     {
@@ -116,15 +117,15 @@ int main ()
         {
             printf("Player 1's turn: \n");
 
-            isChecked(board, &ply1);
+            isChecked(board, &ply1, false);
             saveGame = playerTurn(board, &ply1, &whiteCaptures, &whiteEnPassantCol, &blackEnPassantCol);
 
-            if (whiteCaptures.newCapture == true) capturePiece(ply2, &whiteCaptures);
+            if (whiteCaptures.newCapture == true) capturePiece(&ply2, &whiteCaptures);
             
             if (saveGame) break;
 
             clearScreen();
-            updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
+            updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures, true);
             currentPlayerTurn = 2;
 
             if (blackEnPassantCol != -1) blackEnPassantCol = -1; 
@@ -135,14 +136,14 @@ int main ()
         {
             printf("Player 2's turn: \n");
             
-            isChecked(board, &ply2);
+            isChecked(board, &ply2, false);
             saveGame = playerTurn(board, &ply2, &blackCaptures, &blackEnPassantCol, &whiteEnPassantCol);
-            if (blackCaptures.newCapture == true) capturePiece(ply1, &blackCaptures);
+            if (blackCaptures.newCapture == true) capturePiece(&ply1, &blackCaptures);
             
             if (saveGame) break;
             
             clearScreen();
-            updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures);
+            updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures, true);
             currentPlayerTurn = 1;
 
             if (whiteEnPassantCol != -1) whiteEnPassantCol = -1; 
