@@ -36,7 +36,16 @@ bool loadPlayerTurn(char** board, Player* player, Move move, Captured* capture, 
 int loadGame(char** board, Player* player1, Player* player2, Captured* ply1Captures
     , Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol)
 {
-    freeBoard(board, *player1, *player2);
+     for(int i = 0; i < BOARD_SIZE; i++)
+    {
+        for(int j = 0; j < BOARD_SIZE; j++) 
+        {
+            board[i][j] = EMPTY_SQUARE;
+        }
+    }
+
+    freePlayer(*player1);
+    freePlayer(*player2);
 
     board = initializeBoard();
     *player1 = createPlayer(COLOR_WHITE);
