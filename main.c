@@ -3,19 +3,19 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include "../Moves/include/pawnMoves.h"
-#include "../Moves/include/rookMoves.h"
-#include "../Moves/include/knightMoves.h"
-#include "../Moves/include/bishopMoves.h"
-#include "../Moves/include/queenMoves.h"
-#include "../Moves/include/kingMoves.h"
-#include "../Moves/include/captures.h"
-#include "./include/saveGame.h"
-#include "../Board/include/board.h"
-#include "../Pieces/include/player.h"
-#include "./include/staleMate.h"
-#include "./include/checkMate.h"
-#include "./include/check.h"
+#include "./Board/include/board.h"
+#include "./Pieces/include/player.h"
+#include "./Moves/include/pawnMoves.h"
+#include "./Moves/include/rookMoves.h"
+#include "./Moves/include/knightMoves.h"
+#include "./Moves/include/bishopMoves.h"
+#include "./Moves/include/queenMoves.h"
+#include "./Moves/include/kingMoves.h"
+#include "./Moves/include/captures.h"
+#include "./Game-End/include/saveGame.h"
+#include "./Game-End/include/staleMate.h"
+#include "./Game-End/include/checkMate.h"
+#include "./Game-End/include/check.h"
 
 extern char *path;
 
@@ -35,6 +35,7 @@ char playerTurn(char** board, Player* player, Captured* capture, int* plyEnPassa
 
         if (move.symbol == 's') return 's';
         else if (move.symbol == 'u') return 'u';
+        else if (move.symbol == 'e') return 'e';
 
         bool pieceMoveValid = false;
         char moveSymbol = tolower(move.symbol);
@@ -48,11 +49,7 @@ char playerTurn(char** board, Player* player, Captured* capture, int* plyEnPassa
         
         if (!pieceMoveValid) continue;
         
-        if (isChecked(board, player, !legalCheck))
-        {
-            printf("Illegal move: King remains in check, Try Again!!!\n\n");            
-            return 'i'; 
-        }
+        if (isChecked(board, player, !legalCheck)) return 'i'; 
 
         break; 
     }
@@ -140,11 +137,9 @@ int main ()
                     clearScreen();
                     updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures, true);
                 }
-                else 
-                {
-                    printf("No moves to undo, Try Again!!!\n");
-                    continue;
-                }
+                else printf("No moves to undo, Try Again!!!\n");
+
+                continue;
             }
             else if (gameState == 'i')
             {
@@ -153,16 +148,37 @@ int main ()
                             &whiteCaptures, &blackCaptures, 
                                 &whiteEnPassantCol, &blackEnPassantCol);
                 updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures, true);
+                printf("Illegal move: King remains in check, Try Again!!!\n\n");
                 continue;
+            }
+            else if (gameState == 'e')
+            {
+                printf("Game Ends!!!\nPlayer 2 wins by Resignation!!!\n");
+                break;
             }
 
             clearScreen();
             updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures, true);
             currentPlayerTurn = 2;
 
-            if (checkMate(board, &ply2))
+            if (checkMate(board, &ply1))
             {
                 printf("Game Ended By Checkmate.\nPlayer 1 wins!!!\n");
+                printf("Do you want to undo last move(u, press any key to end game)? ");
+                if (scanf("%c", &gameState) == 1)
+                {
+                    if (gameState == 'u')
+                    {    
+                        undoLastMove(board, &ply1, &ply2, &whiteCaptures, &blackCaptures, &whiteEnPassantCol, &blackEnPassantCol);
+                        currentPlayerTurn = 1;
+                        clearScreen();
+                        updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures, true);
+                    
+                        continue;
+                    }
+                }
+
+                printf("Game Ended, Good Game!!!\n");
                 remove(path);
                 break;
             }
@@ -182,21 +198,32 @@ int main ()
             if (gameState == 's') break;
             else if (gameState == 'u')
             {
-                undoLastMove(board, &ply1, &ply2, &whiteCaptures, &blackCaptures
-                            , &whiteEnPassantCol, &blackEnPassantCol);
-                printf("Move undone.\nReturning turn to player 1!!!\n");
-                currentPlayerTurn = 1;
-                clearScreen();
-                updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures, true);
-
+                if(undoLastMove(board, &ply1, &ply2, &whiteCaptures, &blackCaptures
+                            , &whiteEnPassantCol, &blackEnPassantCol))
+                {
+                    printf("Move undone.\nReturning turn to player 1!!!\n");
+                    currentPlayerTurn = 1;
+                    clearScreen();
+                    updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures, true);
+                }
+                else printf("No moves to undo, Try Again!!!\n");
+                
                 continue;
             }
-            else if (gameState == 'i') 
+            else if (gameState == 'i')
             {
+                clearScreen();
                 loadGame(board, &ply1, &ply2, 
                             &whiteCaptures, &blackCaptures, 
                                 &whiteEnPassantCol, &blackEnPassantCol);
+                updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures, true);
+                printf("Illegal move: King remains in check, Try Again!!!\n\n");
                 continue;
+            }
+            else if (gameState == 'e')
+            {
+                printf("Game Ends!!!\nPlayer 1 wins by Resignation!!!\n");
+                break;
             }
             
             clearScreen();
@@ -206,6 +233,21 @@ int main ()
             if (checkMate(board, &ply1))
             {
                 printf("Game Ended By Checkmate.\nPlayer 2 wins!!!\n");
+                printf("Do you want to undo last move(u, press any key to end game)? ");
+                if (scanf("%c", &gameState) == 1)
+                {
+                    if (gameState == 'u')
+                    {    
+                        undoLastMove(board, &ply1, &ply2, &whiteCaptures, &blackCaptures, &whiteEnPassantCol, &blackEnPassantCol);
+                        currentPlayerTurn = 2;
+                        clearScreen();
+                        updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures, true);
+                    
+                        continue;
+                    }
+                }
+
+                printf("Game Ended, Good Game!!!\n");
                 remove(path);
                 break;
             }

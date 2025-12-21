@@ -6,17 +6,16 @@
 
 Captured initializeCapture(PieceColor color)
 {
-    Captured captures = {
-        .captureCount = 0,
-        .capturedSymbols = {},
-        .capturedSymbols[MAXCAPTNUM - 1] = 'X',
-        .newCapture = false
-    };
+    Captured captures;
+    captures.captureCount = 0;
+    captures.newCapture = false;
 
-    for (int i = 0; i < MAXCAPTNUM - 1; i++)
+    for (int i = 0; i < MAXCAPTNUM; i++)
     {
         captures.capturedSymbols[i] = ' ';
     }
+    
+    captures.capturedSymbols[MAXCAPTNUM - 1] = 'X';
 
     return captures;
 }
@@ -25,96 +24,105 @@ PieceColor pieceColorAt(char** board, int row, int col)
 {    
     if (isEmpty(board, row, col)) return -1; 
 
-    if (board[row][col] >= 'A' && board[row][col] <= 'Z') return COLOR_BLACK;
+    if (isupper(board[row][col])) return COLOR_BLACK;
     
     return COLOR_WHITE;
 }
 
-void capturePiece(Player player, Captured* captureData)
+void capturePiece(Player* player, Captured* captureData)
 {
-    if (tolower(captureData->capturedPiece.symbol) == 'p')
+    if (!captureData->newCapture) return;
+
+    char sym = tolower(captureData->capturedPiece.symbol);
+    bool found = false;
+
+    if (sym == 'p')
     {
         for (int i = 0; i < NUM_PAWNS; i++)
         {
-            if (captureData->capturedPiece.colPosition == player.pawns[i].colPosition 
-                    && captureData->capturedPiece.rowPosition == player.pawns[i].rowPosition 
-                        && captureData->newCapture == true)
+            if (captureData->capturedPiece.colPosition == player->pawns[i].colPosition 
+                && captureData->capturedPiece.rowPosition == player->pawns[i].rowPosition 
+                && player->pawns[i].isActive)
             {
-                player.pawns[i].isActive = false;
-                captureData->capturedSymbols[captureData->captureCount - 1] = player.pawns[i].symbol;
+                player->pawns[i].isActive = false;
+                found = true;
                 break;
             }
         }
     }
-    else if (tolower(captureData->capturedPiece.symbol) == 'r')
+    else if (sym == 'r')
     {
         for (int i = 0; i < NUM_PIECES; i++)
         {
-            if (captureData->capturedPiece.colPosition == player.rocks[i].colPosition 
-                    && captureData->capturedPiece.rowPosition == player.rocks[i].rowPosition 
-                        && captureData->newCapture == true)
+            if (captureData->capturedPiece.colPosition == player->rocks[i].colPosition 
+                && captureData->capturedPiece.rowPosition == player->rocks[i].rowPosition 
+                && player->rocks[i].isActive)
             {
-                player.rocks[i].isActive = false;
-                captureData->capturedSymbols[captureData->captureCount - 1] = player.rocks[i].symbol;
+                player->rocks[i].isActive = false;
+                found = true;
                 break;
             }
         }
     }
-    else if (tolower(captureData->capturedPiece.symbol) == 'n')
+    else if (sym == 'n')
     {
         for (int i = 0; i < NUM_PIECES; i++)
         {
-            if (captureData->capturedPiece.colPosition == player.knights[i].colPosition 
-                    && captureData->capturedPiece.rowPosition == player.knights[i].rowPosition 
-                        && captureData->newCapture == true)
+            if (captureData->capturedPiece.colPosition == player->knights[i].colPosition 
+                && captureData->capturedPiece.rowPosition == player->knights[i].rowPosition 
+                && player->knights[i].isActive)
             {
-                player.knights[i].isActive = false;
-                captureData->capturedSymbols[captureData->captureCount - 1] = player.knights[i].symbol;
+                player->knights[i].isActive = false;
+                found = true;
                 break;
             }
         }
     }
-    else if (tolower(captureData->capturedPiece.symbol) == 'b')
+    else if (sym == 'b')
     {
         for (int i = 0; i < NUM_PIECES; i++)
         {
-            if (captureData->capturedPiece.colPosition == player.bishops[i].colPosition 
-                    && captureData->capturedPiece.rowPosition == player.bishops[i].rowPosition 
-                        && captureData->newCapture == true)
+            if (captureData->capturedPiece.colPosition == player->bishops[i].colPosition 
+                && captureData->capturedPiece.rowPosition == player->bishops[i].rowPosition 
+                && player->bishops[i].isActive)
             {
-                player.bishops[i].isActive = false;
-                captureData->capturedSymbols[captureData->captureCount - 1] = player.bishops[i].symbol;
+                player->bishops[i].isActive = false;
+                found = true;
                 break;
             }
-        }
-    }
-    else if (tolower(captureData->capturedPiece.symbol) == 'q')
-    {
-        if (captureData->capturedPiece.colPosition == player.queen->colPosition 
-                    && captureData->capturedPiece.rowPosition == player.queen->rowPosition 
-                        && captureData->newCapture == true)
-        {
-            player.queen->isActive = false;
-            captureData->capturedSymbols[captureData->captureCount - 1] = player.queen->symbol;
         }
     }
 
-    // Check if the capture is a promoted Pawn
-    else
+    else if (sym == 'q')
+    {
+        if (captureData->capturedPiece.colPosition == player->queen->colPosition 
+            && captureData->capturedPiece.rowPosition == player->queen->rowPosition 
+            && player->queen->isActive)
+        {
+            player->queen->isActive = false;
+            found = true;
+        }
+    }
+
+    if (!found)
     {
         for (int i = 0; i < NUM_PAWNS; i++)
         {
-            if (captureData->capturedPiece.colPosition == player.pawns[i].colPosition 
-                    && captureData->capturedPiece.rowPosition == player.pawns[i].rowPosition 
-                        && captureData->capturedPiece.symbol == player.pawns[i].symbol
-                            && captureData->newCapture == true )
+            if (captureData->capturedPiece.colPosition == player->pawns[i].colPosition 
+                && captureData->capturedPiece.rowPosition == player->pawns[i].rowPosition 
+                && player->pawns[i].isActive)
             {
-                player.pawns[i].isActive = false;
-                captureData->capturedSymbols[captureData->captureCount] = player.pawns[i].symbol;
+                player->pawns[i].isActive = false;
+                found = true;
+                break;
             }
         }
+    }
+
+    if (found)
+    {
+        captureData->capturedSymbols[captureData->captureCount - 1] = captureData->capturedPiece.symbol;
     }
 
     captureData->newCapture = false;
-    return;
 }

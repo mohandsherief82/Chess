@@ -3,6 +3,6 @@
 
 #include "../../Pieces/include/player.h"
 
-bool moveKnight(char** board, Player* player, Move move, Captured* playerCaptures);
+bool moveKnight(char** board, Player* player, Move move, Captured* playerCaptures, bool legalCheck);
 
 #endif

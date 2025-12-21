@@ -1,5 +1,5 @@
 CC=gcc
-FLAGS=-Wall -g
+FLAGS=-Wall
 
 .PHONY: board pieces moves test_pieces test_moves test_moves_io test_board
 
@@ -15,6 +15,9 @@ moves:
 game_end:
 	$(CC) $(FLAGS) ./Pieces/src/*.c ./Board/src/board.c ./Moves/src/*.c ./Game-End/src/*.c ./Game-End/test.c -o ./Game-End/bin/test.o
 
+compile:
+	$(CC) $(FLAGS) ./Pieces/src/*.c ./Board/src/board.c ./Moves/src/*.c ./Game-End/src/*.c ./main.c -o ./run.o
+
 test_board: board
 	./Board/bin/test.o
 
@@ -24,14 +27,15 @@ test_pieces: pieces
 test_moves: moves
 	./Moves/bin/test.o
 
-test_moves_io: moves
-	./Moves/bin/test.o < ./Moves/testing/input.txt > ./Moves/testing/output.txt
-
 test_game: game_end
 	./Game-End/bin/test.o
+
+run: compile
+	./run.o
 
 clean:
 	rm -f ./Board/bin/*
 	rm -f ./Pieces/bin/*
 	rm -f ./Moves/bin/*
+	rm -f ./*.o
 	clear

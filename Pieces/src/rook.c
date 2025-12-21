@@ -5,11 +5,11 @@
 #include <stdbool.h>
 #include<stdlib.h>
 
-Rock createRock(PieceColor color, int row, int col)
+Rook createRook(PieceColor color, int row, int col)
 {
     char sym = (color == COLOR_BLACK) ? 'R' : 'r';
 
-    Rock r = {
+    Rook r = {
         .symbol = sym,
         .color = color,
         .rowPosition = row,

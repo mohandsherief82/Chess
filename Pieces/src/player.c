@@ -27,8 +27,8 @@ Player createPlayer(PieceColor color)
     Knight *knights = (Knight*)malloc(NUM_PIECES * sizeof(Knight));
     for (int i = 0; i < NUM_PIECES; i++) knights[i] = createKnight(color, backRank, i);
 
-    Rock *rocks = (Rock*)malloc(NUM_PIECES * sizeof(Rock));
-    for (int i = 0; i < NUM_PIECES; i++) rocks[i] = createRock(color, backRank, i);
+    Rook *rocks = (Rook*)malloc(NUM_PIECES * sizeof(Rook));
+    for (int i = 0; i < NUM_PIECES; i++) rocks[i] = createRook(color, backRank, i);
 
     Pawn *pawns = (Pawn*)malloc(NUM_PAWNS * sizeof(Pawn));
     for (int i = 0; i < NUM_PAWNS; i++) pawns[i] = createPawn(color, pawnRank, i);
@@ -55,8 +55,8 @@ Player createPlayer(PieceColor color)
 
 bool isValidPiece(char symbol)
 {
-    return (symbol == 'p' || symbol == 'r' || symbol == 'n' || 
-            symbol == 'b' || symbol == 'q' || symbol == 'k' || symbol == 's');
+    return (symbol == 'p' || symbol == 'r' || symbol == 'n' || symbol == 'u' || symbol == 'e'
+            ||  symbol == 'b' || symbol == 'q' || symbol == 'k' || symbol == 's');
 }
 
 
@@ -85,7 +85,7 @@ Move getMove()
 
     while (true)
     {
-        printf("\nEnter piece symbol(p, r, n, b, q, k): ");
+        printf("\nEnter piece symbol(p, r, n, b, q, k), (u for undo, s for save, e for resign): ");
         if (scanf(" %c", &symbol) != 1) 
         {
             while ((c = getchar()) != '\n' && c != EOF);
@@ -103,7 +103,7 @@ Move getMove()
     while ((c = getchar()) != '\n' && c != EOF);
 
     move.symbol = symbol;
-    if (move.symbol == 's') return move;
+    if (move.symbol == 's' || move.symbol == 'u' || move.symbol == 'e') return move;
 
 
     while (!moveFlag)
@@ -175,6 +175,8 @@ void freePlayer(Player player)
     free(player.bishops);
     free(player.knights);
     free(player.rocks);
+    free(player.queen);
+    free(player.king);
 
     return;
 }

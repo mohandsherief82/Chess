@@ -14,7 +14,7 @@ int main()
     char** Board = initializeBoard();
     
     // Display Board for testing
-    displayBoard(Board, playerWhite, playerBlack, whiteCaptures, blackCaptures);
+    updateBoard(Board, playerWhite, playerBlack, whiteCaptures, blackCaptures, true);
 
     freeBoard(Board, playerWhite, playerBlack);
 

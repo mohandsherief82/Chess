@@ -1,6 +1,6 @@
 #include  "../include/staleMate.h"
 #include "../../Moves/include/pawnMoves.h"
-#include "../../Moves/include/rockMoves.h"
+#include "../../Moves/include/rookMoves.h"
 #include "../../Moves/include/knightMoves.h"
 #include "../../Moves/include/bishopMoves.h"
 #include "../../Moves/include/queenMoves.h"
@@ -9,6 +9,7 @@
 #include  "../../Board/include/board.h"
 #include  "../../chessTypes.h"
 #include  "../../Pieces/include/player.h"
+#include "../include/check.h"
 
 #include <stdio.h>
 #include <stdbool.h>
@@ -19,66 +20,69 @@
 
 char** copyBoard(char** board)
 {
-    char** copyBoard = malloc(sizeof(char*) * BOARD_SIZE);
-    for(int i =0; i < BOARD_SIZE; i++)
+    char** cpyBoard = malloc(sizeof(char*) * BOARD_SIZE);
+    for (int i = 0; i < BOARD_SIZE; i++)
     {
-        copyBoard[i] = malloc(sizeof(char) * BOARD_SIZE);
-        memcpy(copyBoard[i], board[i], BOARD_SIZE * sizeof(char)); 
+        cpyBoard[i] = malloc(sizeof(char) * BOARD_SIZE);
+        memcpy(cpyBoard[i], board[i], BOARD_SIZE * sizeof(char)); 
     }
-    return copyBoard;
+    return cpyBoard;
 }
+
 
 Player copyPlayer(Player* player)
 {
-    Player copyPlayer;
+    Player cpy;
+    memcpy(&cpy, player, sizeof(Player));
 
-    copyPlayer.bishops = (Bishop*)malloc(NUM_PIECES * sizeof(Bishop));
-    memcpy(copyPlayer.bishops, player->bishops, NUM_PIECES * sizeof(Bishop)); 
+    cpy.bishops = malloc(NUM_PIECES * sizeof(Bishop));
+    memcpy(cpy.bishops, player->bishops, NUM_PIECES * sizeof(Bishop)); 
 
-    copyPlayer.knights = (Knight*)malloc(NUM_PIECES * sizeof(Knight));
-    memcpy(copyPlayer.knights, player->knights, NUM_PIECES * sizeof(Knight));
+    cpy.knights = malloc(NUM_PIECES * sizeof(Knight));
+    memcpy(cpy.knights, player->knights, NUM_PIECES * sizeof(Knight));
 
-    copyPlayer.rocks = (Rock*)malloc(NUM_PIECES * sizeof(Rock));
-    memcpy(copyPlayer.rocks, player->rocks, NUM_PIECES * sizeof(Rock));
+    cpy.rocks = malloc(NUM_PIECES * sizeof(Rook));
+    memcpy(cpy.rocks, player->rocks, NUM_PIECES * sizeof(Rook));
 
-    copyPlayer.pawns = (Pawn*)malloc(NUM_PAWNS * sizeof(Pawn));
-    memcpy(copyPlayer.pawns, player->pawns, NUM_PAWNS * sizeof(Pawn));
+    cpy.pawns = malloc(NUM_PAWNS * sizeof(Pawn));
+    memcpy(cpy.pawns, player->pawns, NUM_PAWNS * sizeof(Pawn));
 
-    copyPlayer.queen = (Queen*)malloc(sizeof(Queen));
-    memcpy(copyPlayer.queen, player->queen, sizeof(Queen));
+    cpy.queen = malloc(sizeof(Queen));
+    memcpy(cpy.queen, player->queen, sizeof(Queen));
 
-    copyPlayer.king = (King*)malloc(sizeof(King));
-    memcpy(copyPlayer.king, player->king, sizeof(King));
+    cpy.king = malloc(sizeof(King));
+    memcpy(cpy.king, player->king, sizeof(King));
 
-    return copyPlayer;
+    return cpy;
 }
 
-void freeCopy(Player copyPlayer, char** copyBoard)
-{
-    free(copyPlayer.pawns);
-    free(copyPlayer.rocks);
-    free(copyPlayer.knights);
-    free(copyPlayer.bishops);
-    free(copyPlayer.queen);
-    free(copyPlayer.king);
-    
-    for(int i = 0; i < BOARD_SIZE; i++) free(copyBoard[i]);
 
-    free(copyBoard);
+void freeCopy(Player cpyPlayer, char** cpyBoard)
+{
+    free(cpyPlayer.pawns);
+    free(cpyPlayer.rocks);
+    free(cpyPlayer.knights);
+    free(cpyPlayer.bishops);
+    free(cpyPlayer.queen);
+    free(cpyPlayer.king);
+    
+    for (int i = 0; i < BOARD_SIZE; i++) free(cpyBoard[i]);
+    free(cpyBoard);
 }
 
 
 bool legalMove(char** board, Player* player)
 {
+    bool legalCheck = true;
     Move testMove;
-    Captured tempCapture = {0}; 
+    Captured tempCapture = {0};
+    int plyEpCol = -1, oppEpCol = -1;
     
     for (int rPrev = 0; rPrev < BOARD_SIZE; rPrev++)
     {
         for (int cPrev = 0; cPrev < BOARD_SIZE; cPrev++)
         {
-            if (isEmpty(board, rPrev, cPrev) || pieceColorAt(board, rPrev, cPrev) != player->color)
-                    continue;
+            if (isEmpty(board, rPrev, cPrev) || pieceColorAt(board, rPrev, cPrev) != player->color) continue;
 
             testMove.symbol = board[rPrev][cPrev];
             testMove.rowPrev = rPrev;
@@ -88,8 +92,10 @@ bool legalMove(char** board, Player* player)
             {
                 for (int cNext = 0; cNext < BOARD_SIZE; cNext++)
                 {
-                    char** cpyBoard = copyBoard(board);
-                    Player cpyPlayer = copyPlayer(player);
+                    if (rNext == rPrev && cNext == cPrev) continue;
+
+                    char** cpyB = copyBoard(board);
+                    Player cpyP = copyPlayer(player);
                     
                     testMove.rowNext = rNext;
                     testMove.colNext = cNext;
@@ -97,39 +103,32 @@ bool legalMove(char** board, Player* player)
                     bool moveSuccessful = false;
                     char pieceType = tolower(testMove.symbol);
                     
-                    if (pieceType == 'p') moveSuccessful = movePawn(cpyBoard , &cpyPlayer, testMove, &tempCapture);
-                    else if (pieceType == 'r') moveSuccessful = moveRock(cpyBoard , &cpyPlayer, testMove, &tempCapture);
-                    else if (pieceType == 'n') moveSuccessful = moveKnight(cpyBoard , &cpyPlayer, testMove, &tempCapture);
-                    else if (pieceType == 'b') moveSuccessful = moveBishop(cpyBoard , &cpyPlayer, testMove, &tempCapture);
-                    else if (pieceType == 'q') moveSuccessful = moveQueen(cpyBoard , &cpyPlayer, testMove, &tempCapture);
-                    else if (pieceType == 'k') moveSuccessful = moveKing(cpyBoard , &cpyPlayer, testMove, &tempCapture);
+                    if (pieceType == 'p') moveSuccessful = movePawn(cpyB, &cpyP, &testMove, &tempCapture, &plyEpCol, &oppEpCol, legalCheck, false);
+                    else if (pieceType == 'r') moveSuccessful = moveRook(cpyB, &cpyP, testMove, &tempCapture, legalCheck);
+                    else if (pieceType == 'n') moveSuccessful = moveKnight(cpyB, &cpyP, testMove, &tempCapture, legalCheck);
+                    else if (pieceType == 'b') moveSuccessful = moveBishop(cpyB, &cpyP, testMove, &tempCapture, legalCheck);
+                    else if (pieceType == 'q') moveSuccessful = moveQueen(cpyB, &cpyP, testMove, &tempCapture, legalCheck);
+                    else if (pieceType == 'k') moveSuccessful = moveKing(cpyB, &cpyP, testMove, &tempCapture, legalCheck);
 
-                    if (moveSuccessful && !isChecked(cpyBoard, &cpyPlayer))
+                    if (moveSuccessful && !isChecked(cpyB, &cpyP, true))
                     {
-                        freeCopy(cpyPlayer, cpyBoard);
+                        freeCopy(cpyP, cpyB);
                         return true;
                     } 
                     
-                    freeCopy(cpyPlayer, cpyBoard);
-
-                    cpyPlayer.pawns = NULL;
-                    cpyPlayer.rocks = NULL;
-                    cpyPlayer.knights = NULL;
-                    cpyPlayer.bishops = NULL;
-                    cpyPlayer.queen = NULL;
-                    cpyPlayer.king = NULL;
-                    cpyBoard = NULL;
+                    freeCopy(cpyP, cpyB);
+                    plyEpCol = -1;
+                    oppEpCol = -1;
                 }
             }
         }
     }
-
     return false;
 }
 
 
 bool checkStalemate(char** board, Player* player)
 {
-    if(!legalMove(board, player) && !isChecked(board, player)) return true;
+    if(!legalMove(board, player) && !isChecked(board, player, true)) return true;
     else return false;
 }

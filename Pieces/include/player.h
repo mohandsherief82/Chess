@@ -14,9 +14,9 @@
 
 typedef struct
 {
-    const PieceColor color;
+    PieceColor color;
     Pawn *pawns;
-    Rock *rocks;
+    Rook *rocks;
     Knight *knights;
     Bishop *bishops;
     Queen *queen;
