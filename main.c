@@ -76,7 +76,7 @@ int main ()
             "-------------------------------------------------------|\n");
     printf("\t\t\t\t\t\t\t\t Welcome To Terminal Chess\n");
     printf("- In our game, we represent white pieces with lowercase letters and black pieces with uppercase letters.\n\
-        - Each piece has a different letter, where: \n \t- p: white pawn\n\t- r: white rock.\n\t- N: black knight.\n\t- b: white bishop\n\
+        - Each piece has a different letter, where: \n \t- p: white pawn\n\t- r: white rook.\n\t- N: black knight.\n\t- b: white bishop\n\
         - Q: black queen.\n\t- K: black king.\n");
         
     while (gameInit == '\0')

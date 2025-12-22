@@ -15,6 +15,7 @@ extern char* path;
 char** initializeBoard()
 {
     char **board = (char**)malloc(BOARD_SIZE * sizeof(char*));
+    if (board == NULL) exit(1);
 
     // Initialize board with empty cells,
     // will be overwritten with the first display of the board
@@ -58,8 +59,6 @@ void addPieces(char** board, void* piecesArray, int numPieces, size_t piece_size
 
 void updateBoard(char** board, Player player1, Player player2, Captured ply1Captures, Captured ply2Captures, bool PRINT)
 {
-    int score = ply1Captures.captureScore - ply2Captures.captureScore;
-
     clearScreen();
     if (PRINT)
     {
@@ -68,7 +67,7 @@ void updateBoard(char** board, Player player1, Player player2, Captured ply1Capt
         printf("\t\t|             Moves             |\t\t\t Board \t\t\t|\t\t\t Captures \t\t\t\t   |\n");
         printf("\t\t|---------------|---------------|-----------------------------------------------|--------------------"
                     "----------------------------------------------|\n");
-        printf("\t\t|     White     |     Black     |\t    A   B   C   D   E   F   G   H  \t|\t\t\t Black Captures %c%d \t\t\t   |\n", (score > 0) ? '-': '+', abs(score));
+        printf("\t\t|     White     |     Black     |\t    A   B   C   D   E   F   G   H  \t|\t\t\t Black Captures  \t\t\t   |\n");
         printf("\t\t|---------------|---------------|\t  |---|---|---|---|---|---|---|---|\t|"
                 "------------------------------------------------------------------|\n");
     }
@@ -132,7 +131,7 @@ void updateBoard(char** board, Player player1, Player player2, Captured ply1Capt
         }
         
         if (PRINT) printf(" |%d\t|", BOARD_SIZE - i);
-        if (i == 4 && PRINT) printf("\t\t\t White Captures %c%d \t\t\t   |", (score < 0) ? '-': '+', abs(score));
+        if (i == 4 && PRINT) printf("\t\t\t White Captures  \t\t\t   |");
         else if (i == 1 || i == 2)
         {
             int startIndex = (i % 5 == 1) ? 0 : 8

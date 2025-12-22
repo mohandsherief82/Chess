@@ -7,7 +7,6 @@
 Captured initializeCapture(PieceColor color)
 {
     Captured captures;
-    captures.captureCount = 0;
     captures.newCapture = false;
 
     for (int i = 0; i < MAXCAPTNUM; i++)
@@ -50,7 +49,6 @@ void capturePiece(Player* player, Captured* captureData)
                 break;
             }
         }
-        captureData->captureScore += 5;
     }
     else if (sym == 'n')
     {
@@ -65,7 +63,6 @@ void capturePiece(Player* player, Captured* captureData)
                 break;
             }
         }
-        captureData->captureScore += 3;
     }
     else if (sym == 'b')
     {
@@ -80,7 +77,6 @@ void capturePiece(Player* player, Captured* captureData)
                 break;
             }
         }
-        captureData->captureScore += 3;
     }
     else if (sym == 'q')
     {
@@ -91,7 +87,6 @@ void capturePiece(Player* player, Captured* captureData)
             player->queen->isActive = false;
             found = true;
         }
-        captureData->captureScore += 9;
     }
 
     // Handles Pawns and Promoted Pawns
@@ -105,27 +100,11 @@ void capturePiece(Player* player, Captured* captureData)
             {
                 player->pawns[i].isActive = false;
                 found = true;
-                switch (tolower(player->pawns[i].symbol))
-                {
-                    case 'n':
-                    case 'b':
-                        captureData->captureScore += 3;
-                        break;
-                    case 'r':
-                        captureData->captureScore += 5;
-                        break;
-                    case 'q':
-                        captureData->captureScore += 9;
-                        break;
-                    default:
-                        captureData->captureScore++;
-                        break;
-                }
                 break;
             }
         }
     }
-    else captureData->capturedSymbols[captureData->captureCount - 1] = captureData->capturedPiece.symbol;
-
+    
+    captureData->capturedSymbols[captureData->captureCount - 1] = captureData->capturedPiece.symbol;
     captureData->newCapture = false;
 }

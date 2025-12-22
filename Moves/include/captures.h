@@ -12,7 +12,6 @@ typedef struct
 {
     Piece capturedPiece;
     int captureCount;
-    int captureScore;
     char capturedSymbols[MAXCAPTNUM];
     bool newCapture;
 } Captured;
