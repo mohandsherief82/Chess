@@ -33,13 +33,20 @@ bool loadPlayerTurn(char** board, Player* player, Move move, Captured* capture, 
 }
 
 
-int loadGame(char*** board, Player* player1, Player* player2, Captured* ply1Captures
+int loadGame(char** board, Player* player1, Player* player2, Captured* ply1Captures
     , Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol)
 {
-    
-    freeBoard(*board, *player1, *player2);
+     for(int i = 0; i < BOARD_SIZE; i++)
+    {
+        for(int j = 0; j < BOARD_SIZE; j++) 
+        {
+            board[i][j] = EMPTY_SQUARE;
+        }
+    }
 
-    *board = initializeBoard();
+    freePlayer(*player1);
+    freePlayer(*player2);
+
     *player1 = createPlayer(COLOR_WHITE);
     *player2 = createPlayer(COLOR_BLACK);
     *whiteEnPassantCol = -1;
@@ -66,24 +73,24 @@ int loadGame(char*** board, Player* player1, Player* player2, Captured* ply1Capt
         
         if (readData == 0) break;
 
-        loadPlayerTurn(*board, player1, move[0], ply1Captures, whiteEnPassantCol, blackEnPassantCol);
+        loadPlayerTurn(board, player1, move[0], ply1Captures, whiteEnPassantCol, blackEnPassantCol);
         if (ply1Captures->newCapture == true) capturePiece(player2, ply1Captures);
         totalMovesRead++;
-        updateBoard(*board, *player1, *player2, *ply1Captures, *ply2Captures, false);
+        updateBoard(board, *player1, *player2, *ply1Captures, *ply2Captures, false);
         
         if (readData == 2) 
         {
-            loadPlayerTurn(*board, player2, move[1], ply2Captures, blackEnPassantCol, whiteEnPassantCol);
+            loadPlayerTurn(board, player2, move[1], ply2Captures, blackEnPassantCol, whiteEnPassantCol);
             if (ply2Captures->newCapture == true) capturePiece(player1, ply2Captures);
             totalMovesRead++;
-            updateBoard(*board, *player1, *player2, *ply1Captures, *ply2Captures, false);
+            updateBoard(board, *player1, *player2, *ply1Captures, *ply2Captures, false);
         }    
         else break; 
     }    
     
     fclose(fptr);
-    isChecked(*board, player1, true);
-    isChecked(*board, player2, true);
+    isChecked(board, player1, true);
+    isChecked(board, player2, true);
     
     return (totalMovesRead % 2 == 0) ? 1 : 2;
 }
@@ -95,23 +102,25 @@ bool undoLastMove(char** board, Player* player1, Player* player2, Captured* ply1
     FILE* fptr = fopen(path, "rb");
 
     fseek(fptr, 0, SEEK_END);
-    unsigned long totalMoves = ftell(fptr) / sizeof(Move);
-    if(totalMoves == 0)
+    int totalMoves = ftell(fptr) / sizeof(Move);
+    if(totalMoves ==0)
     {
         fclose(fptr);
         return false;
     }
-    Move* backMove = malloc(sizeof(Move) * (totalMoves - 1));
+    Move* backMove = malloc(sizeof(Move) * (totalMoves -1));
             fseek(fptr, 0, SEEK_SET);
-    fread(backMove, sizeof(Move), totalMoves - 1, fptr);
+    fread(backMove, sizeof(Move), totalMoves -1, fptr);
     fclose(fptr);
     fptr = fopen(path, "wb");
-    fwrite(backMove, sizeof(Move), totalMoves - 1, fptr);
-    fclose(fptr);
+    fwrite(backMove, sizeof(Move), totalMoves -1, fptr);
+        fclose(fptr);
     free(backMove);
 
-    for(int i = 0; i < BOARD_SIZE; i++)
-        for(int j = 0; j <BOARD_SIZE;j++) board[i][j] = EMPTY_SQUARE;
+    for(int i=0; i<BOARD_SIZE; i++)
+    {
+        for(int j =0; j <BOARD_SIZE;j++) board[i][j] = EMPTY_SQUARE;
+    }
 
     freePlayer(*player1);
     freePlayer(*player2);
@@ -120,9 +129,8 @@ bool undoLastMove(char** board, Player* player1, Player* player2, Captured* ply1
     *ply1Captures = initializeCapture(COLOR_WHITE);
     *ply2Captures = initializeCapture(COLOR_BLACK);
 
-    loadGame(&board, player1, player2, ply1Captures
+    loadGame(board, player1, player2, ply1Captures
             , ply2Captures, whiteEnPassantCol, blackEnPassantCol);
-
     return true;
 }
 
@@ -130,16 +138,10 @@ bool undoLastMove(char** board, Player* player1, Player* player2, Captured* ply1
 void saveMove(Move move)
 {
     FILE* fptr = fopen(path, "ab");
-    if (fptr != NULL)
+    if (fptr)
     {
+        if (move.symbol == 'p') printf("%c\n", move.promotedPawn);
         fwrite(&move, sizeof(Move), 1, fptr);
         fclose(fptr);
     }
-    else
-    {
-        printf("Problem With Saving Moves, Aborting Program!!!\n");
-        exit(1);
-    }
-
-    return;
 }
