@@ -27,8 +27,8 @@ Player createPlayer(PieceColor color)
     Knight *knights = (Knight*)malloc(NUM_PIECES * sizeof(Knight));
     for (int i = 0; i < NUM_PIECES; i++) knights[i] = createKnight(color, backRank, i);
 
-    Rook *rocks = (Rook*)malloc(NUM_PIECES * sizeof(Rook));
-    for (int i = 0; i < NUM_PIECES; i++) rocks[i] = createRook(color, backRank, i);
+    Rook *rooks = (Rook*)malloc(NUM_PIECES * sizeof(Rook));
+    for (int i = 0; i < NUM_PIECES; i++) rooks[i] = createRook(color, backRank, i);
 
     Pawn *pawns = (Pawn*)malloc(NUM_PAWNS * sizeof(Pawn));
     for (int i = 0; i < NUM_PAWNS; i++) pawns[i] = createPawn(color, pawnRank, i);
@@ -43,7 +43,7 @@ Player createPlayer(PieceColor color)
         .color = color,
         .bishops = bishops,
         .knights = knights,
-        .rocks = rocks,
+        .rooks = rooks,
         .pawns = pawns,
         .queen = queen,
         .king = king
@@ -53,7 +53,7 @@ Player createPlayer(PieceColor color)
 }
 
 
-bool isValidPiece(char symbol)
+bool isValidSymbol(char symbol)
 {
     return (symbol == 'p' || symbol == 'r' || symbol == 'n' || symbol == 'u' || symbol == 'e'
             ||  symbol == 'b' || symbol == 'q' || symbol == 'k' || symbol == 's');
@@ -95,7 +95,7 @@ Move getMove()
 
         toLower(&symbol);
 
-        if (isValidPiece(symbol)) break;
+        if (isValidSymbol(symbol)) break;
         printf("Invalid Piece Symbol, Try Again!!!!\n");
         while ((c = getchar()) != '\n' && c != EOF);
     }
@@ -165,6 +165,8 @@ Move getMove()
     move.colNext = colNext;
     move.rowNext = rowNext;
 
+    move.promotedPawn = '_';
+
     return move;
 }
 
@@ -174,7 +176,7 @@ void freePlayer(Player player)
     free(player.pawns);
     free(player.bishops);
     free(player.knights);
-    free(player.rocks);
+    free(player.rooks);
     free(player.queen);
     free(player.king);
 

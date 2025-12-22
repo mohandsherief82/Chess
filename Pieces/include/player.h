@@ -16,7 +16,7 @@ typedef struct
 {
     PieceColor color;
     Pawn *pawns;
-    Rook *rocks;
+    Rook *rooks;
     Knight *knights;
     Bishop *bishops;
     Queen *queen;
@@ -24,7 +24,7 @@ typedef struct
 } Player;
 
 Player createPlayer(PieceColor color);
-bool isValidPiece(char symbol);
+bool isValidSymbol(char symbol);
 void freePlayer(Player player);
 Move getMove();
 

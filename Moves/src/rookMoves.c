@@ -16,9 +16,9 @@ bool moveRook(char** board ,Player* player, Move move, Captured* playerCaptures,
     {
         for (int i = 0; i < NUM_PIECES; i++)
         {
-            if (player->rocks[i].colPosition == move.colPrev && player->rocks[i].rowPosition == move.rowPrev && player->rocks[i].isActive)
+            if (player->rooks[i].colPosition == move.colPrev && player->rooks[i].rowPosition == move.rowPrev && player->rooks[i].isActive)
             {
-                rock = &player->rocks[i];
+                rock = &player->rooks[i];
                 break;
             }
         }

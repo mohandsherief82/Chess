@@ -12,7 +12,7 @@ int main ()
 
 
     free(player.pawns);
-    free(player.rocks);
+    free(player.rooks);
     free(player.bishops);
     free(player.knights);
 

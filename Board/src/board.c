@@ -10,6 +10,8 @@
 
 #define MAX_MOVES_TO_DISPLAY 16
 
+extern char* path;
+
 char** initializeBoard()
 {
     char **board = (char**)malloc(BOARD_SIZE * sizeof(char*));
@@ -74,8 +76,8 @@ void updateBoard(char** board, Player player1, Player player2, Captured ply1Capt
     addPieces(board, player1.pawns, NUM_PAWNS, sizeof(Pawn));
     addPieces(board, player2.pawns, NUM_PAWNS, sizeof(Pawn));
 
-    addPieces(board, player1.rocks, NUM_PIECES, sizeof(Rook));
-    addPieces(board, player2.rocks, NUM_PIECES, sizeof(Rook));
+    addPieces(board, player1.rooks, NUM_PIECES, sizeof(Rook));
+    addPieces(board, player2.rooks, NUM_PIECES, sizeof(Rook));
 
     addPieces(board, player1.knights, NUM_PIECES, sizeof(Knight));
     addPieces(board, player2.knights, NUM_PIECES, sizeof(Knight));
@@ -89,13 +91,13 @@ void updateBoard(char** board, Player player1, Player player2, Captured ply1Capt
     addPieces(board, player1.king, 1, sizeof(King));
     addPieces(board, player2.king, 1, sizeof(King));
 
-    FILE *fptr = fopen("./Game-End/testing/game.bin", "rb");
+    FILE *fptr = fopen(path, "rb");
     
     if (fptr == NULL)
     {
-        FILE* ftemp = fopen("./Game-End/testing/game.bin", "wb");
+        FILE* ftemp = fopen(path, "wb");
         if (ftemp != NULL) fclose(ftemp);
-        fptr = fopen("./Game-End/testing/game.bin", "rb");
+        fptr = fopen(path, "rb");
     }
 
     long fileSize = getFileSize(fptr);

@@ -41,8 +41,8 @@ Player copyPlayer(Player* player)
     cpy.knights = malloc(NUM_PIECES * sizeof(Knight));
     memcpy(cpy.knights, player->knights, NUM_PIECES * sizeof(Knight));
 
-    cpy.rocks = malloc(NUM_PIECES * sizeof(Rook));
-    memcpy(cpy.rocks, player->rocks, NUM_PIECES * sizeof(Rook));
+    cpy.rooks = malloc(NUM_PIECES * sizeof(Rook));
+    memcpy(cpy.rooks, player->rooks, NUM_PIECES * sizeof(Rook));
 
     cpy.pawns = malloc(NUM_PAWNS * sizeof(Pawn));
     memcpy(cpy.pawns, player->pawns, NUM_PAWNS * sizeof(Pawn));
@@ -60,7 +60,7 @@ Player copyPlayer(Player* player)
 void freeCopy(Player cpyPlayer, char** cpyBoard)
 {
     free(cpyPlayer.pawns);
-    free(cpyPlayer.rocks);
+    free(cpyPlayer.rooks);
     free(cpyPlayer.knights);
     free(cpyPlayer.bishops);
     free(cpyPlayer.queen);

@@ -32,7 +32,7 @@ void promotePawn(Pawn* pawn, Move* move, bool load)
         char newSymbol;
         pawn->promoted = true;
 
-        if (isValidPiece(tolower(move->promotedPawn)) && load) newSymbol = tolower(move->promotedPawn);
+        if (isValidSymbol(tolower(move->promotedPawn)) && load) newSymbol = tolower(move->promotedPawn);
         else if (!load)
         {
             while (true)
@@ -98,12 +98,6 @@ bool movePawn(char** board, Player* player, Move* move, Captured* playerCaptures
             pawn->rowPosition = move->rowNext;
             board[move->rowNext][move->colNext] = pawn->symbol;
 
-            // if (pawn->isPinned)
-            // {
-            //     if (!legalCheck) printf("This Pawn is pinned, Try Again!!!\n");
-            //     return false;
-            // }
-
             if (!legalCheck)
             {
                 if (pawn->firstMove) pawn->firstMove = false;
@@ -131,12 +125,6 @@ bool movePawn(char** board, Player* player, Move* move, Captured* playerCaptures
                 pawn->firstMove = false;
                 *plyEnPassantCol = move->colNext;
             }
-
-            // if (pawn->isPinned)
-            // {
-            //     if (!legalCheck) printf("This Pawn is pinned, Try Again!!!\n");
-            //     return false;
-            // }
             
             return true;
         }

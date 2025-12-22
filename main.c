@@ -99,7 +99,7 @@ int main ()
         }
         else if (tolower(gameInit) == 'l')
         {
-            currentPlayerTurn = loadGame(board, &ply1, &ply2, &whiteCaptures, &blackCaptures, &whiteEnPassantCol, &blackEnPassantCol);
+            currentPlayerTurn = loadGame(&board, &ply1, &ply2, &whiteCaptures, &blackCaptures, &whiteEnPassantCol, &blackEnPassantCol);
             break;
         }
         else
@@ -146,7 +146,7 @@ int main ()
             else if (gameState == 'i')
             {
                 clearScreen();
-                loadGame(board, &ply1, &ply2, 
+                loadGame(&board, &ply1, &ply2, 
                             &whiteCaptures, &blackCaptures, 
                                 &whiteEnPassantCol, &blackEnPassantCol);
                 updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures, true);
@@ -215,7 +215,7 @@ int main ()
             else if (gameState == 'i')
             {
                 clearScreen();
-                loadGame(board, &ply1, &ply2, 
+                loadGame(&board, &ply1, &ply2, 
                             &whiteCaptures, &blackCaptures, 
                                 &whiteEnPassantCol, &blackEnPassantCol);
                 updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures, true);

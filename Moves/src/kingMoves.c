@@ -19,7 +19,7 @@ bool performCastling(char** board, Player* player, Move move, bool legalCheck)
     {
         int row = move.rowPrev;
 
-        if (move.colNext == 2 && player->rocks[0].firstMove == true)
+        if (move.colNext == 2 && player->rooks[0].firstMove == true)
         {
             if (isEmpty(board, row, 1) && isEmpty(board, row, 2) && isEmpty(board, row, 3))
             {
@@ -71,15 +71,15 @@ bool performCastling(char** board, Player* player, Move move, bool legalCheck)
                 board[row][3] = board[row][0];
                 board[row][0] = EMPTY_SQUARE;
                
-                player->rocks[0].colPosition = 3;
-                player->rocks[0].firstMove = false;
+                player->rooks[0].colPosition = 3;
+                player->rooks[0].firstMove = false;
                 player->king->firstMove = false;
 
                 return true;
             }
         }
 
-        else if (move.colNext == 6 && player->rocks[1].firstMove == true)
+        else if (move.colNext == 6 && player->rooks[1].firstMove == true)
         {
             if (isEmpty(board, row, 5) && isEmpty(board, row, 6))
             {    
@@ -131,8 +131,8 @@ bool performCastling(char** board, Player* player, Move move, bool legalCheck)
                 board[row][5] = board[row][7];
                 board[row][7] = EMPTY_SQUARE;
                 
-                player->rocks[1].colPosition = 5;
-                player->rocks[1].firstMove = false;
+                player->rooks[1].colPosition = 5;
+                player->rooks[1].firstMove = false;
                 player->king->firstMove = false;
 
                 return true;
