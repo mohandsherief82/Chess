@@ -13,7 +13,8 @@ Rook createRook(PieceColor color, int row, int col)
         .symbol = sym,
         .color = color,
         .rowPosition = row,
-        .colPosition = 0 + col * 7,
+        // 0 for the A col and 7 * col to assign the other rook as the difference between initial positions is 7
+        .colPosition = 0 + 7 * col,
         .isActive = true,
         .firstMove = true
     };

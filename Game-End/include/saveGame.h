@@ -7,8 +7,10 @@
 
 #include <stdio.h>
 
+extern char* path;
+
 void saveMove(Move move);
-int loadGame(char** board, Player* player1, Player* player2, Captured* ply1Captures
+int loadGame(char*** board, Player* player1, Player* player2, Captured* ply1Captures
             , Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol);
 bool undoLastMove(char** board, Player* player1, Player* player2, Captured* ply1Captures
             , Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol);

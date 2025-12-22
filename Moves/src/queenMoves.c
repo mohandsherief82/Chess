@@ -14,9 +14,9 @@ bool moveQueen(char** board, Player* player, Move move, Captured* playerCaptures
     int dispX, dispY, rowStep = 0, colStep = 0, r, c;
     Queen* queen = (Queen*)checkPromotedPawn(player, move);
     
-    if (queen == NULL && player->queen[0].isActive) 
+    if (queen == NULL && player->queen->isActive) 
     {
-        if (player->queen[0].colPosition == move.colPrev && player->queen[0].rowPosition == move.rowPrev) 
+        if (player->queen->colPosition == move.colPrev && player->queen->rowPosition == move.rowPrev) 
         {
             queen = player->queen;
         }
@@ -25,12 +25,6 @@ bool moveQueen(char** board, Player* player, Move move, Captured* playerCaptures
     if (queen == NULL)
     {
         if (!legalCheck) printf("No Queen At This Position, Try Again!!!\n");
-        return false;
-    }
-
-    if (queen->isPinned) 
-    {
-        if (!legalCheck) printf("This queen is pinned, Try Again!!!\n");
         return false;
     }
 

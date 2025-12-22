@@ -19,8 +19,29 @@
 
 extern char *path;
 
-char playerTurn(char** board, Player* player, Captured* capture, int* plyEnPassantCol, int* opponentEnPassantCol)
+char playerTurn(char** board, Player* player, Captured* capture, int* plyEnPassantCol, int* opponentEnPassantCol, int* counter)
 {
+    if (*counter >= 100)
+    {
+        printf("Draw available by the 50-move rule!\n");
+        printf("Would you like to claim the draw? (y/n): ");
+        char choice;
+        int c;
+        
+        if (scanf(" %c", &choice) == 1) 
+        {
+            while ((c = getchar()) != '\n' && c != EOF);
+            
+            if (tolower(choice) == 'y') 
+            {
+                printf("Game drawn by the 50-move rule!\n");
+                return 't'; 
+            }
+            else printf("Continuing game...\n");
+
+        }
+    }
+
     if (checkStalemate(board, player))
     {
         printf("No Valid Moves for this player.\nGame Ended with a Stalemate!!!\n");
@@ -49,7 +70,10 @@ char playerTurn(char** board, Player* player, Captured* capture, int* plyEnPassa
         
         if (!pieceMoveValid) continue;
         
-        if (isChecked(board, player, !legalCheck)) return 'i'; 
+        if (isChecked(board, player, !legalCheck)) return 'i';
+
+        if (capture->newCapture == true || moveSymbol == 'p') *counter = 0;
+        else (*counter)++;
 
         break; 
     }
@@ -68,13 +92,15 @@ int main ()
     char** board = initializeBoard(), gameInit = '\0';
     char gameState = '_';
     int whiteEnPassantCol = -1, blackEnPassantCol = -1;
-    int c, currentPlayerTurn = 1;
+    int c, currentPlayerTurn = 1, moveCounter = 0;
 
     
-    printf("|-------------------------------------------------------------------------------------------------------------------------------------------------------------|\n");
+    clearScreen();
+    printf("|----------------------------------------------------------------------------------------------------------------------"
+            "-------------------------------------------------------|\n");
     printf("\t\t\t\t\t\t\t\t Welcome To Terminal Chess\n");
     printf("- In our game, we represent white pieces with lowercase letters and black pieces with uppercase letters.\n\
-        - Each piece has a different letter, where: \n \t- p: white pawn\n\t- r: white rock.\n\t- N: black knight.\n\t- b: white bishop\n\
+        - Each piece has a different letter, where: \n \t- p: white pawn\n\t- r: white rook.\n\t- N: black knight.\n\t- b: white bishop\n\
         - Q: black queen.\n\t- K: black king.\n");
         
     while (gameInit == '\0')
@@ -97,7 +123,7 @@ int main ()
         }
         else if (tolower(gameInit) == 'l')
         {
-            currentPlayerTurn = loadGame(board, &ply1, &ply2, &whiteCaptures, &blackCaptures, &whiteEnPassantCol, &blackEnPassantCol);
+            currentPlayerTurn = loadGame(&board, &ply1, &ply2, &whiteCaptures, &blackCaptures, &whiteEnPassantCol, &blackEnPassantCol);
             break;
         }
         else
@@ -122,7 +148,7 @@ int main ()
             printf("Player 1's turn: \n");
 
             isChecked(board, &ply1, false);
-            gameState = playerTurn(board, &ply1, &whiteCaptures, &whiteEnPassantCol, &blackEnPassantCol);
+            gameState = playerTurn(board, &ply1, &whiteCaptures, &whiteEnPassantCol, &blackEnPassantCol, &moveCounter);
 
             if (whiteCaptures.newCapture == true) capturePiece(&ply2, &whiteCaptures);
             
@@ -144,11 +170,11 @@ int main ()
             else if (gameState == 'i')
             {
                 clearScreen();
-                loadGame(board, &ply1, &ply2, 
+                loadGame(&board, &ply1, &ply2, 
                             &whiteCaptures, &blackCaptures, 
                                 &whiteEnPassantCol, &blackEnPassantCol);
                 updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures, true);
-                printf("Illegal move: King remains in check, Try Again!!!\n\n");
+                printf("Illegal move: King is in check, Try Again!!!\n\n");
                 continue;
             }
             else if (gameState == 'e')
@@ -156,12 +182,13 @@ int main ()
                 printf("Game Ends!!!\nPlayer 2 wins by Resignation!!!\n");
                 break;
             }
+            else if (gameState == 't') break;
 
             clearScreen();
             updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures, true);
             currentPlayerTurn = 2;
 
-            if (checkMate(board, &ply1))
+            if (checkMate(board, &ply2))
             {
                 printf("Game Ended By Checkmate.\nPlayer 1 wins!!!\n");
                 printf("Do you want to undo last move(u, press any key to end game)? ");
@@ -192,7 +219,7 @@ int main ()
             printf("Player 2's turn: \n");
             
             isChecked(board, &ply2, false);
-            gameState = playerTurn(board, &ply2, &blackCaptures, &blackEnPassantCol, &whiteEnPassantCol);
+            gameState = playerTurn(board, &ply2, &blackCaptures, &blackEnPassantCol, &whiteEnPassantCol, &moveCounter);
             if (blackCaptures.newCapture == true) capturePiece(&ply1, &blackCaptures);
             
             if (gameState == 's') break;
@@ -213,11 +240,11 @@ int main ()
             else if (gameState == 'i')
             {
                 clearScreen();
-                loadGame(board, &ply1, &ply2, 
+                loadGame(&board, &ply1, &ply2, 
                             &whiteCaptures, &blackCaptures, 
                                 &whiteEnPassantCol, &blackEnPassantCol);
                 updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures, true);
-                printf("Illegal move: King remains in check, Try Again!!!\n\n");
+                printf("Illegal move: King is in check, Try Again!!!\n\n");
                 continue;
             }
             else if (gameState == 'e')
@@ -225,6 +252,7 @@ int main ()
                 printf("Game Ends!!!\nPlayer 1 wins by Resignation!!!\n");
                 break;
             }
+            else if (gameState == 't') break;
             
             clearScreen();
             updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures, true);

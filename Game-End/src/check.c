@@ -31,8 +31,8 @@ Piece* findPiece(Player* player, Move move)
     {
         for (int i = 0; i < NUM_PIECES; i++)
         {
-            if (player->rocks[i].colPosition == move.colPrev && player->rocks[i].rowPosition == move.rowPrev && player->rocks[i].isActive)
-                return (Piece*)&player->rocks[i];
+            if (player->rooks[i].colPosition == move.colPrev && player->rooks[i].rowPosition == move.rowPrev && player->rooks[i].isActive)
+                return (Piece*)&player->rooks[i];
         }
     }
     else if (symbol == 'n')
@@ -68,7 +68,7 @@ bool isChecked(char** board, Player* player, bool legalCheck)
     if (!legalCheck)
     {
         for (int i = 0; i < NUM_PAWNS; i++) player->pawns[i].isPinned = false;
-        for (int i = 0; i < NUM_PIECES; i++) player->rocks[i].isPinned = false;
+        for (int i = 0; i < NUM_PIECES; i++) player->rooks[i].isPinned = false;
         for (int i = 0; i < NUM_PIECES; i++) player->knights[i].isPinned = false;
         for (int i = 0; i < NUM_PIECES; i++) player->bishops[i].isPinned = false;
         if (player->queen != NULL) player->queen->isPinned = false; 

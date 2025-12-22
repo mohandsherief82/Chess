@@ -7,7 +7,6 @@
 Captured initializeCapture(PieceColor color)
 {
     Captured captures;
-    captures.captureCount = 0;
     captures.newCapture = false;
 
     for (int i = 0; i < MAXCAPTNUM; i++)
@@ -16,6 +15,7 @@ Captured initializeCapture(PieceColor color)
     }
     
     captures.capturedSymbols[MAXCAPTNUM - 1] = 'X';
+    captures.captureCount = 0;
 
     return captures;
 }
@@ -36,29 +36,15 @@ void capturePiece(Player* player, Captured* captureData)
     char sym = tolower(captureData->capturedPiece.symbol);
     bool found = false;
 
-    if (sym == 'p')
-    {
-        for (int i = 0; i < NUM_PAWNS; i++)
-        {
-            if (captureData->capturedPiece.colPosition == player->pawns[i].colPosition 
-                && captureData->capturedPiece.rowPosition == player->pawns[i].rowPosition 
-                && player->pawns[i].isActive)
-            {
-                player->pawns[i].isActive = false;
-                found = true;
-                break;
-            }
-        }
-    }
-    else if (sym == 'r')
+    if (sym == 'r')
     {
         for (int i = 0; i < NUM_PIECES; i++)
         {
-            if (captureData->capturedPiece.colPosition == player->rocks[i].colPosition 
-                && captureData->capturedPiece.rowPosition == player->rocks[i].rowPosition 
-                && player->rocks[i].isActive)
+            if (captureData->capturedPiece.colPosition == player->rooks[i].colPosition 
+                && captureData->capturedPiece.rowPosition == player->rooks[i].rowPosition 
+                && player->rooks[i].isActive)
             {
-                player->rocks[i].isActive = false;
+                player->rooks[i].isActive = false;
                 found = true;
                 break;
             }
@@ -92,7 +78,6 @@ void capturePiece(Player* player, Captured* captureData)
             }
         }
     }
-
     else if (sym == 'q')
     {
         if (captureData->capturedPiece.colPosition == player->queen->colPosition 
@@ -104,6 +89,7 @@ void capturePiece(Player* player, Captured* captureData)
         }
     }
 
+    // Handles Pawns and Promoted Pawns
     if (!found)
     {
         for (int i = 0; i < NUM_PAWNS; i++)
@@ -118,11 +104,7 @@ void capturePiece(Player* player, Captured* captureData)
             }
         }
     }
-
-    if (found)
-    {
-        captureData->capturedSymbols[captureData->captureCount - 1] = captureData->capturedPiece.symbol;
-    }
-
+    
+    captureData->capturedSymbols[captureData->captureCount - 1] = captureData->capturedPiece.symbol;
     captureData->newCapture = false;
 }

@@ -4,7 +4,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 
+#define BUFFER 5
 
 Player createPlayer(PieceColor color)
 {
@@ -22,28 +24,34 @@ Player createPlayer(PieceColor color)
     }
 
     Bishop *bishops = (Bishop*)malloc(NUM_PIECES * sizeof(Bishop));
+    if (bishops == NULL) exit(1);
     for (int i = 0; i < NUM_PIECES; i++) bishops[i] = createBishop(color, backRank, i);
 
     Knight *knights = (Knight*)malloc(NUM_PIECES * sizeof(Knight));
+    if (knights == NULL) exit(1);
     for (int i = 0; i < NUM_PIECES; i++) knights[i] = createKnight(color, backRank, i);
 
-    Rook *rocks = (Rook*)malloc(NUM_PIECES * sizeof(Rook));
-    for (int i = 0; i < NUM_PIECES; i++) rocks[i] = createRook(color, backRank, i);
+    Rook *rooks = (Rook*)malloc(NUM_PIECES * sizeof(Rook));
+    if (rooks == NULL) exit(1);
+    for (int i = 0; i < NUM_PIECES; i++) rooks[i] = createRook(color, backRank, i);
 
     Pawn *pawns = (Pawn*)malloc(NUM_PAWNS * sizeof(Pawn));
+    if (pawns == NULL) exit(1);
     for (int i = 0; i < NUM_PAWNS; i++) pawns[i] = createPawn(color, pawnRank, i);
 
     Queen *queen = (Queen*)malloc(sizeof(Queen));
+    if (queen == NULL) exit(1);
     *queen = createQueen(color, backRank);
 
     King *king = (King*)malloc(sizeof(King));
+    if (king == NULL) exit(1);
     *king = createKing(color, backRank);
 
     Player player = {
         .color = color,
         .bishops = bishops,
         .knights = knights,
-        .rocks = rocks,
+        .rooks = rooks,
         .pawns = pawns,
         .queen = queen,
         .king = king
@@ -53,7 +61,7 @@ Player createPlayer(PieceColor color)
 }
 
 
-bool isValidPiece(char symbol)
+bool isValidSymbol(char symbol)
 {
     return (symbol == 'p' || symbol == 'r' || symbol == 'n' || symbol == 'u' || symbol == 'e'
             ||  symbol == 'b' || symbol == 'q' || symbol == 'k' || symbol == 's');
@@ -66,17 +74,11 @@ bool isValidMove(int coordinate)
 }
 
 
-void toLower(char *letter)
-{
-    if (*letter >= 'A' && *letter <= 'Z') *letter += 32;
-}
-
-
 Move getMove()
 {
     Move move;
 
-    char symbol, moveInput[5]; 
+    char symbol, moveInput[BUFFER]; 
     char tempColPrev, tempColNext;
     int rowPrev, rowNext,
             colPrev, colNext;
@@ -93,9 +95,9 @@ Move getMove()
             continue;
         }
 
-        toLower(&symbol);
+        symbol = tolower(symbol);
 
-        if (isValidPiece(symbol)) break;
+        if (isValidSymbol(symbol)) break;
         printf("Invalid Piece Symbol, Try Again!!!!\n");
         while ((c = getchar()) != '\n' && c != EOF);
     }
@@ -108,29 +110,33 @@ Move getMove()
 
     while (!moveFlag)
     {
+        char inputLine[20];
+
         printf("\nEnter move (e.g., e2e4): ");
-        if (scanf(" %4s", moveInput) != 1) 
+        if (fgets(inputLine, sizeof(inputLine), stdin) == NULL) 
         {
-            while ((c = getchar()) != '\n' && c != EOF);
-            printf("Invalid move format, Try Again!!!!\n");
+            printf("Error reading input, Try Again!!!\n");
             continue;
         }
 
-        // Clear the rest of the line
-        while ((c = getchar()) != '\n' && c != EOF);
+        // Remove newline
+        inputLine[strcspn(inputLine, "\n")] = 0;
 
-        if (strlen(moveInput) != 4) 
+        // Validate length
+        if (strlen(inputLine) != 4) 
         {
-            printf("Move must be 4 characters (colRowColRow), Try Again!!!!\n");
+            printf("Move must be 4 characters, Try Again!\n");
             continue;
         }
+
+        strcpy(moveInput, inputLine);
 
         // Extract and preprocess characters
         tempColPrev = moveInput[0];
         tempColNext = moveInput[2];
         
-        toLower(&tempColPrev);
-        toLower(&tempColNext);
+        tempColPrev = tolower(tempColPrev);
+        tempColNext = tolower(tempColNext);
 
         // Convert row characters ('1'-'8') to integers (1-8)
         rowPrev = moveInput[1] - '0'; 
@@ -165,6 +171,8 @@ Move getMove()
     move.colNext = colNext;
     move.rowNext = rowNext;
 
+    move.promotedPawn = '_';
+
     return move;
 }
 
@@ -174,7 +182,7 @@ void freePlayer(Player player)
     free(player.pawns);
     free(player.bishops);
     free(player.knights);
-    free(player.rocks);
+    free(player.rooks);
     free(player.queen);
     free(player.king);
 
