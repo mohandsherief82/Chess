@@ -180,11 +180,22 @@ Move getMove()
 void freePlayer(Player player)
 {
     free(player.pawns);
+    player.pawns = NULL;
+    
     free(player.bishops);
+    player.bishops = NULL;
+    
     free(player.knights);
+    player.knights = NULL;
+    
     free(player.rooks);
+    player.rooks = NULL;
+    
     free(player.queen);
+    player.queen = NULL;
+    
     free(player.king);
+    player.king = NULL;
 
     return;
 }

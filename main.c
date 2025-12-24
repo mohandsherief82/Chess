@@ -132,10 +132,13 @@ int main ()
         else
         {
             remove(path);
+
             FILE *fptr = fopen(path, "wb");
             if (fptr != NULL) fclose(fptr);
+
             clearRedo();
             currentPlayerTurn = 1;
+
             break;
         }
     }
@@ -176,9 +179,9 @@ int main ()
                 if(redoLastMove(board, &ply1, &ply2, &whiteCaptures, &blackCaptures
                             , &whiteEnPassantCol, &blackEnPassantCol))
                 {
-                    printf("Move redone.\n");
                     clearScreen();
                     updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures, true);
+                    printf("Move redone.\n");
                     currentPlayerTurn = 2; 
                 }
                 else printf("No moves to redo, Try Again!!!\n");
@@ -197,7 +200,7 @@ int main ()
             }
             else if (gameState == 'e')
             {
-                printf("Game Ends!!!\nPlayer 2 wins by Resignation!!!\n");
+                printf("\nGame Ends!!!\nPlayer 2 wins by Resignation!!!\n");
                 break;
             }
             else if (gameState == 't') break;
@@ -281,7 +284,7 @@ int main ()
             }
             else if (gameState == 'e')
             {
-                printf("Game Ends!!!\nPlayer 1 wins by Resignation!!!\n");
+                printf("\nGame Ends!!!\nPlayer 1 wins by Resignation!!!\n");
                 break;
             }
             else if (gameState == 't') break;
