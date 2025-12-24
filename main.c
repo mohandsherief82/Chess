@@ -79,7 +79,7 @@ char playerTurn(char** board, Player* player, Captured* capture, int* plyEnPassa
         break; 
     }
 
-    clearRedoStack();
+    clearRedo();
     
     saveMove(move);
 
@@ -134,7 +134,7 @@ int main ()
             remove(path);
             FILE *fptr = fopen(path, "wb");
             if (fptr != NULL) fclose(fptr);
-            clearRedoStack();
+            clearRedo();
             currentPlayerTurn = 1;
             break;
         }

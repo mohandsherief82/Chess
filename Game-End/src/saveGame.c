@@ -218,7 +218,7 @@ bool redoLastMove(char** board, Player* player1, Player* player2, Captured* ply1
     return true;
 }
 
-void clearRedoStack()
+void clearRedo()
 {
     FILE* fptr = fopen(redoPath, "wb");
     fclose(fptr);
