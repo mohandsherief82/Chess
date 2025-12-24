@@ -10,6 +10,6 @@ Player copyPlayer(Player* player);
 void freeCopy(Player copyPlayer, char** copyBoard);
 bool checkStalemate(char** board, Player* player);
 bool legalMove(char** board, Player* player);
-bool inSufficientMaterial(Player player1, Player player2)
+bool inSufficientMaterial(Player player1, Player player2);
 
 #endif
