@@ -64,7 +64,7 @@ Player createPlayer(PieceColor color)
 bool isValidSymbol(char symbol)
 {
     return (symbol == 'p' || symbol == 'r' || symbol == 'n' || symbol == 'u' || symbol == 'e'
-            ||  symbol == 'b' || symbol == 'q' || symbol == 'k' || symbol == 's');
+            ||  symbol == 'b' || symbol == 'q' || symbol == 'k' || symbol == 's' || symbol == 'd');
 }
 
 
@@ -87,7 +87,7 @@ Move getMove()
 
     while (true)
     {
-        printf("\nEnter piece symbol(p, r, n, b, q, k), (u for undo, s for save, e for resign): ");
+        printf("\nEnter piece symbol(p, r, n, b, q, k), (u for undo, d for redo, s for save, e for resign): ");
         if (scanf(" %c", &symbol) != 1) 
         {
             while ((c = getchar()) != '\n' && c != EOF);
@@ -105,7 +105,7 @@ Move getMove()
     while ((c = getchar()) != '\n' && c != EOF);
 
     move.symbol = symbol;
-    if (move.symbol == 's' || move.symbol == 'u' || move.symbol == 'e') return move;
+    if (move.symbol == 's' || move.symbol == 'u' || move.symbol == 'e'|| move.symbol == 'd') return move;
 
 
     while (!moveFlag)

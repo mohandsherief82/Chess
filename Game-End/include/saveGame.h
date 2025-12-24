@@ -12,5 +12,8 @@ int loadGame(char** board, Player* player1, Player* player2, Captured* ply1Captu
             , Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol);
 bool undoLastMove(char** board, Player* player1, Player* player2, Captured* ply1Captures
             , Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol);
+bool redoLastMove(char** board, Player* player1, Player* player2, Captured* ply1Captures
+            , Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol);
+void clearRedoStack();
 
 #endif

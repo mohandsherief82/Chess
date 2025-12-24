@@ -57,6 +57,7 @@ char playerTurn(char** board, Player* player, Captured* capture, int* plyEnPassa
         if (move.symbol == 's') return 's';
         else if (move.symbol == 'u') return 'u';
         else if (move.symbol == 'e') return 'e';
+        else if (move.symbol == 'd') return 'd';
 
         bool pieceMoveValid = false;
         char moveSymbol = tolower(move.symbol);
@@ -77,6 +78,8 @@ char playerTurn(char** board, Player* player, Captured* capture, int* plyEnPassa
 
         break; 
     }
+
+    clearRedoStack();
     
     saveMove(move);
 
@@ -131,6 +134,7 @@ int main ()
             remove(path);
             FILE *fptr = fopen(path, "wb");
             if (fptr != NULL) fclose(fptr);
+            clearRedoStack();
             currentPlayerTurn = 1;
             break;
         }
@@ -164,6 +168,20 @@ int main ()
                     updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures, true);
                 }
                 else printf("No moves to undo, Try Again!!!\n");
+
+                continue;
+            }
+            else if (gameState == 'd')  
+            {
+                if(redoLastMove(board, &ply1, &ply2, &whiteCaptures, &blackCaptures
+                            , &whiteEnPassantCol, &blackEnPassantCol))
+                {
+                    printf("Move redone.\n");
+                    clearScreen();
+                    updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures, true);
+                    currentPlayerTurn = 2; 
+                }
+                else printf("No moves to redo, Try Again!!!\n");
 
                 continue;
             }
@@ -235,6 +253,20 @@ int main ()
                 }
                 else printf("No moves to undo, Try Again!!!\n");
                 
+                continue;
+            }
+            else if (gameState == 'd')  
+            {
+                if(redoLastMove(board, &ply1, &ply2, &whiteCaptures, &blackCaptures
+                            , &whiteEnPassantCol, &blackEnPassantCol))
+                {
+                    printf("Move redone.\n");
+                    clearScreen();
+                    updateBoard(board, ply1, ply2, whiteCaptures, blackCaptures, true);
+                    currentPlayerTurn = 1;  
+                }
+                else printf("No moves to redo, Try Again!!!\n");
+
                 continue;
             }
             else if (gameState == 'i')
