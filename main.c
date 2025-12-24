@@ -152,6 +152,13 @@ int main ()
         // Player 1's turn
         if (currentPlayerTurn == 1)
         {
+            if (inSufficientMaterial(ply1, ply2))
+            {
+                printf("Insufficient Material, Game Ends by Draw!!!\n");
+                gameState = '_';
+                break;
+            }
+
             printf("Player 1's turn: \n");
 
             isChecked(board, &ply1, false);
@@ -237,6 +244,13 @@ int main ()
         // Player 2's turn
         if (currentPlayerTurn == 2)
         {
+            if (inSufficientMaterial(ply1, ply2))
+            {
+                printf("Insufficient Material, Game Ends by Draw!!!\n");
+                gameState = '_';
+                break;
+            }
+
             printf("Player 2's turn: \n");
             
             isChecked(board, &ply2, false);

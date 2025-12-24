@@ -127,6 +127,38 @@ bool legalMove(char** board, Player* player)
 }
 
 
+bool inSufficientMaterial(Player player1, Player player2)
+{
+    int p1Minor = 0, p2Minor = 0;
+
+    if (player1.queen->isActive || player2.queen->isActive) return false;
+    
+    for (int i = 0; i < 2; i++) 
+    {
+        if (player1.rooks[i].isActive || player2.rooks[i].isActive) return false;
+    }
+
+    for (int i = 0; i < 8; i++) 
+    {
+        if (player1.pawns[i].isActive || player2.pawns[i].isActive) return false;
+    }
+
+    for (int i = 0; i < 2; i++) {
+        if (player1.bishops[i].isActive) p1Minor++;
+        if (player1.knights[i].isActive) p1Minor++;
+        
+        if (player2.bishops[i].isActive) p2Minor++;
+        if (player2.knights[i].isActive) p2Minor++;
+    }
+
+    if (p1Minor == 0 && p2Minor == 0) return true;
+    if ((p1Minor == 1 && p2Minor == 0) || (p1Minor == 0 && p2Minor == 1)) return true;
+    if (p1Minor == 1 && p2Minor == 1) return true; 
+
+    return false;
+}
+
+
 bool checkStalemate(char** board, Player* player)
 {
     if(!legalMove(board, player) && !isChecked(board, player, true)) return true;
