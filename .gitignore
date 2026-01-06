@@ -3,3 +3,5 @@
 */bin/
 */testing/
 Pieces/testing
+*.txt
+build/
