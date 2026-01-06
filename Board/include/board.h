@@ -1,13 +1,8 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-#define BOARD_SIZE 8
-#define BLACK_SQUARE '.'
-#define WHITE_SQUARE '-'
-#define EMPTY_SQUARE ' '
-
-#include "../../Pieces/include/player.h"
-#include "../../Moves/include/captures.h"
+#include "player.h"
+#include "captures.h"
 
 char** initializeBoard();
 

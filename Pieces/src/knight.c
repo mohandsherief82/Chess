@@ -1,6 +1,5 @@
-#include "../include/knight.h"
-#include "../../chessTypes.h"
-#include "../../Board/include/board.h"
+#include "knight.h"
+#include "chessTypes.h"
 
 #include <stdbool.h>
 #include <stdlib.h>

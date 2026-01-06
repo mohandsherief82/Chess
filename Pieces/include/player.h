@@ -3,8 +3,8 @@
 #include "knight.h"
 #include "queen.h"
 #include "bishop.h"
-#include "rock.h"
-#include "../../chessTypes.h"
+#include "rook.h"
+#include "chessTypes.h"
 
 #ifndef PLAYER_H
 #define PLAYER_H

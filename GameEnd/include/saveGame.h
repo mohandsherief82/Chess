@@ -1,9 +1,9 @@
 #ifndef SAVE_GAME_H
 #define SAVE_GAME_H
 
-#include "../../chessTypes.h"
-#include "../../Pieces/include/player.h" 
-#include "../../Moves/include/captures.h"
+#include "chessTypes.h"
+#include "player.h" 
+#include "captures.h"
 
 #include <stdio.h>
 

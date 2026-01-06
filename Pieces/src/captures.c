@@ -1,5 +1,4 @@
-#include "../include/captures.h"
-#include "../../Board/include/board.h"
+#include "captures.h"
 
 #include <stdlib.h>
 #include <ctype.h>
@@ -19,6 +18,13 @@ Captured initializeCapture(PieceColor color)
 
     return captures;
 }
+
+
+bool isEmpty(char** board, int r, int c)
+{
+    return board[r][c] == WHITE_SQUARE || board[r][c] == BLACK_SQUARE || board[r][c] == EMPTY_SQUARE;
+}
+
 
 PieceColor pieceColorAt(char** board, int row, int col)
 {    

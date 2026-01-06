@@ -3,6 +3,12 @@
 #ifndef CHESS_TYPES_H
 #define CHESS_TYPES_H
 
+#define BOARD_SIZE 8
+#define BLACK_SQUARE '.'
+#define WHITE_SQUARE '-'
+#define EMPTY_SQUARE ' '
+
+
 typedef enum {
     COLOR_WHITE = 0,
     COLOR_BLACK,

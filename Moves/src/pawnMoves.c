@@ -1,6 +1,6 @@
-#include "../../Pieces/include/player.h"
-#include "../../Board/include/board.h"
-#include "../include/captures.h"
+#include "player.h"
+#include "board.h"
+#include "captures.h"
 
 #include <stdbool.h>
 #include <stdlib.h>

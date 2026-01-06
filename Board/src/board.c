@@ -3,10 +3,9 @@
 #include <stdbool.h>
 #include <ctype.h>
 
-#include "../../Pieces/include/player.h"
-#include "../include/board.h"
-#include "../../Game-End/include/saveGame.h"
-#include "../../Moves/include/captures.h"
+#include "player.h"
+#include "board.h"
+#include "captures.h"
 
 #define MAX_MOVES_TO_DISPLAY 16
 
@@ -181,12 +180,6 @@ void updateBoard(char** board, Player player1, Player player2, Captured ply1Capt
     }
 
     fclose(fptr);
-}
-
-
-bool isEmpty(char** board, int r, int c)
-{
-    return board[r][c] == WHITE_SQUARE || board[r][c] == BLACK_SQUARE || board[r][c] == EMPTY_SQUARE;
 }
 
 

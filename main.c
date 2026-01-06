@@ -3,19 +3,19 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include "./Board/include/board.h"
-#include "./Pieces/include/player.h"
-#include "./Moves/include/pawnMoves.h"
-#include "./Moves/include/rookMoves.h"
-#include "./Moves/include/knightMoves.h"
-#include "./Moves/include/bishopMoves.h"
-#include "./Moves/include/queenMoves.h"
-#include "./Moves/include/kingMoves.h"
-#include "./Moves/include/captures.h"
-#include "./Game-End/include/saveGame.h"
-#include "./Game-End/include/staleMate.h"
-#include "./Game-End/include/checkMate.h"
-#include "./Game-End/include/check.h"
+#include "board.h"
+#include "player.h"
+#include "pawnMoves.h"
+#include "rookMoves.h"
+#include "knightMoves.h"
+#include "bishopMoves.h"
+#include "queenMoves.h"
+#include "kingMoves.h"
+#include "captures.h"
+#include "saveGame.h"
+#include "staleMate.h"
+#include "checkMate.h"
+#include "check.h"
 
 extern char *path;
 

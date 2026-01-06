@@ -3,17 +3,17 @@
 #include <stdbool.h>
 #include <ctype.h>
 
-#include "../../Moves/include/pawnMoves.h"
-#include "../../Moves/include/rookMoves.h"
-#include "../../Moves/include/knightMoves.h"
-#include "../../Moves/include/bishopMoves.h"
-#include "../../Moves/include/queenMoves.h"
-#include "../../Moves/include/kingMoves.h"
-#include "../../Moves/include/captures.h"
-#include "../../Board/include/board.h"
-#include "../../Pieces/include/player.h"
-#include "../../chessTypes.h"
-#include "../include/check.h"
+#include "pawnMoves.h"
+#include "rookMoves.h"
+#include "knightMoves.h"
+#include "bishopMoves.h"
+#include "queenMoves.h"
+#include "kingMoves.h"
+#include "captures.h"
+#include "board.h"
+#include "player.h"
+#include "chessTypes.h"
+#include "check.h"
 
 const char* path = "./Game/game.bin";
 const char* redoPath = "./Game/redo.bin";

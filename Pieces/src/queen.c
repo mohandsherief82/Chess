@@ -1,5 +1,5 @@
-#include "../include/queen.h"
-#include "../../chessTypes.h"
+#include "queen.h"
+#include "chessTypes.h"
 
 Queen createQueen(PieceColor color, int row)
 {

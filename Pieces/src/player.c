@@ -1,5 +1,5 @@
-#include "../include/player.h"
-#include "../../chessTypes.h"
+#include "player.h"
+#include "chessTypes.h"
 
 #include <stdlib.h>
 #include <stdio.h>

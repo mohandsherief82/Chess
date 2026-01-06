@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 
-#include "../../Pieces/include/player.h"
+#include "player.h"
 
 bool isChecked(char** board, Player* player, bool legalCheck);
 

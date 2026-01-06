@@ -1,9 +1,6 @@
-#include "../../Moves/include/kingMoves.h"
-#include "../include/saveGame.h"
-#include "../../Board/include/board.h"
-#include "../../Pieces/include/player.h"
-#include "../include/check.h"
-#include "../include/staleMate.h"
+#include "player.h"
+#include "check.h"
+#include "staleMate.h"
 
 #include <stdbool.h>
 #include <stdlib.h>

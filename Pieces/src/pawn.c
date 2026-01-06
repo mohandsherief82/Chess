@@ -1,8 +1,8 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#include "../include/pawn.h"
-#include "../../chessTypes.h"
+#include "pawn.h"
+#include "chessTypes.h"
 
 
 // Store all Pawn piece data regardless of color

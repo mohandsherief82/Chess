@@ -3,8 +3,8 @@
 
 #define MAXCAPTNUM 16
 
-#include "../../chessTypes.h"
-#include "../../Pieces/include/player.h"
+#include "chessTypes.h"
+#include "player.h"
 
 #include <stdbool.h>
 
