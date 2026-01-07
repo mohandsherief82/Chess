@@ -1,12 +1,17 @@
 cmake_minimum_required(VERSION 3.28)
 project(GUI LANGUAGES CXX)
 
+# Enable Qt automation tools
 set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON) 
 
-find_package(Qt6 REQUIRED COMPONENTS Widgets)
+find_package(Qt6 REQUIRED COMPONENTS Widgets Svg)
 
-# Make sure this filename matches your file on disk!
+# Define the executable
 add_executable(Gui)
+
+# Manage sources and headers
 target_sources(
     Gui
     PUBLIC
@@ -15,12 +20,14 @@ target_sources(
         BASE_DIRS include
         FILES
             include/guiBoard.hpp
-)
-target_sources(
-    Gui
     PRIVATE
         src/guiBoard.cpp
         test.cpp
+        resources.qrc
 )
 
-target_link_libraries(Gui PRIVATE Qt6::Widgets)
+# Ensure the compiler can find your headers
+target_include_directories(Gui PRIVATE include ..)
+
+# Link the required libraries
+target_link_libraries(Gui PRIVATE Qt6::Widgets Qt6::Svg)
