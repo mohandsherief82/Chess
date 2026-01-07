@@ -5,7 +5,7 @@ project(Chess LANGUAGES C)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 # Define the main game
-add_executable(Game main.c chessTypes.h)
+add_executable(Game main.c)
 
 add_subdirectory(Pieces)
 add_subdirectory(Board)
