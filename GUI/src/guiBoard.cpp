@@ -1,11 +1,4 @@
-#include <QGridLayout>
-#include <QWidget>
-#include <QString>
-#include <QLabel>
-#include <QVBoxLayout>
-#include <QIcon>
-
-#include <cctype>
+#include "guiBoard.hpp"
 
 QString getIconPath(char piece) 
 {
@@ -78,10 +71,20 @@ void add_piece_to_cell(QWidget *cell, char pieceChar)
 }
 
 
-void display_board(QGridLayout *gl, const char (&board)[8][8]
+void display_board(QMainWindow *main_window, const char (&board)[8][8]
         , QLabel *player1_label, QLabel *player2_label, int player_turn) 
 {
-    if (!gl) return;
+    QWidget *master_container = new QWidget();
+    QVBoxLayout *master_layout = new QVBoxLayout(master_container);
+
+    master_layout->setContentsMargins(20, 20, 20, 20);
+    master_layout->setSpacing(10);
+
+    QWidget *container_top = new QWidget();
+    QWidget *container_central = new QWidget();
+    QWidget *container_bottom = new QWidget();
+
+    QGridLayout *gl = new QGridLayout(container_central);
 
     clear_items(gl);
 
@@ -141,6 +144,13 @@ void display_board(QGridLayout *gl, const char (&board)[8][8]
 
         gl->addWidget(player2_label, 9, 0, 1, 8, Qt::AlignLeft);
     }
+
+    // Add widgets to the main layout
+    master_layout->addWidget(container_top);
+    master_layout->addWidget(container_central); 
+    master_layout->addWidget(container_bottom);
+
+    main_window->setCentralWidget(master_container);
 
     return;
 }

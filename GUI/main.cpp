@@ -10,6 +10,7 @@
 #include <QLabel>
 
 #include "guiBoard.hpp"
+#include "startMenu.hpp"
 
 extern "C" 
 {
@@ -32,41 +33,23 @@ int main(int argc, char **argv)
     QApplication app(argc, argv);
     QMainWindow *main_window = new QMainWindow();
 
-    QWidget *master_container = new QWidget();
-    QVBoxLayout *master_layout = new QVBoxLayout(master_container);
-
-    master_layout->setContentsMargins(20, 20, 20, 20);
-    master_layout->setSpacing(10);
-
-    QWidget *container_top = new QWidget();
-    QWidget *container_central = new QWidget();
-    QWidget *container_bottom = new QWidget();
-
-    QGridLayout *main_grid = new QGridLayout(container_central);
+    // Main Window Main Settings
+    main_window->setStyleSheet("background-color: #0A1118;");
+    main_window->setFixedSize(QGuiApplication::primaryScreen()->availableGeometry().size());
     
     QLabel *player2_msg = new QLabel("Player 2 (Black)");
     QLabel *player1_msg = new QLabel("Player 1 (White)");
 
-    int player_turn {2};
+    int player_turn {1};
 
     // Set Styles to the text
     player2_msg->setStyleSheet("font-weight: bold; color: #f8e7bb; font-size: 20px; margin-bottom: 5px;"); 
     player1_msg->setStyleSheet("font-weight: bold; color: #f8e7bb; font-size: 20px; margin-bottom: 5px;");
 
-
     // Add pieces and the board to the main grid
-    display_board(main_grid, board, player1_msg, player2_msg, player_turn);
+    display_board(main_window, board, player1_msg, player2_msg, player_turn);
 
-    // Add widgets to the main layout
-    master_layout->addWidget(container_top);
-    master_layout->addWidget(container_central); 
-    master_layout->addWidget(container_bottom);
-
-    // Add Containers to the main window
-    main_window->setCentralWidget(master_container);
-    main_window->setStyleSheet("background-color: #0A1118;");
-
-    main_window->setFixedSize(QGuiApplication::primaryScreen()->availableGeometry().size());
+    display_start_window(main_window);
 
     main_window->show();
 
