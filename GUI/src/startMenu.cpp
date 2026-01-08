@@ -4,43 +4,92 @@
 #include <QVBoxLayout>
 #include <QWidget>
 #include <QLabel>
-#include <QSpacerItem>
+#include <QDebug>
 
-#include <vector>
+#include <unordered_map>
+#include <string>
 
 #include "guiBoard.hpp"
 #include "startMenu.hpp"
 
-
-extern "C"
+extern "C" 
 {
     #include "Board/include/board.h"
     #include "Pieces/include/player.h"
     #include "Pieces/include/captures.h"
+    #include "GameEnd/include/saveGame.h"
 }
 
-std::vector<PlayerData> start_game(QMainWindow *main_window, QLabel *player1_label, QLabel *player2_label)
+
+void load_game(QMainWindow *main_window, QLabel *player1_label, QLabel *player2_label
+            , char**& board, std::unordered_map<std::string, PlayerData>& ply_map, int *whiteEP, int *blackEP)
 {
-    char **board = initializeBoard();
+    // Ensure board is allocated
+    if (board == nullptr) board = initializeBoard();
 
-    PlayerData ply1_data, ply2_data;
+    // Create the local structs without any initialization
+    Player ply1;
+    Player ply2;
 
-    ply1_data.player = createPlayer(COLOR_WHITE);
-    ply1_data.ply_captures = initializeCapture(COLOR_WHITE);
-    ply2_data.player = createPlayer(COLOR_BLACK);
-    ply2_data.ply_captures = initializeCapture(COLOR_BLACK);
+    Captured white_captures;
+    Captured black_captures;
 
-    std::vector<PlayerData> ply_data {ply1_data, ply2_data};
+    // Load the Game
+    int player_turn = loadGame(board, &ply1, &ply2, &white_captures, 
+            &black_captures, whiteEP, blackEP);
 
-    updateBoard(board, ply1_data.player, ply2_data.player);
+    // Transfer the loaded data into map
+    ply_map.clear();
 
-    display_board(main_window, board, player1_label, player2_label);
+    PlayerData p1_data, p2_data;
+    p1_data.player = ply1;
+    p1_data.ply_captures = white_captures;
+    
+    p2_data.player = ply2;
+    p2_data.ply_captures = black_captures;
 
-    return ply_data;
+    ply_map["Player 1"] = p1_data;
+    ply_map["Player 2"] = p2_data;
+
+    // Update UI and board
+    updateBoard(board, ply_map["Player 1"].player, ply_map["Player 2"].player);
+    display_board(main_window, board, player1_label, player2_label, player_turn);
+
+    return;
 }
 
 
-void display_start_window(QMainWindow *main_window, QLabel *player1_label, QLabel *player2_label)
+void start_game(QMainWindow *main_window, QLabel *player1_label, QLabel *player2_label
+            , char**& board, std::unordered_map<std::string, PlayerData>& ply_map, int *whiteEP, int *blackEP) 
+{
+    board = initializeBoard(); 
+
+    PlayerData ply1, ply2;
+
+    ply1.player = createPlayer(COLOR_WHITE);
+    ply1.ply_captures = initializeCapture(COLOR_WHITE);
+    
+    ply2.player = createPlayer(COLOR_BLACK);
+    ply2.ply_captures = initializeCapture(COLOR_BLACK);
+
+    ply_map.clear();
+    ply_map["Player 1"] = ply1;
+    ply_map["Player 2"] = ply2;
+    
+    *whiteEP = -1;
+    *blackEP = -1;
+
+    // Sync board state using the data stored in the map
+    updateBoard(board, ply_map["Player 1"].player, ply_map["Player 2"].player);
+
+    // Render the board
+    display_board(main_window, board, player1_label, player2_label);
+}
+
+
+void display_start_window(QMainWindow *main_window, QLabel *player1_label, QLabel *player2_label, 
+                          std::unordered_map<std::string, PlayerData>& ply_map
+                          , char**& board, int *whiteEP, int *blackEP)
 {
     QWidget *master_container = new QWidget();
     QVBoxLayout *main_layout = new QVBoxLayout(master_container);
@@ -50,26 +99,20 @@ void display_start_window(QMainWindow *main_window, QLabel *player1_label, QLabe
     QPushButton *start_button = new QPushButton("Start a New Game");
     QPushButton *load_button = new QPushButton("Load a Game");
 
-    // Add button functionality
-    QObject::connect(start_button, &QPushButton::clicked, [main_window, player1_label, player2_label]() {
-        start_game(main_window, player1_label, player2_label);
+    // Button Functionality with lambda functions
+    QObject::connect(start_button, &QPushButton::clicked, [=, &ply_map, &board]() {
+        start_game(main_window, player1_label, player2_label, board, ply_map, whiteEP, blackEP);
     });
 
-    // Unified Button Style
+    QObject::connect(load_button, &QPushButton::clicked, [&]() {
+            load_game(main_window, player1_label, player2_label, board, ply_map, whiteEP, blackEP);
+    });
+
     QString button_style = 
-        "QPushButton {"
-        "   background-color: #004474;"
-        "   color: #f8e7bb;"
-        "   font-size: 18px;"
-        "   font-weight: bold;"
-        "   border-radius: 8px;"
-        "   padding: 20px;"
-        "   min-width: 250px;"
-        "}"
-        "QPushButton:hover {"
-        "   background-color: #0c7ace;"
-        "   color: white;"
-        "}";
+            "QPushButton { background-color: #004474; color: #f8e7bb; "
+            "font-size: 18px; font-weight: bold; border-radius: 8px; "
+            "padding: 20px; min-width: 250px; }"
+            "QPushButton:hover { background-color: #0c7ace; color: white; }";
 
     start_button->setStyleSheet(button_style);
     load_button->setStyleSheet(button_style);
@@ -77,7 +120,7 @@ void display_start_window(QMainWindow *main_window, QLabel *player1_label, QLabe
     start_msg->setStyleSheet("font-weight: bold; color: #f8e7bb; font-size: 60px; margin-bottom: 20px;");
     start_msg->setAlignment(Qt::AlignCenter);
 
-    // Build the Menu Stack
+    // Layout assembly
     main_layout->addStretch(2);
     main_layout->addWidget(start_msg);
     main_layout->addSpacing(40);
@@ -86,14 +129,12 @@ void display_start_window(QMainWindow *main_window, QLabel *player1_label, QLabe
 
     button_layout->addWidget(start_button, 0, Qt::AlignCenter);
     button_layout->addSpacing(15);
-
+    
     button_layout->addWidget(load_button, 0, Qt::AlignCenter);
     button_layout->addStretch(1);
-    
+
     main_layout->addLayout(button_layout);
     main_layout->addStretch(3);
 
     main_window->setCentralWidget(master_container);
-
-    main_window->setStyleSheet("background-color: #0A1118;");
 }

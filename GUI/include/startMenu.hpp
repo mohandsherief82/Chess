@@ -13,9 +13,10 @@ extern "C"
 
 struct PlayerData
 {
-        Player player;
-        Captured ply_captures;
+    Player player;
+    Captured ply_captures;
 };
 
-void display_start_window (QMainWindow *main_window, QLabel *player1_label, QLabel *player2_label);
-std::vector<PlayerData> start_game(QMainWindow *main_window, QLabel *player1_label, QLabel *player2_label);
+void display_start_window(QMainWindow *main_window, QLabel *player1_label, QLabel *player2_label, 
+                          std::unordered_map<std::string, PlayerData>& ply_map
+                          , char**& board, int *whiteEP, int *blackEP);
