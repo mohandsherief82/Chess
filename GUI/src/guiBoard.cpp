@@ -38,6 +38,22 @@ QString getIconPath(char piece)
 }
 
 
+void clear_items(QGridLayout *gl) 
+{
+    if (!gl) return;
+
+    QLayoutItem *item;
+    while ((item = gl->takeAt(0)) != nullptr) 
+    {
+        if (QWidget *widget = item->widget()) 
+        {
+            widget->deleteLater(); 
+        }
+        delete item;
+    }
+}
+
+
 void add_piece_to_cell(QWidget *cell, char pieceChar) 
 {
     QString iconPath = getIconPath(pieceChar);
@@ -62,27 +78,24 @@ void add_piece_to_cell(QWidget *cell, char pieceChar)
 }
 
 
-void display_board(QGridLayout *gl, const char (&board)[8][8]) 
+void display_board(QGridLayout *gl, const char (&board)[8][8]
+        , QLabel *player1_label, QLabel *player2_label) 
 {
     if (!gl) return;
 
-    QLayoutItem *item;
-    while ((item = gl->takeAt(0)) != nullptr)
-    {
-        if (item->widget()) delete item->widget();
-        delete item;
-    }
+    clear_items(gl);
 
     gl->setSpacing(0);
     gl->setContentsMargins(0, 0, 0, 0);
     gl->setAlignment(Qt::AlignCenter);
+
+    gl->addWidget(player1_label, 0, 0, 1, 8, Qt::AlignLeft);
 
     for (int i = 0; i < 8; i++) 
     {
         for (int j = 0; j < 8; j++) 
         {
             QWidget *cell = new QWidget();
-            
             cell->setFixedSize(70, 70);
 
             QString color = ((i + j) % 2 == 0) ? "#f8e7bb" : "#004474";
@@ -95,7 +108,9 @@ void display_board(QGridLayout *gl, const char (&board)[8][8])
 
             if (board[i][j] != '-' && board[i][j] != '.') add_piece_to_cell(cell, board[i][j]);
 
-            gl->addWidget(cell, i, j);
+            gl->addWidget(cell, i + 1, j);
         }
     }
+
+    gl->addWidget(player2_label, 9, 0, 1, 8, Qt::AlignLeft);
 }
