@@ -46,10 +46,10 @@ int main(int argc, char **argv)
     player2_msg->setStyleSheet("font-weight: bold; color: #f8e7bb; font-size: 20px; margin-bottom: 5px;"); 
     player1_msg->setStyleSheet("font-weight: bold; color: #f8e7bb; font-size: 20px; margin-bottom: 5px;");
 
-    // Add pieces and the board to the main grid
-    display_board(main_window, board, player1_msg, player2_msg, player_turn);
+    // // Add pieces and the board to the main grid
+    // display_board(main_window, board, player1_msg, player2_msg, player_turn);
 
-    display_start_window(main_window);
+    display_start_window(main_window, player1_msg, player2_msg);
 
     main_window->show();
 

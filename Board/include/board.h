@@ -6,8 +6,7 @@
 
 char** initializeBoard();
 
-void updateBoard(char** board, Player player1, Player player2, 
-                        Captured ply1Captures, Captured ply2Captures, bool PRINT);
+void updateBoard(char** board, Player player1, Player player2);
 void clearScreen();
 void freeBoard(char** board, Player player1, Player player2);
 bool isEmpty(char** board, int r, int c);

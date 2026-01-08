@@ -9,7 +9,8 @@
 #define EMPTY_SQUARE ' '
 
 
-typedef enum {
+typedef enum 
+{
     COLOR_WHITE = 0,
     COLOR_BLACK,
 } PieceColor;
