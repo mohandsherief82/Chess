@@ -1,5 +1,6 @@
 #include "guiBoard.hpp"
 
+
 QString getIconPath(char piece) 
 {
     QString colorStr = (std::islower(piece)) ? "white" : "black";
@@ -25,6 +26,8 @@ QString getIconPath(char piece)
         case 'k':   
             typeStr = "king";   
             break;
+        default:
+            return QString("");
     }
 
     return QString(":/icons/icons/%1_%2.svg").arg(colorStr).arg(typeStr);
@@ -71,7 +74,7 @@ void add_piece_to_cell(QWidget *cell, char pieceChar)
 }
 
 
-void display_board(QMainWindow *main_window, const char (&board)[8][8]
+void display_board(QMainWindow *main_window, char **board
         , QLabel *player1_label, QLabel *player2_label, int player_turn) 
 {
     QWidget *master_container = new QWidget();

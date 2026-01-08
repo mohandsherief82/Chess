@@ -78,14 +78,14 @@ int loadGame(char** board, Player* player1, Player* player2, Captured* ply1Captu
         loadPlayerTurn(board, player1, move[0], ply1Captures, whiteEnPassantCol, blackEnPassantCol);
         if (ply1Captures->newCapture == true) capturePiece(player2, ply1Captures);
         totalMovesRead++;
-        updateBoard(board, *player1, *player2, *ply1Captures, *ply2Captures, false);
+        updateBoard(board, *player1, *player2);
         
         if (readData == 2) 
         {
             loadPlayerTurn(board, player2, move[1], ply2Captures, blackEnPassantCol, whiteEnPassantCol);
             if (ply2Captures->newCapture == true) capturePiece(player1, ply2Captures);
             totalMovesRead++;
-            updateBoard(board, *player1, *player2, *ply1Captures, *ply2Captures, false);
+            updateBoard(board, *player1, *player2);
         }    
         else break; 
     }    

@@ -9,7 +9,7 @@ set(CMAKE_AUTORCC ON)
 find_package(Qt6 REQUIRED COMPONENTS Widgets Svg)
 
 # Define the executable
-add_library(Gui SHARED)
+add_library(Gui)
 
 # Manage sources and headers
 target_sources(
@@ -24,7 +24,6 @@ target_sources(
     PRIVATE
         src/guiBoard.cpp
         src/startMenu.cpp
-        main.cpp
         resources.qrc
 )
 
@@ -32,4 +31,10 @@ target_sources(
 target_include_directories(Gui PRIVATE include ..)
 
 # Link the required libraries
-target_link_libraries(Gui PRIVATE Qt6::Widgets Qt6::Svg)
+target_link_libraries(
+    Gui 
+    PRIVATE 
+        Qt6::Widgets 
+        Qt6::Svg 
+    PUBLIC
+        GameEnd)

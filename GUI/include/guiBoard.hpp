@@ -10,5 +10,5 @@
 
 #include <cctype>
 
-void display_board(QMainWindow *main_window, const char (&board)[8][8]
-        , QLabel *player1_label, QLabel *player2_label, int player_turn);
+void display_board(QMainWindow *main_window, char **board
+        , QLabel *player1_label, QLabel *player2_label, int player_turn = 1);
