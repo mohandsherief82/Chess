@@ -5,4 +5,4 @@
 #include <QLabel>
 
 void display_board(QGridLayout *gl, const char (&board)[8][8]
-        , QLabel *player1_label, QLabel *player2_label);
+        , QLabel *player1_label, QLabel *player2_label, int player_turn = 1);

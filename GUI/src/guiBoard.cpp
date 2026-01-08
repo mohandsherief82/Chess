@@ -79,7 +79,7 @@ void add_piece_to_cell(QWidget *cell, char pieceChar)
 
 
 void display_board(QGridLayout *gl, const char (&board)[8][8]
-        , QLabel *player1_label, QLabel *player2_label) 
+        , QLabel *player1_label, QLabel *player2_label, int player_turn) 
 {
     if (!gl) return;
 
@@ -89,28 +89,58 @@ void display_board(QGridLayout *gl, const char (&board)[8][8]
     gl->setContentsMargins(0, 0, 0, 0);
     gl->setAlignment(Qt::AlignCenter);
 
-    gl->addWidget(player1_label, 0, 0, 1, 8, Qt::AlignLeft);
-
-    for (int i = 0; i < 8; i++) 
+    if (player_turn == 1) 
     {
-        for (int j = 0; j < 8; j++) 
+        gl->addWidget(player2_label, 0, 0, 1, 8, Qt::AlignLeft);
+        for (int i = 0; i < 8; i++) 
         {
-            QWidget *cell = new QWidget();
-            cell->setFixedSize(70, 70);
+            for (int j = 0; j < 8; j++) 
+            {
+                QWidget *cell = new QWidget();
+                cell->setFixedSize(70, 70);
 
-            QString color = ((i + j) % 2 == 0) ? "#f8e7bb" : "#004474";
+                QString color = ((i + j) % 2 == 0) ? "#f8e7bb" : "#004474";
 
-            cell->setStyleSheet(QString(
-                "background-color: %1;"
-                "border: none;"
-                "margin: 0px;"
-            ).arg(color));
+                cell->setStyleSheet(QString(
+                    "background-color: %1;"
+                    "border: none;"
+                    "margin: 0px;"
+                ).arg(color));
 
-            if (board[i][j] != '-' && board[i][j] != '.') add_piece_to_cell(cell, board[i][j]);
+                if (board[i][j] != '-' && board[i][j] != '.') add_piece_to_cell(cell, board[i][j]);
 
-            gl->addWidget(cell, i + 1, j);
+                gl->addWidget(cell, i + 1, j);
+            }
         }
+
+        gl->addWidget(player1_label, 9, 0, 1, 8, Qt::AlignLeft);
+    }
+    else
+    {
+        gl->addWidget(player1_label, 0, 0, 1, 8, Qt::AlignLeft);
+        for (int i = 0; i < 8; i++) 
+        {
+            for (int j = 0; j < 8; j++) 
+            {
+                QWidget *cell = new QWidget();
+                cell->setFixedSize(70, 70);
+
+                QString color = ((i + j) % 2 == 0) ? "#f8e7bb" : "#004474";
+
+                cell->setStyleSheet(QString(
+                    "background-color: %1;"
+                    "border: none;"
+                    "margin: 0px;"
+                ).arg(color));
+
+                if (board[i][j] != '-' && board[i][j] != '.') add_piece_to_cell(cell, board[i][j]);
+
+                gl->addWidget(cell, (7 - i) + 1, j);
+            }
+        }
+
+        gl->addWidget(player2_label, 9, 0, 1, 8, Qt::AlignLeft);
     }
 
-    gl->addWidget(player2_label, 9, 0, 1, 8, Qt::AlignLeft);
+    return;
 }
