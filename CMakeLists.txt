@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.28)
 project(Chess LANGUAGES C CXX)
 
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 # AUTOMOC: Handles Qt's meta-object system (signals/slots)
 # AUTOUIC: Handles .ui files from Qt Designer
 # AUTORCC: Handles .qrc resource files (your icons)

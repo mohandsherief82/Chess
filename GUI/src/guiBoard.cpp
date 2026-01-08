@@ -30,7 +30,7 @@ QString getIconPath(char piece)
             return QString("");
     }
 
-    return QString(":/icons/icons/%1_%2.svg").arg(colorStr).arg(typeStr);
+    return QString(":/icons/%1_%2.svg").arg(colorStr).arg(typeStr);
 }
 
 

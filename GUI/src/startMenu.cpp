@@ -32,7 +32,7 @@ std::vector<PlayerData> start_game(QMainWindow *main_window, QLabel *player1_lab
 
     std::vector<PlayerData> ply_data {ply1_data, ply2_data};
 
-    updateBoard(board, player1, player2);
+    updateBoard(board, ply1_data.player, ply2_data.player);
 
     display_board(main_window, board, player1_label, player2_label);
 

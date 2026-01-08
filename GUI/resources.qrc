@@ -1,6 +1,6 @@
 <!DOCTYPE RCC>
 <RCC version="1.0">
-    <qresource prefix="/icons">
+    <qresource prefix="/">
         <file>icons/white_pawn.svg</file>
         <file>icons/black_pawn.svg</file>
         <file>icons/white_rook.svg</file>
