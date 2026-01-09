@@ -8,6 +8,7 @@
 
 #include <unordered_map>
 #include <string>
+#include <iostream>
 
 #include "guiBoard.hpp"
 #include "startMenu.hpp"
@@ -24,34 +25,35 @@ extern "C"
 void load_game(QMainWindow *main_window, QLabel *player1_label, QLabel *player2_label
             , char**& board, std::unordered_map<std::string, PlayerData>& ply_map, int *whiteEP, int *blackEP)
 {
-    // Ensure board is allocated
+    // Ensure the board is initialized
     if (board == nullptr) board = initializeBoard();
 
-    // Create the local structs without any initialization
-    Player ply1;
-    Player ply2;
+    Player ply1 = {};
+    Player ply2 = {};
 
-    Captured white_captures;
-    Captured black_captures;
+    Captured white_captures = {};
+    Captured black_captures = {};
 
-    // Load the Game
+    // Pass the pointers directly to loadGame
     int player_turn = loadGame(board, &ply1, &ply2, &white_captures, 
             &black_captures, whiteEP, blackEP);
 
-    // Transfer the loaded data into map
+    if (ply_map.count("Player 1")) freePlayer(ply_map["Player 1"].player);
+    if (ply_map.count("Player 2")) freePlayer(ply_map["Player 2"].player);
+
     ply_map.clear();
 
     PlayerData p1_data, p2_data;
+
     p1_data.player = ply1;
     p1_data.ply_captures = white_captures;
-    
+
     p2_data.player = ply2;
     p2_data.ply_captures = black_captures;
 
     ply_map["Player 1"] = p1_data;
     ply_map["Player 2"] = p2_data;
 
-    // Update UI and board
     updateBoard(board, ply_map["Player 1"].player, ply_map["Player 2"].player);
     display_board(main_window, board, player1_label, player2_label, player_turn);
 
@@ -59,8 +61,8 @@ void load_game(QMainWindow *main_window, QLabel *player1_label, QLabel *player2_
 }
 
 
-void start_game(QMainWindow *main_window, QLabel *player1_label, QLabel *player2_label
-            , char**& board, std::unordered_map<std::string, PlayerData>& ply_map, int *whiteEP, int *blackEP) 
+void start_game(QMainWindow *main_window, QLabel *player1_label, QLabel *player2_label, char**& board
+    , std::unordered_map<std::string, PlayerData>& ply_map) 
 {
     board = initializeBoard(); 
 
@@ -75,9 +77,6 @@ void start_game(QMainWindow *main_window, QLabel *player1_label, QLabel *player2
     ply_map.clear();
     ply_map["Player 1"] = ply1;
     ply_map["Player 2"] = ply2;
-    
-    *whiteEP = -1;
-    *blackEP = -1;
 
     // Sync board state using the data stored in the map
     updateBoard(board, ply_map["Player 1"].player, ply_map["Player 2"].player);
@@ -100,11 +99,13 @@ void display_start_window(QMainWindow *main_window, QLabel *player1_label, QLabe
     QPushButton *load_button = new QPushButton("Load a Game");
 
     // Button Functionality with lambda functions
-    QObject::connect(start_button, &QPushButton::clicked, [=, &ply_map, &board]() {
-        start_game(main_window, player1_label, player2_label, board, ply_map, whiteEP, blackEP);
+    QObject::connect(start_button, &QPushButton::clicked, [=, &ply_map, &board]() 
+    {
+        start_game(main_window, player1_label, player2_label, board, ply_map);
     });
 
-    QObject::connect(load_button, &QPushButton::clicked, [&]() {
+    QObject::connect(load_button, &QPushButton::clicked, [=, &ply_map, &board]() 
+    {
             load_game(main_window, player1_label, player2_label, board, ply_map, whiteEP, blackEP);
     });
 

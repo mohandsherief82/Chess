@@ -38,3 +38,12 @@ target_link_libraries(
         Qt6::Widgets
         Qt6::Svg
 )
+
+# Add game binary directories to the build
+add_custom_command(
+    TARGET 
+        Game 
+    POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_SOURCE_DIR}/GameBin/Load"
+        COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_SOURCE_DIR}/GameBin/Redo"
+)

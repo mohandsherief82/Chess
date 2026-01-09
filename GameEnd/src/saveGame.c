@@ -43,18 +43,21 @@ int loadGame(char** board, Player* player1, Player* player2, Captured* ply1Captu
 
     for (int i = 0; i < BOARD_SIZE; i++) 
         for (int j = 0; j < BOARD_SIZE; j++) board[i][j] = EMPTY_SQUARE;
-
+    
     if (player1 != NULL) freePlayer(*player1);
     if (player2 != NULL) freePlayer(*player2);
 
     *player1 = createPlayer(COLOR_WHITE);
     *player2 = createPlayer(COLOR_BLACK);
+
     *whiteEnPassantCol = -1;
     *blackEnPassantCol = -1;
+
     *ply1Captures = initializeCapture(COLOR_WHITE);
     *ply2Captures = initializeCapture(COLOR_BLACK);
 
     FILE* fptr = fopen(path, "rb");
+
     if (fptr == NULL) 
     {
         printf("No Game to Load, Starting a New Game!!!\n");
