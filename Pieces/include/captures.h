@@ -19,5 +19,6 @@ typedef struct
 Captured initializeCapture(PieceColor color);
 PieceColor pieceColorAt(char** board, int row, int col);
 void capturePiece(Player* player, Captured* playerCaptures);
+bool isEmpty(char** board, int r, int c);
 
 #endif

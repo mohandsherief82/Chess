@@ -15,15 +15,17 @@
 #include "chessTypes.h"
 #include "check.h"
 
-const char* path = "./Game/game.bin";
-const char* redoPath = "./Game/redo.bin";
+const char* path = "./GameBin/Load/game.bin";
+const char* redoPath = "./GameBin/Redo/redo.bin";
+
 
 bool loadPlayerTurn(char** board, Player* player, Move move, Captured* capture, int *whiteEnPassantCol, int *blackEnPassantCol) 
 {
-    bool state;
+    bool state = false;
     char sym = tolower(move.symbol);
 
-    if (sym == 'p') state = movePawn(board, player, &move, capture, whiteEnPassantCol, blackEnPassantCol, false, true);
+    if (sym == 'p') state = movePawn(board, player, &move, capture, whiteEnPassantCol,
+                                         blackEnPassantCol, false, true);
     else if (sym == 'r') state = moveRook(board, player, move, capture, false);
     else if (sym == 'n') state = moveKnight(board, player, move, capture, false);
     else if (sym == 'b') state = moveBishop(board, player, move, capture, false);
@@ -34,20 +36,13 @@ bool loadPlayerTurn(char** board, Player* player, Move move, Captured* capture, 
 }
 
 
-int loadGame(char** board, Player* player1, Player* player2, Captured* ply1Captures
-    , Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol)
+int loadGame(char** board, Player* player1, Player* player2, Captured* ply1Captures, 
+    Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol)
 {
-    if (board != NULL)
-    {
-        for(int i = 0; i < BOARD_SIZE; i++)
-        {
-            for(int j = 0; j < BOARD_SIZE; j++) 
-            {
-                board[i][j] = EMPTY_SQUARE;
-            }
-        }
-    }
-    else board = initializeBoard();
+    if (board == NULL) return -1;
+
+    for (int i = 0; i < BOARD_SIZE; i++) 
+        for (int j = 0; j < BOARD_SIZE; j++) board[i][j] = EMPTY_SQUARE;
 
     if (player1 != NULL) freePlayer(*player1);
     if (player2 != NULL) freePlayer(*player2);
@@ -60,38 +55,32 @@ int loadGame(char** board, Player* player1, Player* player2, Captured* ply1Captu
     *ply2Captures = initializeCapture(COLOR_BLACK);
 
     FILE* fptr = fopen(path, "rb");
-    if (fptr == NULL)
+    if (fptr == NULL) 
     {
         printf("No Game to Load, Starting a New Game!!!\n");
-        fptr = fopen(path, "wb");
-        if (fptr != NULL) fclose(fptr);
-        
-        return 1;
+        return 1; 
     }
 
     Move move[2];
     int readData;
     int totalMovesRead = 0;
     
-    while (true)
+    while ((readData = fread(move, sizeof(Move), 2, fptr)) > 0) 
     {
-        readData = fread(move, sizeof(Move), 2, fptr);
-        
-        if (readData == 0) break;
-
         loadPlayerTurn(board, player1, move[0], ply1Captures, whiteEnPassantCol, blackEnPassantCol);
-        if (ply1Captures->newCapture == true) capturePiece(player2, ply1Captures);
+        if (ply1Captures->newCapture) capturePiece(player2, ply1Captures);
+
         totalMovesRead++;
         updateBoard(board, *player1, *player2);
         
         if (readData == 2) 
         {
             loadPlayerTurn(board, player2, move[1], ply2Captures, blackEnPassantCol, whiteEnPassantCol);
-            if (ply2Captures->newCapture == true) capturePiece(player1, ply2Captures);
+            if (ply2Captures->newCapture) capturePiece(player1, ply2Captures);
+
             totalMovesRead++;
             updateBoard(board, *player1, *player2);
-        }    
-        else break; 
+        }
     }    
     
     fclose(fptr);
@@ -102,17 +91,19 @@ int loadGame(char** board, Player* player1, Player* player2, Captured* ply1Captu
 }
 
 
-bool undoLastMove(char** board, Player* player1, Player* player2, Captured* ply1Captures
-            , Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol)
+bool undoLastMove(char** board, Player* player1, Player* player2, Captured* ply1Captures,
+     Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol)
 {
     FILE* fptr = fopen(path, "rb");
+    if (!fptr) return false;
 
     fseek(fptr, 0, SEEK_END);
     long fileSize = ftell(fptr);
     int totalMoves = (int)(fileSize / sizeof(Move));
-    if(totalMoves == 0)
+    
+    if (totalMoves == 0) 
     {
-        if (fptr != NULL) fclose(fptr);
+        fclose(fptr);
         return false;
     }
 
@@ -121,91 +112,108 @@ bool undoLastMove(char** board, Player* player1, Player* player2, Captured* ply1
     fread(&lastMove, sizeof(Move), 1, fptr);
     
     FILE* redoFile = fopen(redoPath, "ab");
+    if (redoFile) 
+    {
+        fwrite(&lastMove, sizeof(Move), 1, redoFile);
+        fclose(redoFile);
+    }
 
-    fwrite(&lastMove, sizeof(Move), 1, redoFile);
-    if (fptr != NULL) fclose(redoFile);
-
-    Move* backMove = malloc(sizeof(Move) * (totalMoves -1));
-    fseek(fptr, 0, SEEK_SET);
-    fread(backMove, sizeof(Move), totalMoves -1, fptr);
-    if (fptr != NULL) fclose(fptr);
+    Move* backMove = NULL;
+    if (totalMoves > 1) 
+    {
+        backMove = malloc(sizeof(Move) * (totalMoves - 1));
+        if (backMove) 
+        {
+            fseek(fptr, 0, SEEK_SET);
+            fread(backMove, sizeof(Move), totalMoves - 1, fptr);
+        }
+    }
+    fclose(fptr); 
     
     fptr = fopen(path, "wb");
-    fwrite(backMove, sizeof(Move), totalMoves -1, fptr);
-    if (fptr != NULL) fclose(fptr);
-    free(backMove);
+    if (fptr) 
+    {
+        if (backMove) 
+        {
+            fwrite(backMove, sizeof(Move), totalMoves - 1, fptr);
+            free(backMove);
+        }
 
-    loadGame(board, player1, player2, ply1Captures
-            , ply2Captures, whiteEnPassantCol, blackEnPassantCol);
+        fclose(fptr);
+    }
+
+    loadGame(board, player1, player2, ply1Captures, ply2Captures, whiteEnPassantCol, blackEnPassantCol);
 
     return true;
 }
- 
+
 
 void saveMove(Move move)
 {
     FILE* fptr = fopen(path, "ab");
-    if (fptr)
+
+    if (fptr) 
     {
-        if (move.symbol == 'p') printf("%c\n", move.promotedPawn);
         fwrite(&move, sizeof(Move), 1, fptr);
-        if (fptr != NULL) fclose(fptr);
+        fclose(fptr);
     }
 }
 
-bool redoLastMove(char** board, Player* player1, Player* player2, Captured* ply1Captures
-            , Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol)
+
+bool redoLastMove(char** board, Player* player1, Player* player2, Captured* ply1Captures, Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol)
 {
     FILE* fptr = fopen(redoPath, "rb");
 
-    if (fptr == NULL)
+    if (fptr == NULL) 
     {
-        printf("Problems Reading Redo File, Aborting!!!\n");
-        exit(1);
+        return false;
     }
     
     fseek(fptr, 0, SEEK_END);
     long fileSize = ftell(fptr);
     int totalMoves = (int)(fileSize / sizeof(Move));
     
-    if (totalMoves == 0)
+    if (totalMoves == 0) 
     {
-        if (fptr != NULL) fclose(fptr);
+        fclose(fptr);
         return false;
     }
 
     fseek(fptr, -(long)sizeof(Move), SEEK_END);
     Move redoMove;
     fread(&redoMove, sizeof(Move), 1, fptr);
-    if (fptr != NULL) fclose(fptr);
     
-    fptr = fopen(redoPath, "rb");
-    if (totalMoves > 1)
+    Move* remainingMoves = NULL;
+    if (totalMoves > 1) 
     {
-        Move* remainingMoves = malloc(sizeof(Move) * (totalMoves - 1));
-        fseek(fptr, 0, SEEK_SET);
-        fread(remainingMoves, sizeof(Move), totalMoves - 1, fptr);
-        if (fptr != NULL) fclose(fptr);
-        
-        fptr = fopen(redoPath, "wb");
-        fwrite(remainingMoves, sizeof(Move), totalMoves - 1, fptr);
-        if (fptr != NULL) fclose(fptr);
-        free(remainingMoves);
+        remainingMoves = malloc(sizeof(Move) * (totalMoves - 1));
+        if (remainingMoves) 
+        {
+            fseek(fptr, 0, SEEK_SET);
+            fread(remainingMoves, sizeof(Move), totalMoves - 1, fptr);
+        }
     }
-    else 
+
+    fclose(fptr);
+    
+    fptr = fopen(redoPath, "wb");
+    if (fptr) 
     {
-        if (fptr != NULL) fclose(fptr);
-        fptr = fopen(redoPath, "wb");
-        if (fptr != NULL) fclose(fptr);
+        if (remainingMoves) 
+        {
+            fwrite(remainingMoves, sizeof(Move), totalMoves - 1, fptr);
+            free(remainingMoves);
+        }
+
+        fclose(fptr);
     }
     
     saveMove(redoMove);
-    
-    loadGame(board, player1, player2, ply1Captures, ply2Captures, 
-             whiteEnPassantCol, blackEnPassantCol);
+    loadGame(board, player1, player2, ply1Captures, ply2Captures, whiteEnPassantCol, blackEnPassantCol);
     
     return true;
 }
+
 
 void clearRedo()
 {

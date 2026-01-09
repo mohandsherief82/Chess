@@ -4,11 +4,12 @@
 #include "player.h"
 #include "captures.h"
 
+#include <stdio.h>
+
 char** initializeBoard();
 
 void updateBoard(char** board, Player player1, Player player2);
-void clearScreen();
 void freeBoard(char** board, Player player1, Player player2);
-bool isEmpty(char** board, int r, int c);
+long getFileSize(FILE *fp);
 
 #endif
