@@ -1,5 +1,5 @@
 #include "guiBoard.hpp"
-
+#include "piecesIcon.hpp"
 
 QString getIconPath(char piece) 
 {
@@ -55,11 +55,19 @@ void add_piece_to_cell(QWidget *cell, char pieceChar)
     QString iconPath = getIconPath(pieceChar);
     if (iconPath.isEmpty()) return;
 
-    QVBoxLayout *layout = new QVBoxLayout(cell);
-    
-    layout->setContentsMargins(5, 5, 5, 5); 
+    // Use a layout if it doesn't already have one
+    QVBoxLayout *layout = static_cast<QVBoxLayout*>(cell->layout());
+    if (!layout) 
+    {
+        layout = new QVBoxLayout(cell);
+        layout->setContentsMargins(5, 5, 5, 5);
+    }
 
-    QLabel *pieceLabel = new QLabel();
+    // Use our new DraggablePiece class
+    DraggablePiece *pieceLabel = new DraggablePiece();
+    
+    // Store the pieceChar in the objectName so we know what we are dragging
+    pieceLabel->setObjectName(QString(pieceChar));
     
     QIcon icon(iconPath);
     QPixmap pixmap = icon.pixmap(QSize(60, 60));
@@ -69,8 +77,6 @@ void add_piece_to_cell(QWidget *cell, char pieceChar)
     pieceLabel->setAlignment(Qt::AlignCenter);
 
     layout->addWidget(pieceLabel);
-
-    return;
 }
 
 

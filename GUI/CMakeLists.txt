@@ -21,9 +21,11 @@ target_sources(
         FILES
             include/guiBoard.hpp
             include/startMenu.hpp
+            include/piecesIcon.hpp
     PRIVATE
         src/guiBoard.cpp
         src/startMenu.cpp
+        src/piecesIcon.cpp
 )
 
 # Ensure the compiler can find your headers
