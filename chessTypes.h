@@ -9,10 +9,21 @@
 #define EMPTY_SQUARE ' '
 
 
+typedef enum
+{
+    PAWN, 
+    ROOK, 
+    QUEEN, 
+    BISHOP, 
+    KING, 
+    KNIGHT
+} PieceType;
+
+
 typedef enum 
 {
     COLOR_WHITE = 0,
-    COLOR_BLACK,
+    COLOR_BLACK
 } PieceColor;
 
 // Placeholder struct for adding pieces

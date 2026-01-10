@@ -57,14 +57,28 @@ void add_piece_to_cell(QWidget *cell, char pieceChar, int row, int col)
 
     // Use a layout if it doesn't already have one
     QVBoxLayout *layout = static_cast<QVBoxLayout*>(cell->layout());
+
     if (!layout) 
     {
         layout = new QVBoxLayout(cell);
         layout->setContentsMargins(5, 5, 5, 5);
     }
 
+    PieceColor color = (std::islower(pieceChar)) ? COLOR_WHITE: COLOR_BLACK;
+    PieceType piece_type;
+
+    switch (std::tolower(pieceChar))
+    {
+        case 'p': piece_type = PAWN; break;
+        case 'n': piece_type = KNIGHT; break;
+        case 'r': piece_type = ROOK; break;
+        case 'b': piece_type = BISHOP; break;
+        case 'q': piece_type = QUEEN; break;
+        case 'k': piece_type = KING; break;
+    }
+
     // Use our new DraggablePiece class
-    DraggablePiece *pieceLabel = new DraggablePiece(row, col);
+    DraggablePiece *pieceLabel = new DraggablePiece(row, col, color, piece_type);
     
     // Store the pieceChar in the objectName so we know what we are dragging
     pieceLabel->setObjectName(QString(pieceChar));

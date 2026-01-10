@@ -3,13 +3,11 @@
 #include <QDrag>
 #include <QMimeData>
 
-DraggablePiece::DraggablePiece(QWidget *parent) : QLabel(parent) 
-{}
 
-
-DraggablePiece::DraggablePiece(int row_pos, int col_pos)
+DraggablePiece::DraggablePiece(int row_pos, int col_pos, PieceColor color, PieceType symbol)
 {
-    QLabel(parent);
+    this->color = color;
+    this->symbol = symbol;
 
     this->row_pos = row_pos;
     this->col_pos = col_pos;
