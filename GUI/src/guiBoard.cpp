@@ -50,7 +50,7 @@ void clear_items(QGridLayout *gl)
 }
 
 
-void add_piece_to_cell(QWidget *cell, char pieceChar) 
+void add_piece_to_cell(QWidget *cell, char pieceChar, int row, int col) 
 {
     QString iconPath = getIconPath(pieceChar);
     if (iconPath.isEmpty()) return;
@@ -64,7 +64,7 @@ void add_piece_to_cell(QWidget *cell, char pieceChar)
     }
 
     // Use our new DraggablePiece class
-    DraggablePiece *pieceLabel = new DraggablePiece();
+    DraggablePiece *pieceLabel = new DraggablePiece(row, col);
     
     // Store the pieceChar in the objectName so we know what we are dragging
     pieceLabel->setObjectName(QString(pieceChar));
@@ -119,7 +119,7 @@ void display_board(QMainWindow *main_window, char **board
                     "margin: 0px;"
                 ).arg(color));
 
-                if (board[i][j] != '-' && board[i][j] != '.') add_piece_to_cell(cell, board[i][j]);
+                if (board[i][j] != '-' && board[i][j] != '.') add_piece_to_cell(cell, board[i][j], i, j);
 
                 gl->addWidget(cell, i + 1, j);
             }
@@ -145,7 +145,7 @@ void display_board(QMainWindow *main_window, char **board
                     "margin: 0px;"
                 ).arg(color));
 
-                if (board[i][j] != '-' && board[i][j] != '.') add_piece_to_cell(cell, board[i][j]);
+                if (board[i][j] != '-' && board[i][j] != '.') add_piece_to_cell(cell, board[i][j], i, j);
 
                 gl->addWidget(cell, (7 - i) + 1, j);
             }

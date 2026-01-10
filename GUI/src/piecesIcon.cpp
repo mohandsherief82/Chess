@@ -3,11 +3,19 @@
 #include <QDrag>
 #include <QMimeData>
 
-// 1. Removed "= nullptr" here
 DraggablePiece::DraggablePiece(QWidget *parent) : QLabel(parent) 
 {}
 
-// 2. Removed "override" and the semicolon before the brace
+
+DraggablePiece::DraggablePiece(int row_pos, int col_pos)
+{
+    QLabel(parent);
+
+    this->row_pos = row_pos;
+    this->col_pos = col_pos;
+}
+
+
 void DraggablePiece::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton && !pixmap().isNull())
