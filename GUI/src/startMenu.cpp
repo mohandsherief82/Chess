@@ -43,19 +43,20 @@ void load_game(QMainWindow *main_window, QLabel *player1_label, QLabel *player2_
 
     ply_map.clear();
 
-    PlayerData p1_data, p2_data;
+    PlayerData ply1_data, ply2_data;
 
-    p1_data.player = ply1;
-    p1_data.ply_captures = white_captures;
+    ply1_data.player = ply1;
+    ply1_data.ply_captures = white_captures;
 
-    p2_data.player = ply2;
-    p2_data.ply_captures = black_captures;
+    ply2_data.player = ply2;
+    ply2_data.ply_captures = black_captures;
 
-    ply_map["Player 1"] = p1_data;
-    ply_map["Player 2"] = p2_data;
+    ply_map["Player 1"] = ply1_data;
+    ply_map["Player 2"] = ply2_data;
 
     updateBoard(board, ply_map["Player 1"].player, ply_map["Player 2"].player);
-    display_board(main_window, board, player1_label, player2_label, player_turn);
+    display_board(main_window, board, player1_label, player2_label
+            , &ply1_data.ply_captures, &ply2_data.ply_captures, player_turn);
 
     return;
 }
@@ -82,7 +83,9 @@ void start_game(QMainWindow *main_window, QLabel *player1_label, QLabel *player2
     updateBoard(board, ply_map["Player 1"].player, ply_map["Player 2"].player);
 
     // Render the board
-    display_board(main_window, board, player1_label, player2_label);
+    display_board(main_window, board, player1_label, player2_label, &ply1.ply_captures, &ply2.ply_captures);
+
+    return;
 }
 
 

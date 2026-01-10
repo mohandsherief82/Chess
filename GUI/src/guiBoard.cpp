@@ -50,18 +50,45 @@ void clear_items(QGridLayout *gl)
 }
 
 
-void add_piece_to_cell(QWidget *cell, char pieceChar, int row, int col) 
+void add_piece_to_cell(QWidget *cell, char pieceChar) 
 {
     QString iconPath = getIconPath(pieceChar);
     if (iconPath.isEmpty()) return;
 
-    // Use a layout if it doesn't already have one
     QVBoxLayout *layout = static_cast<QVBoxLayout*>(cell->layout());
 
     if (!layout) 
     {
         layout = new QVBoxLayout(cell);
-        layout->setContentsMargins(5, 5, 5, 5);
+        layout->setContentsMargins(0, 0, 0, 0);
+    }
+
+    QLabel *pieceLabel = new QLabel(cell);
+
+    QIcon icon(iconPath);
+    QPixmap pixmap = icon.pixmap(QSize(60, 60));
+
+    pieceLabel->setPixmap(pixmap);
+    pieceLabel->setScaledContents(true);
+    pieceLabel->setAlignment(Qt::AlignCenter);
+
+    layout->addWidget(pieceLabel);
+
+    return;
+}
+
+
+void add_piece_to_cell(QWidget *cell, char pieceChar, int row, int col) 
+{
+    QString iconPath = getIconPath(pieceChar);
+    if (iconPath.isEmpty()) return;
+
+    QVBoxLayout *layout = static_cast<QVBoxLayout*>(cell->layout());
+
+    if (!layout) 
+    {
+        layout = new QVBoxLayout(cell);
+        layout->setContentsMargins(0, 0, 0, 0);
     }
 
     PieceColor color = (std::islower(pieceChar)) ? COLOR_WHITE: COLOR_BLACK;
@@ -77,10 +104,8 @@ void add_piece_to_cell(QWidget *cell, char pieceChar, int row, int col)
         case 'k': piece_type = KING; break;
     }
 
-    // Use our new DraggablePiece class
-    DraggablePiece *pieceLabel = new DraggablePiece(row, col, color, piece_type);
+    DraggablePiece *pieceLabel = new DraggablePiece(cell, row, col, color, piece_type);
     
-    // Store the pieceChar in the objectName so we know what we are dragging
     pieceLabel->setObjectName(QString(pieceChar));
     
     QIcon icon(iconPath);
@@ -94,84 +119,95 @@ void add_piece_to_cell(QWidget *cell, char pieceChar, int row, int col)
 }
 
 
-void display_board(QMainWindow *main_window, char **board
-        , QLabel *player1_label, QLabel *player2_label, int player_turn) 
+void add_captures(QVBoxLayout *capture_box, QLabel *ply_label, Captured *ply_captures)
 {
-    QWidget *master_container = new QWidget();
-    QVBoxLayout *master_layout = new QVBoxLayout(master_container);
+    capture_box->addWidget(ply_label);
 
-    master_layout->setContentsMargins(20, 20, 20, 20);
-    master_layout->setSpacing(10);
-
-    QWidget *container_top = new QWidget();
-    QWidget *container_central = new QWidget();
-    QWidget *container_bottom = new QWidget();
-
-    QGridLayout *gl = new QGridLayout(container_central);
-
-    clear_items(gl);
+    QGridLayout *gl = new QGridLayout();
 
     gl->setSpacing(0);
     gl->setContentsMargins(0, 0, 0, 0);
-    gl->setAlignment(Qt::AlignCenter);
+
+    gl->setAlignment(Qt::AlignLeft);
+
+    for (int i = 0; i < MAXCAPTNUM; i++)
+    {
+        QWidget *cell = new QWidget();
+
+        cell->setFixedSize(30, 30);
+
+        if (i < ply_captures->captureCount) add_piece_to_cell(cell, ply_captures->capturedSymbols[i]);
+
+        gl->addWidget(cell, 1, i);
+    }
+
+    capture_box->addLayout(gl);
+    capture_box->addSpacing(15);
+
+    return;
+}
+
+
+void display_board(QMainWindow *main_window, char **board, 
+                   QLabel *player1_label, QLabel *player2_label, 
+                   Captured *ply1_captures, Captured *ply2_captures, 
+                   int player_turn)
+{
+    QWidget *master_container = new QWidget();
+    
+    QVBoxLayout *master_layout = new QVBoxLayout(master_container);
+    master_layout->setContentsMargins(20, 10, 20, 10);
+    master_layout->setSpacing(5);
+
+    QWidget *container_central = new QWidget();
+    QGridLayout *gl = new QGridLayout(container_central);
+
+    gl->setSpacing(0);
+    gl->setContentsMargins(0, 0, 0, 0);
+
+    QVBoxLayout *ply1_data = new QVBoxLayout();
+    QVBoxLayout *ply2_data = new QVBoxLayout();
+
+    add_captures(ply1_data, player1_label, ply1_captures);
+    add_captures(ply2_data, player2_label, ply2_captures);
 
     if (player_turn == 1) 
     {
-        gl->addWidget(player2_label, 0, 0, 1, 8, Qt::AlignLeft);
-        for (int i = 0; i < 8; i++) 
-        {
-            for (int j = 0; j < 8; j++) 
-            {
-                QWidget *cell = new QWidget();
-                cell->setFixedSize(70, 70);
-
-                QString color = ((i + j) % 2 == 0) ? "#f8e7bb" : "#004474";
-
-                cell->setStyleSheet(QString(
-                    "background-color: %1;"
-                    "border: none;"
-                    "margin: 0px;"
-                ).arg(color));
-
-                if (board[i][j] != '-' && board[i][j] != '.') add_piece_to_cell(cell, board[i][j], i, j);
-
-                gl->addWidget(cell, i + 1, j);
-            }
-        }
-
-        gl->addWidget(player1_label, 9, 0, 1, 8, Qt::AlignLeft);
+        gl->addLayout(ply2_data, 0, 0, 1, 8, Qt::AlignLeft);
+        gl->addLayout(ply1_data, 9, 0, 1, 8, Qt::AlignLeft);
     }
     else
     {
-        gl->addWidget(player1_label, 0, 0, 1, 8, Qt::AlignLeft);
-        for (int i = 0; i < 8; i++) 
-        {
-            for (int j = 0; j < 8; j++) 
-            {
-                QWidget *cell = new QWidget();
-                cell->setFixedSize(70, 70);
-
-                QString color = ((i + j) % 2 == 0) ? "#f8e7bb" : "#004474";
-
-                cell->setStyleSheet(QString(
-                    "background-color: %1;"
-                    "border: none;"
-                    "margin: 0px;"
-                ).arg(color));
-
-                if (board[i][j] != '-' && board[i][j] != '.') add_piece_to_cell(cell, board[i][j], i, j);
-
-                gl->addWidget(cell, (7 - i) + 1, j);
-            }
-        }
-
-        gl->addWidget(player2_label, 9, 0, 1, 8, Qt::AlignLeft);
+        gl->addLayout(ply1_data, 0, 0, 1, 8, Qt::AlignLeft);
+        gl->addLayout(ply2_data, 9, 0, 1, 8, Qt::AlignLeft);
     }
 
-    // Add widgets to the main layout
-    master_layout->addWidget(container_top);
-    master_layout->addWidget(container_central); 
-    master_layout->addWidget(container_bottom);
+    for (int i = 0; i < 8; i++) 
+    {
+        for (int j = 0; j < 8; j++) 
+        {
+            QWidget *cell = new QWidget();
+            cell->setFixedSize(70, 70);
+
+            QString color = ((i + j) % 2 == 0) ? "#f8e7bb" : "#004474";
+
+            cell->setStyleSheet(QString(
+                "background-color: %1;"
+                "border: none;"
+                "margin: 0px;"
+            ).arg(color));
+
+            bool isCurrentPlayerPiece = (player_turn == 1) ? std::islower(board[i][j]) : std::isupper(board[i][j]);
+
+            if (!isEmpty(board, i, j) && isCurrentPlayerPiece) add_piece_to_cell(cell, board[i][j], i, j);
+            else add_piece_to_cell(cell, board[i][j]);
+
+            int displayRow = (player_turn == 1) ? (i + 1) : ((7 - i) + 1);
+            gl->addWidget(cell, displayRow, j);
+        }
+    }
+
+    master_layout->addWidget(container_central, 0, Qt::AlignCenter);
 
     main_window->setCentralWidget(master_container);
 

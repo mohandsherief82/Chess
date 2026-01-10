@@ -30,7 +30,7 @@ int main(int argc, char **argv)
     QLabel *player1_msg = new QLabel("Player 1 (White)");
 
     // Set Styles for the labels
-    QString label_style = "font-weight: bold; color: #f8e7bb; font-size: 20px; margin-bottom: 5px;";
+    QString label_style = "font-weight: bold; color: #f8e7bb; font-size: 20px; margin-bottom: 5px; padding-bottom: 2px;";
     player2_msg->setStyleSheet(label_style); 
     player1_msg->setStyleSheet(label_style);
 

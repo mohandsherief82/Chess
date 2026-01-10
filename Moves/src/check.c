@@ -71,7 +71,9 @@ MoveValidation isChecked(char** board, Player* player, bool legalCheck)
         for (int i = 0; i < NUM_PIECES; i++) player->rooks[i].isPinned = false;
         for (int i = 0; i < NUM_PIECES; i++) player->knights[i].isPinned = false;
         for (int i = 0; i < NUM_PIECES; i++) player->bishops[i].isPinned = false;
+        
         if (player->queen != NULL) player->queen->isPinned = false; 
+
         king->isChecked = false; 
     }
     

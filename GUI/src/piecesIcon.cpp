@@ -4,7 +4,8 @@
 #include <QMimeData>
 
 
-DraggablePiece::DraggablePiece(int row_pos, int col_pos, PieceColor color, PieceType symbol)
+DraggablePiece::DraggablePiece(QWidget *parent, int row_pos, int col_pos,
+     PieceColor color, PieceType symbol) : QLabel (parent)
 {
     this->color = color;
     this->symbol = symbol;

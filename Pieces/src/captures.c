@@ -12,8 +12,7 @@ Captured initializeCapture(PieceColor color)
     {
         captures.capturedSymbols[i] = ' ';
     }
-    
-    captures.capturedSymbols[MAXCAPTNUM - 1] = 'X';
+
     captures.captureCount = 0;
 
     return captures;
@@ -111,6 +110,11 @@ void capturePiece(Player* player, Captured* captureData)
         }
     }
     
-    captureData->capturedSymbols[captureData->captureCount - 1] = captureData->capturedPiece.symbol;
+    char symbol;
+
+    if (player->color == COLOR_WHITE) tolower(sym);
+    else toupper(sym); 
+
+    captureData->capturedSymbols[captureData->captureCount - 1] = sym;
     captureData->newCapture = false;
 }

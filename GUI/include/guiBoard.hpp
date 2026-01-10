@@ -10,5 +10,11 @@
 
 #include <cctype>
 
+extern "C"
+{
+	#include "captures.h"
+}
+
 void display_board(QMainWindow *main_window, char **board
-        , QLabel *player1_label, QLabel *player2_label, int player_turn = 1);
+        , QLabel *player1_label, QLabel *player2_label, Captured *ply1_captures = nullptr, 
+			Captured *ply2_captures = nullptr, int player_turn = 1);

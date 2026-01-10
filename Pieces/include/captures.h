@@ -1,7 +1,7 @@
 #ifndef CAPTURES_H
 #define CAPTURES_H
 
-#define MAXCAPTNUM 16
+#define MAXCAPTNUM 15
 
 #include "chessTypes.h"
 #include "player.h"
