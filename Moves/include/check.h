@@ -5,6 +5,6 @@
 
 #include "player.h"
 
-bool isChecked(char** board, Player* player, bool legalCheck);
+MoveValidation isChecked(char** board, Player* player, bool legalCheck);
 
 #endif
