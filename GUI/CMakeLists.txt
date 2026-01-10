@@ -11,6 +11,16 @@ find_package(Qt6 REQUIRED COMPONENTS Widgets Svg)
 # Define the executable
 add_library(Gui SHARED resources.qrc)
 
+# Link the required libraries
+target_link_libraries(
+    Gui 
+    PRIVATE 
+        Qt6::Widgets 
+        Qt6::Svg 
+    PUBLIC
+        GameEnd
+)
+
 # Manage sources and headers
 target_sources(
     Gui
@@ -30,13 +40,3 @@ target_sources(
 
 # Ensure the compiler can find your headers
 target_include_directories(Gui PRIVATE include ..)
-
-# Link the required libraries
-target_link_libraries(
-    Gui 
-    PRIVATE 
-        Qt6::Widgets 
-        Qt6::Svg 
-    PUBLIC
-        GameEnd
-)
