@@ -4,6 +4,6 @@
 #include "player.h"
 #include "captures.h"
 
-bool moveRook(char** board ,Player* player, Move move, Captured* playerCaptures, bool legalCheck);
+MoveValidation moveRook(char** board ,Player* player, Move move, Captured* playerCaptures, bool legalCheck);
 
 #endif

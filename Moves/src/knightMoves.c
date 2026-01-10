@@ -8,7 +8,7 @@
 #include <ctype.h>
 
 
-bool moveKnight(char** board ,Player* player, Move move, Captured* playerCaptures, bool legalCheck)
+MoveValidation moveKnight(char** board ,Player* player, Move move, Captured* playerCaptures, bool legalCheck)
 {
     int dispX, dispY;
     Knight* knight = (Knight*)checkPromotedPawn(player, move);
@@ -25,28 +25,14 @@ bool moveKnight(char** board ,Player* player, Move move, Captured* playerCapture
         }
     }
 
-    if (knight == NULL) 
-    {
-        if (!legalCheck) printf("No Knight At This Position, Try Again!!!\n");
-        return false;
-    }
-
     dispX = abs(move.rowNext - move.rowPrev);
     dispY = abs(move.colNext - move.colPrev);
 
-    if (!((dispX == 2 && dispY == 1) || (dispX == 1 && dispY == 2))) 
-    {
-        if (!legalCheck) printf("Invalid Knight Move, Try Again!!!\n");
-        return false;
-    }
+    if (!((dispX == 2 && dispY == 1) || (dispX == 1 && dispY == 2))) return INVALID_MOVE;
 
     if (!isEmpty(board, move.rowNext, move.colNext))
     {      
-        if (pieceColorAt(board, move.rowNext, move.colNext) == knight->color)
-        {
-            if (!legalCheck) printf("Invalid Knight Move, Try Again!!!\n");
-            return false;
-        }
+        if (pieceColorAt(board, move.rowNext, move.colNext) == knight->color) return FRIENDLY_CAPTURE;
         
         if (!legalCheck)
         {
@@ -57,6 +43,13 @@ bool moveKnight(char** board ,Player* player, Move move, Captured* playerCapture
             
             playerCaptures->captureCount++;
             playerCaptures->newCapture = true;
+
+            board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
+            board[move.rowNext][move.colNext] = knight->symbol;
+            knight->rowPosition = move.rowNext;
+            knight->colPosition = move.colNext;
+
+            return ENEMY_CAPTURE;
         }
     }
 
@@ -65,5 +58,5 @@ bool moveKnight(char** board ,Player* player, Move move, Captured* playerCapture
     knight->rowPosition = move.rowNext;
     knight->colPosition = move.colNext;
 
-    return true;
+    return VALID_MOVE;
 }

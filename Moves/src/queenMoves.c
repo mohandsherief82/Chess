@@ -9,7 +9,7 @@
 #include <ctype.h>
 
 
-bool moveQueen(char** board, Player* player, Move move, Captured* playerCaptures, bool legalCheck)
+MoveValidation moveQueen(char** board, Player* player, Move move, Captured* playerCaptures, bool legalCheck)
 {
     int dispX, dispY, rowStep = 0, colStep = 0, r, c;
     Queen* queen = (Queen*)checkPromotedPawn(player, move);
@@ -21,22 +21,13 @@ bool moveQueen(char** board, Player* player, Move move, Captured* playerCaptures
             queen = player->queen;
         }
     }
-    
-    if (queen == NULL)
-    {
-        if (!legalCheck) printf("No Queen At This Position, Try Again!!!\n");
-        return false;
-    }
 
     dispX = move.rowNext - move.rowPrev;
     dispY = move.colNext - move.colPrev;
 
     // Validate queen movement "Diagonal or on axes"
     if (!((abs(dispX) == abs(dispY)) || (dispX == 0 || dispY == 0)) || (dispX == 0 && dispY == 0)) 
-    {
-        if (!legalCheck) printf("Invalid Queen Move, Try Again!!!\n");
-        return false; 
-    }
+        return INVALID_MOVE;
 
     if (dispX != 0) rowStep = (dispX > 0) ? 1 : -1;
     if (dispY != 0) colStep = (dispY > 0) ? 1 : -1;
@@ -47,11 +38,7 @@ bool moveQueen(char** board, Player* player, Move move, Captured* playerCaptures
     // Path collision check
     while (r != move.rowNext || c != move.colNext)
     {
-        if (!isEmpty(board, r, c)) 
-        {
-            if (!legalCheck) printf("Invalid Queen Move: Path Blocked, Try Again!!!\n");
-            return false;
-        }
+        if (!isEmpty(board, r, c)) return INVALID_MOVE;
 
         r += rowStep;
         c += colStep;
@@ -59,11 +46,7 @@ bool moveQueen(char** board, Player* player, Move move, Captured* playerCaptures
 
     if (!isEmpty(board, move.rowNext, move.colNext))
     {
-        if (pieceColorAt(board, move.rowNext, move.colNext) == queen->color)
-        {
-            if (!legalCheck) printf("Can't Capture Friendly piece, Try Again!!!\n");
-            return false;
-        }
+        if (pieceColorAt(board, move.rowNext, move.colNext) == queen->color) return FRIENDLY_CAPTURE;
         
         if (!legalCheck)
         {
@@ -75,6 +58,13 @@ bool moveQueen(char** board, Player* player, Move move, Captured* playerCaptures
             
             playerCaptures->captureCount++;
             playerCaptures->newCapture = true;
+
+            board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
+            board[move.rowNext][move.colNext] = queen->symbol;
+            queen->rowPosition = move.rowNext;
+            queen->colPosition = move.colNext;
+
+            return ENEMY_CAPTURE;
         }
     }
 

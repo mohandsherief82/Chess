@@ -11,6 +11,18 @@
 
 typedef enum
 {
+    INVALID_MOVE,
+    VALID_MOVE,
+    FRIENDLY_CAPTURE,
+    ENEMY_CAPTURE,
+    PROMOTION,
+    CASTLING,
+    KING_CHECKED
+} MoveValidation;
+
+
+typedef enum
+{
     PAWN, 
     ROOK, 
     QUEEN, 

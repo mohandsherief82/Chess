@@ -8,7 +8,7 @@
 #include <ctype.h>
 
 
-bool moveBishop(char** board, Player* player, Move move, Captured* playerCaptures, bool legalCheck)
+MoveValidation moveBishop(char** board, Player* player, Move move, Captured* playerCaptures, bool legalCheck)
 {
     int dispX, dispY, r, c, rowStep, colStep;
     Bishop* bishop = (Bishop*)checkPromotedPawn(player, move);
@@ -27,21 +27,11 @@ bool moveBishop(char** board, Player* player, Move move, Captured* playerCapture
         }
     }
 
-    if (bishop == NULL) 
-    {
-        if (!legalCheck) printf("No Bishop At This Position, Try Again!!!\n");
-        return false;
-    }
-
     // Bishop move logic: abs(difference) of rows must equal abs(difference) of columns
     dispX = move.rowNext - move.rowPrev;
     dispY = move.colNext - move.colPrev;
 
-    if (abs(dispX) != abs(dispY) || dispX == 0) 
-    {
-        if (!legalCheck) printf("Invalid Bishop Move, Try Again!!!\n");
-        return false;
-    }
+    if (abs(dispX) != abs(dispY) || dispX == 0) return INVALID_MOVE;
 
     rowStep = (dispX > 0) ? 1 : -1;
     colStep = (dispY > 0) ? 1 : -1;
@@ -52,11 +42,8 @@ bool moveBishop(char** board, Player* player, Move move, Captured* playerCapture
     // Check for blocking pieces along the path
     while (r != move.rowNext)
     {
-        if (!isEmpty(board, r, c))
-        {
-            if (!legalCheck) printf("Invalid Bishop Move, Try Again!!!\n");
-            return false;
-        }
+        if (!isEmpty(board, r, c)) return INVALID_MOVE;
+
         r += rowStep;
         c += colStep;
     }
@@ -64,11 +51,7 @@ bool moveBishop(char** board, Player* player, Move move, Captured* playerCapture
     // Handle Capture logic
     if (!isEmpty(board, move.rowNext, move.colNext))
     {
-        if (pieceColorAt(board, move.rowNext, move.colNext) == bishop->color)
-        {
-            if (!legalCheck) printf("Can't Capture Friendly piece, Try Again!!!\n");
-            return false;
-        }
+        if (pieceColorAt(board, move.rowNext, move.colNext) == bishop->color) return FRIENDLY_CAPTURE;
 
         if (!legalCheck)
         {
@@ -79,6 +62,13 @@ bool moveBishop(char** board, Player* player, Move move, Captured* playerCapture
             
             playerCaptures->captureCount++;
             playerCaptures->newCapture = true;
+
+            board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
+            board[move.rowNext][move.colNext] = bishop->symbol;
+            bishop->rowPosition = move.rowNext;
+            bishop->colPosition = move.colNext;
+
+            return ENEMY_CAPTURE;
         }
     }
 
@@ -87,5 +77,5 @@ bool moveBishop(char** board, Player* player, Move move, Captured* playerCapture
     bishop->rowPosition = move.rowNext;
     bishop->colPosition = move.colNext;
 
-    return true;
+    return VALID_MOVE;
 }

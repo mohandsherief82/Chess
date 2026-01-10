@@ -17,4 +17,6 @@ class DraggablePiece : public QLabel
         PieceType symbol; 
     protected:
         void mousePressEvent(QMouseEvent *event) override;
+    private:
+        void movePiece();
 };
