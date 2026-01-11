@@ -15,9 +15,9 @@ static const int knightRow[8] = {-2, -2, -1, -1, 1, 1, 2, 2};
 static const int knightCol[8] = {-1, 1, -2, 2, -2, 2, -1, 1};
 
 
-Piece* findPiece(Player* player, Move move)
+Piece* findPiece(Player* player, Move move, char symbol)
 {
-    char symbol = tolower(move.symbol);
+    tolower(symbol);
 
     if (symbol == 'p')
     {
@@ -170,8 +170,8 @@ MoveValidation isChecked(char** board, Player* player, bool legalCheck)
             {
                 if (pinCandidate == NULL)
                 {
-                    Move m = { .symbol = tolower(board[r][c]), .colPrev = c, .rowPrev = r };                 
-                    pinCandidate = findPiece(player, m);
+                    Move m = { .colPrev = c, .rowPrev = r };
+                    pinCandidate = findPiece(player, m, board[r][c]);
                     if (pinCandidate == NULL) break; 
                 }
 

@@ -83,7 +83,6 @@ bool legalMove(char** board, Player* player)
         {
             if (isEmpty(board, rPrev, cPrev) || pieceColorAt(board, rPrev, cPrev) != player->color) continue;
 
-            testMove.symbol = board[rPrev][cPrev];
             testMove.rowPrev = rPrev;
             testMove.colPrev = cPrev;
 
@@ -100,7 +99,8 @@ bool legalMove(char** board, Player* player)
                     testMove.colNext = cNext;
 
                     bool moveSuccessful = false;
-                    char pieceType = tolower(testMove.symbol);
+                    char pieceType = board[rPrev][cPrev];
+                    tolower(pieceType);
                     
                     if (pieceType == 'p') moveSuccessful = movePawn(cpyB, &cpyP, &testMove, &tempCapture, &plyEpCol, &oppEpCol, legalCheck, false);
                     else if (pieceType == 'r') moveSuccessful = moveRook(cpyB, &cpyP, testMove, &tempCapture, legalCheck);

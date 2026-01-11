@@ -15,7 +15,7 @@ Piece* checkPromotedPawn(Player* player, Move move)
     for (int i = 0; i < NUM_PAWNS; i++)
     {
         if (move.colPrev == player->pawns[i].colPosition && move.rowPrev == player->pawns[i].rowPosition
-            && player->pawns[i].promoted == true && tolower(player->pawns[i].symbol) == move.symbol) 
+            && player->pawns[i].promoted == true) 
         {
             promotedPawn = (Piece*)&player->pawns[i];
             break;
