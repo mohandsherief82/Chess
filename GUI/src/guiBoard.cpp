@@ -2,6 +2,8 @@
 #include "piecesIcon.hpp"
 #include "boardCell.hpp"
 
+#include <QLabel>
+
 QString getIconPath(char piece) 
 {
     QString colorStr = (std::islower(piece)) ? "white" : "black";
@@ -9,26 +11,13 @@ QString getIconPath(char piece)
 
     switch (std::tolower(piece)) 
     {
-        case 'p':   
-            typeStr = "pawn";   
-            break;
-        case 'r':   
-            typeStr = "rook";   
-            break;
-        case 'n': 
-            typeStr = "knight"; 
-            break;
-        case 'b': 
-            typeStr = "bishop"; 
-            break;
-        case 'q':  
-            typeStr = "queen";  
-            break;
-        case 'k':   
-            typeStr = "king";   
-            break;
-        default:
-            return QString("");
+        case 'p': typeStr = "pawn"; break;
+        case 'r': typeStr = "rook"; break;
+        case 'n': typeStr = "knight"; break;
+        case 'b': typeStr = "bishop"; break;
+        case 'q': typeStr = "queen"; break;
+        case 'k': typeStr = "king"; break;
+        default:  QString("");
     }
 
     return QString(":/icons/%1_%2.svg").arg(colorStr).arg(typeStr);
@@ -149,11 +138,19 @@ void add_captures(QVBoxLayout *capture_box, QLabel *ply_label, Captured *ply_cap
 }
 
 
-void display_board(QMainWindow *main_window, char **board, 
-                   QLabel *player1_label, QLabel *player2_label, 
-                   Captured *ply1_captures, Captured *ply2_captures, 
-                   int player_turn)
+void display_board(QMainWindow *main_window, char **board, Captured *ply1_captures,
+     Captured *ply2_captures, int player_turn)
 {
+    QLabel *player2_msg = new QLabel("Player 2 (Black)");
+    QLabel *player1_msg = new QLabel("Player 1 (White)");
+    
+    QString label_style = "font-weight: bold; color: #f8e7bb;"
+                          " font-size: 20px; margin-bottom: 5px;"
+                          " padding-bottom: 2px;";
+
+    player2_msg->setStyleSheet(label_style); 
+    player1_msg->setStyleSheet(label_style);
+
     QWidget *master_container = new QWidget();
     
     QVBoxLayout *master_layout = new QVBoxLayout(master_container);
@@ -169,8 +166,8 @@ void display_board(QMainWindow *main_window, char **board,
     QVBoxLayout *ply1_data = new QVBoxLayout();
     QVBoxLayout *ply2_data = new QVBoxLayout();
 
-    add_captures(ply1_data, player1_label, ply1_captures);
-    add_captures(ply2_data, player2_label, ply2_captures);
+    add_captures(ply1_data, player1_msg, ply1_captures);
+    add_captures(ply2_data, player2_msg, ply2_captures);
 
     if (player_turn == 1) 
     {
@@ -200,10 +197,11 @@ void display_board(QMainWindow *main_window, char **board,
                                         std::islower(board[i][j]) : 
                                         std::isupper(board[i][j]);
 
-            if (!isEmpty(board, i, j) && isCurrentPlayerPiece) 
-                add_piece_to_cell(cell, board[i][j], i, j);
-            else 
-                add_piece_to_cell(cell, board[i][j]);
+            if (!isEmpty(board, i, j))
+            {
+                if (isCurrentPlayerPiece) add_piece_to_cell(cell, board[i][j], i, j);
+                else add_piece_to_cell(cell, board[i][j]);
+            }  
 
             int displayRow = (player_turn == 1) ? (i + 1) : ((7 - i) + 1);
             gl->addWidget(cell, displayRow, j);

@@ -12,9 +12,9 @@
 
 extern "C"
 {
+	#include "player.h"
 	#include "captures.h"
 }
 
-void display_board(QMainWindow *main_window, char **board
-        , QLabel *player1_label, QLabel *player2_label, Captured *ply1_captures = nullptr, 
-			Captured *ply2_captures = nullptr, int player_turn = 1);
+void display_board(QMainWindow *main_window, char **board,
+	 Captured *ply1_captures = nullptr, Captured *ply2_captures = nullptr, int player_turn = 1);

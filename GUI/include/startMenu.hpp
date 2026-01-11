@@ -17,6 +17,6 @@ struct PlayerData
     Captured ply_captures;
 };
 
-void display_start_window(QMainWindow *main_window, QLabel *player1_label, QLabel *player2_label, 
-                          std::unordered_map<std::string, PlayerData>& ply_map
-                          , char**& board, int *whiteEP, int *blackEP);
+void display_start_window(QMainWindow *main_window, Player *ply1, Player *ply2
+                          , Captured *ply1_captures, Captured *ply2_captures,
+                            char**& board, int *whiteEP, int *blackEP);

@@ -22,76 +22,41 @@ extern "C"
 }
 
 
-void load_game(QMainWindow *main_window, QLabel *player1_label, QLabel *player2_label
-            , char**& board, std::unordered_map<std::string, PlayerData>& ply_map, int *whiteEP, int *blackEP)
+void load_game(QMainWindow *main_window, char**& board, Player *ply1, Player *ply2
+                , Captured *ply1_captures, Captured *ply2_captures, int *whiteEP, int *blackEP)
 {
     // Ensure the board is initialized
     if (board == nullptr) board = initializeBoard();
 
-    Player ply1 = {};
-    Player ply2 = {};
-
-    Captured white_captures = {};
-    Captured black_captures = {};
-
     // Pass the pointers directly to loadGame
-    int player_turn = loadGame(board, &ply1, &ply2, &white_captures, 
-            &black_captures, whiteEP, blackEP);
+    int player_turn = loadGame(board, ply1, ply2, ply1_captures, 
+            ply2_captures, whiteEP, blackEP);
 
-    if (ply_map.count("Player 1")) freePlayer(ply_map["Player 1"].player);
-    if (ply_map.count("Player 2")) freePlayer(ply_map["Player 2"].player);
-
-    ply_map.clear();
-
-    PlayerData ply1_data, ply2_data;
-
-    ply1_data.player = ply1;
-    ply1_data.ply_captures = white_captures;
-
-    ply2_data.player = ply2;
-    ply2_data.ply_captures = black_captures;
-
-    ply_map["Player 1"] = ply1_data;
-    ply_map["Player 2"] = ply2_data;
-
-    updateBoard(board, ply_map["Player 1"].player, ply_map["Player 2"].player);
-    display_board(main_window, board, player1_label, player2_label
-            , &ply1_data.ply_captures, &ply2_data.ply_captures, player_turn);
+    updateBoard(board, *ply1, *ply2);
+    display_board(main_window, board, ply1_captures, ply2_captures, player_turn);
 
     return;
 }
 
 
-void start_game(QMainWindow *main_window, QLabel *player1_label, QLabel *player2_label, char**& board
-    , std::unordered_map<std::string, PlayerData>& ply_map) 
+void start_game(QMainWindow *main_window, char**& board, Player *ply1, Player *ply2
+                          , Captured *ply1_captures, Captured *ply2_captures) 
 {
-    board = initializeBoard(); 
-
-    PlayerData ply1, ply2;
-
-    ply1.player = createPlayer(COLOR_WHITE);
-    ply1.ply_captures = initializeCapture(COLOR_WHITE);
-    
-    ply2.player = createPlayer(COLOR_BLACK);
-    ply2.ply_captures = initializeCapture(COLOR_BLACK);
-
-    ply_map.clear();
-    ply_map["Player 1"] = ply1;
-    ply_map["Player 2"] = ply2;
+    board = initializeBoard();
 
     // Sync board state using the data stored in the map
-    updateBoard(board, ply_map["Player 1"].player, ply_map["Player 2"].player);
+    updateBoard(board, *ply1, *ply2);
 
     // Render the board
-    display_board(main_window, board, player1_label, player2_label, &ply1.ply_captures, &ply2.ply_captures);
+    display_board(main_window, board, ply1_captures, ply2_captures);
 
     return;
 }
 
 
-void display_start_window(QMainWindow *main_window, QLabel *player1_label, QLabel *player2_label, 
-                          std::unordered_map<std::string, PlayerData>& ply_map
-                          , char**& board, int *whiteEP, int *blackEP)
+void display_start_window(QMainWindow *main_window, Player *ply1, Player *ply2
+                          , Captured *ply1_captures, Captured *ply2_captures,
+                            char**& board, int *whiteEP, int *blackEP)
 {
     QWidget *master_container = new QWidget();
     QVBoxLayout *main_layout = new QVBoxLayout(master_container);
@@ -102,14 +67,14 @@ void display_start_window(QMainWindow *main_window, QLabel *player1_label, QLabe
     QPushButton *load_button = new QPushButton("Load a Game");
 
     // Button Functionality with lambda functions
-    QObject::connect(start_button, &QPushButton::clicked, [=, &ply_map, &board]() 
+    QObject::connect(start_button, &QPushButton::clicked, [=, &board]() 
     {
-        start_game(main_window, player1_label, player2_label, board, ply_map);
+        start_game(main_window, board, ply1, ply2, ply1_captures, ply2_captures);
     });
 
-    QObject::connect(load_button, &QPushButton::clicked, [=, &ply_map, &board]() 
+    QObject::connect(load_button, &QPushButton::clicked, [=, &board]() 
     {
-            load_game(main_window, player1_label, player2_label, board, ply_map, whiteEP, blackEP);
+        load_game(main_window, board, ply1, ply2, ply1_captures, ply2_captures, whiteEP, blackEP);
     });
 
     QString button_style = 
