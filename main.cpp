@@ -35,7 +35,7 @@ int main(int argc, char **argv)
     player1_msg->setStyleSheet(label_style);
 
     std::unordered_map<std::string, PlayerData> ply_data;
-    char **board = nullptr;
+    char **board = initializeBoard();
     int whiteEP {-1}, blackEP {-1};
 
     display_start_window(main_window, player1_msg, player2_msg, ply_data, board, &whiteEP, &blackEP);

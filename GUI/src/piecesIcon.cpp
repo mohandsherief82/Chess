@@ -14,6 +14,18 @@ DraggablePiece::DraggablePiece(QWidget *parent, int row_pos, int col_pos,
     this->col_pos = col_pos;
 }
 
+DraggablePiece::DraggablePiece(QWidget *parent, Player *ply, int row_pos, int col_pos
+        , PieceColor color, PieceType symbol) : QLabel (parent)
+{
+    this->color = color;
+    this->symbol = symbol;
+
+    this->row_pos = row_pos;
+    this->col_pos = col_pos;
+
+    this->ply = ply;
+}
+
 
 void DraggablePiece::mousePressEvent(QMouseEvent *event)
 {

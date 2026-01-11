@@ -32,10 +32,12 @@ target_sources(
             include/guiBoard.hpp
             include/startMenu.hpp
             include/piecesIcon.hpp
+            include/boardCell.hpp
     PRIVATE
         src/guiBoard.cpp
         src/startMenu.cpp
         src/piecesIcon.cpp
+        src/boardCell.cpp
 )
 
 # Ensure the compiler can find your headers

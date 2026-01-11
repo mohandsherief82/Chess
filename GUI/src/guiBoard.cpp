@@ -1,5 +1,6 @@
 #include "guiBoard.hpp"
 #include "piecesIcon.hpp"
+#include "boardCell.hpp"
 
 QString getIconPath(char piece) 
 {
@@ -78,7 +79,7 @@ void add_piece_to_cell(QWidget *cell, char pieceChar)
 }
 
 
-void add_piece_to_cell(QWidget *cell, char pieceChar, int row, int col) 
+void add_piece_to_cell(BoardCell *cell, char pieceChar, int row, int col) 
 {
     QString iconPath = getIconPath(pieceChar);
     if (iconPath.isEmpty()) return;
@@ -186,21 +187,23 @@ void display_board(QMainWindow *main_window, char **board,
     {
         for (int j = 0; j < 8; j++) 
         {
-            QWidget *cell = new QWidget();
+            // Use our custom class instead of QWidget
+            BoardCell *cell = new BoardCell(i, j, &board); 
             cell->setFixedSize(70, 70);
 
             QString color = ((i + j) % 2 == 0) ? "#f8e7bb" : "#004474";
-
             cell->setStyleSheet(QString(
-                "background-color: %1;"
-                "border: none;"
-                "margin: 0px;"
+                "background-color: %1; border: none; margin: 0px;"
             ).arg(color));
 
-            bool isCurrentPlayerPiece = (player_turn == 1) ? std::islower(board[i][j]) : std::isupper(board[i][j]);
+            bool isCurrentPlayerPiece = (player_turn == 1) ? 
+                                        std::islower(board[i][j]) : 
+                                        std::isupper(board[i][j]);
 
-            if (!isEmpty(board, i, j) && isCurrentPlayerPiece) add_piece_to_cell(cell, board[i][j], i, j);
-            else add_piece_to_cell(cell, board[i][j]);
+            if (!isEmpty(board, i, j) && isCurrentPlayerPiece) 
+                add_piece_to_cell(cell, board[i][j], i, j);
+            else 
+                add_piece_to_cell(cell, board[i][j]);
 
             int displayRow = (player_turn == 1) ? (i + 1) : ((7 - i) + 1);
             gl->addWidget(cell, displayRow, j);
