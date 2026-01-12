@@ -109,90 +109,16 @@ A move struct was added to store all the move data that is needed to make a move
         char promotedPawn;    // For storing promotion data in the saved moves log
     } Move;
 
-This struct is one of the most important for the game to actually function, so we create for it its own function called `getMove`, which takes a piece symbol previous coordinates and next coordinates without actually seeing if the move is actually valid for this piece it only validates the move to be on board and the correct piece symbol was inputed.
-
-This function also clears the buffer after it takes each input, ensures that every part of the data it stored is in lower case.
-
-The `getMove` is the most tested function in the entire project
+<!-- NEEDS UPDATING AS THE UPDATED VERSION OF TAKING THE MOVES IS CHANGED WITH THE GUI -->
 
 3\. The Build System (Makefile)
 -------------------------------
 
-The project uses a modular `Makefile` to manage compilation. In addition to the primary game targets, several internal targets exist to test specific logic modules independently during development.
+The project uses **CMake** to automatically build and compile the entire binary file and ease the compatibality issues with the older *MakeFile* with different OS paths and file systems.
 
-> **Note:** Targets marked as _Internal/Testing_ were used during intermediate development phases. Some may require specific directory structures or mock data to execute correctly and may not be as stable as the primary `run` target.
+CMake needed **CMakeLists.txt** files to be able to build the system, so in each in subdirectoy/ library in the project exists one file that tells the cmake how to deal and build this libraries and deal with their needed includes and how to actually build this folder.
 
-Target
-
-Command
-
-Category
-
-Purpose
-
-**run**
-
-`make run`
-
-**Primary**
-
-Compiles all modules and launches the full Chess game.
-
-**compile**
-
-`make compile`
-
-**Primary**
-
-Links all source files and generates the `run.o` executable.
-
-**clean**
-
-`make clean`
-
-**Utility**
-
-Wipes all binaries in subdirectories and root, then clears terminal.
-
-**game\_end**
-
-`make game_end`
-
-Internal
-
-Builds the test suite for Checkmate and Stalemate logic.
-
-**moves**
-
-`make moves`
-
-Internal
-
-Compiles move-validation logic for unit testing.
-
-**board**
-
-`make board`
-
-Internal
-
-Compiles board rendering and coordinate mapping modules.
-
-**pieces**
-
-`make pieces`
-
-Internal
-
-Tests individual piece behavior and structure initialization.
-
-**test\_\[module\]**
-
-`make test_board` etc.
-
-Testing
-
-Automated targets that compile and execute test binaries.
+The general *CMakeLists.txt* file builds the entire system where the subdirectories are added in the correct order so other files can actually use them. Also it has linked all the needed libraries like Qt for the gui and the subdirectories that are treated as libraries for the general project structure.
 
 4\. Movement Logic
 ------------------
