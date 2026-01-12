@@ -15,8 +15,8 @@
 #include "chessTypes.h"
 #include "check.h"
 
-const char* path = "./GameBin/Load/game.bin";
-const char* redoPath = "./GameBin/Redo/redo.bin";
+const char* path = "./build/GameBin/Load/game.bin";
+const char* redoPath = "./build/GameBin/Redo/redo.bin";
 
 
 bool loadPlayerTurn(char** board, Player* player, Move move, Captured* capture, int *whiteEnPassantCol, int *blackEnPassantCol) 
@@ -36,16 +36,23 @@ bool loadPlayerTurn(char** board, Player* player, Move move, Captured* capture, 
 }
 
 
-int loadGame(char** board, Player* player1, Player* player2, Captured* ply1Captures, 
+int loadGame(char*** boardPtr, Player* player1, Player* player2, Captured* ply1Captures, 
     Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol)
 {
-    if (board == NULL) return -1;
+    if (boardPtr == NULL) return -1;
+    else if (*boardPtr == NULL) *boardPtr = initializeBoard();
+
+    if (*boardPtr == NULL)
+    {
+        printf("HHHHHH\n");
+        exit(1);
+    }
 
     for (int i = 0; i < BOARD_SIZE; i++) 
-        for (int j = 0; j < BOARD_SIZE; j++) board[i][j] = EMPTY_SQUARE;
+        for (int j = 0; j < BOARD_SIZE; j++) boardPtr[0][i][j] = EMPTY_SQUARE;
     
-    if (player1 != NULL) freePlayer(*player1);
-    if (player2 != NULL) freePlayer(*player2);
+    if (player1 != NULL) freePlayer(player1);
+    if (player2 != NULL) freePlayer(player2);
 
     *player1 = createPlayer(COLOR_WHITE);
     *player2 = createPlayer(COLOR_BLACK);
@@ -70,33 +77,43 @@ int loadGame(char** board, Player* player1, Player* player2, Captured* ply1Captu
     
     while ((readData = fread(move, sizeof(Move), 2, fptr)) > 0) 
     {
-        loadPlayerTurn(board, player1, move[0], ply1Captures, whiteEnPassantCol, blackEnPassantCol);
+        loadPlayerTurn(*boardPtr, player1, move[0], ply1Captures, whiteEnPassantCol, blackEnPassantCol);
         if (ply1Captures->newCapture) capturePiece(player2, ply1Captures);
 
         totalMovesRead++;
-        updateBoard(board, *player1, *player2);
+        updateBoard(*boardPtr, *player1, *player2);
         
         if (readData == 2) 
         {
-            loadPlayerTurn(board, player2, move[1], ply2Captures, blackEnPassantCol, whiteEnPassantCol);
+            loadPlayerTurn(*boardPtr, player2, move[1], ply2Captures, blackEnPassantCol, whiteEnPassantCol);
             if (ply2Captures->newCapture) capturePiece(player1, ply2Captures);
 
             totalMovesRead++;
-            updateBoard(board, *player1, *player2);
+            updateBoard(*boardPtr, *player1, *player2);
         }
     }    
     
     fclose(fptr);
-    isChecked(board, player1, true);
-    isChecked(board, player2, true);
+
+    isChecked(*boardPtr, player1, true);
+    isChecked(*boardPtr, player2, true);
     
     return (totalMovesRead % 2 == 0) ? 1 : 2;
 }
 
 
-bool undoLastMove(char** board, Player* player1, Player* player2, Captured* ply1Captures,
+bool undoLastMove(char*** boardPtr, Player* player1, Player* player2, Captured* ply1Captures,
      Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol)
 {
+    char **board;
+
+    if (boardPtr == NULL)
+    {
+        board = initializeBoard();
+        *boardPtr = board;
+    }
+    else board = *boardPtr;
+
     FILE* fptr = fopen(path, "rb");
     if (!fptr) return false;
 
@@ -145,7 +162,7 @@ bool undoLastMove(char** board, Player* player1, Player* player2, Captured* ply1
         fclose(fptr);
     }
 
-    loadGame(board, player1, player2, ply1Captures, ply2Captures, whiteEnPassantCol, blackEnPassantCol);
+    loadGame(boardPtr, player1, player2, ply1Captures, ply2Captures, whiteEnPassantCol, blackEnPassantCol);
 
     return true;
 }
@@ -163,8 +180,18 @@ void saveMove(Move move)
 }
 
 
-bool redoLastMove(char** board, Player* player1, Player* player2, Captured* ply1Captures, Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol)
+bool redoLastMove(char*** boardPtr, Player* player1, Player* player2,
+     Captured* ply1Captures, Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol)
 {
+    char **board;
+
+    if (boardPtr == NULL)
+    {
+        board = initializeBoard();
+        *boardPtr = board;
+    }
+    else board = *boardPtr;
+
     FILE* fptr = fopen(redoPath, "rb");
 
     if (fptr == NULL) 
@@ -212,7 +239,7 @@ bool redoLastMove(char** board, Player* player1, Player* player2, Captured* ply1
     }
     
     saveMove(redoMove);
-    loadGame(board, player1, player2, ply1Captures, ply2Captures, whiteEnPassantCol, blackEnPassantCol);
+    loadGame(boardPtr, player1, player2, ply1Captures, ply2Captures, whiteEnPassantCol, blackEnPassantCol);
     
     return true;
 }

@@ -28,16 +28,18 @@ int main(int argc, char **argv)
     Player ply2 { createPlayer(COLOR_BLACK) };
 
     Captured white_captured { initializeCapture(COLOR_WHITE) };
-    Captured BLACK_captured { initializeCapture(COLOR_BLACK) };
+    Captured black_captured { initializeCapture(COLOR_BLACK) };
 
     char **board = initializeBoard();
 
     int whiteEP {-1}, blackEP {-1};
 
-    display_start_window(main_window, &ply1, &ply2, &white_captured, &BLACK_captured
+    display_start_window(main_window, &ply1, &ply2, &white_captured, &black_captured
                             , board, &whiteEP, &blackEP);
 
     main_window->show();
+
+    freeBoard(&board, &ply1, &ply2);
 
     return app.exec();
 }

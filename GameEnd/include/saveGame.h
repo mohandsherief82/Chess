@@ -8,12 +8,12 @@
 #include <stdio.h>
 
 void saveMove(Move move);
-int loadGame(char** board, Player* player1, Player* player2, Captured* ply1Captures
-            , Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol);
-bool undoLastMove(char** board, Player* player1, Player* player2, Captured* ply1Captures
-            , Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol);
-bool redoLastMove(char** board, Player* player1, Player* player2, Captured* ply1Captures
-            , Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol);
+int loadGame(char*** board, Player* player1, Player* player2, Captured* ply1Captures, 
+    Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol);
+bool undoLastMove(char*** boardPtr, Player* player1, Player* player2, Captured* ply1Captures,
+     Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol);
+bool redoLastMove(char*** boardPtr, Player* player1, Player* player2,
+     Captured* ply1Captures, Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol);
 void clearRedo();
 
 #endif

@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <ctype.h>
 
+#include "chessTypes.h"
 #include "player.h"
 #include "board.h"
 #include "captures.h"
@@ -19,6 +20,7 @@ char** initializeBoard()
     for(int i = 0; i < BOARD_SIZE; i++)
     {
         board[i] = (char*)malloc(BOARD_SIZE * sizeof(char));
+        if (board[i] == NULL) exit(1);
         for (int j = 0; j < BOARD_SIZE; j++) board[i][j]= EMPTY_SQUARE;
     }
 
@@ -41,6 +43,8 @@ long getFileSize(FILE *fp)
 void addPieces(char** board, void* piecesArray, int numPieces, size_t piece_size)
 {
     char* current_piece = (char*)piecesArray;
+
+    if (piecesArray == NULL) return;
 
     for (int i = 0; i < numPieces; i++)
     {
@@ -91,12 +95,15 @@ void updateBoard(char** board, Player player1, Player player2)
     }
 }
 
-void freeBoard(char** board, Player player1, Player player2)
+void freeBoard(char*** board, Player *player1, Player *player2)
 {
-    for (int i = 0; i < BOARD_SIZE; i++) free(board[i]);
-    free(board);
+    for (int i = 0; i < BOARD_SIZE; i++) free(board[0][i]);
+    free(board[0]);
+
     freePlayer(player1);
     freePlayer(player2);
+
+    board[0] = NULL;
 
     return;
 }

@@ -25,7 +25,7 @@ typedef struct
 
 Player createPlayer(PieceColor color);
 bool isValidSymbol(char symbol);
-void freePlayer(Player player);
+void freePlayer(Player *player);
 Move getMove();
 
 #endif
