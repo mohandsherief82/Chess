@@ -2,6 +2,8 @@
 #include "piecesIcon.hpp"
 #include "boardCell.hpp"
 
+#include <iostream>
+
 #include <QLabel>
 
 QString getIconPath(char piece) 
@@ -68,7 +70,8 @@ void add_piece_to_cell(QWidget *cell, char pieceChar)
 }
 
 
-void add_piece_to_cell(BoardCell *cell, char pieceChar, int row, int col) 
+void add_piece_to_cell(BoardCell *cell, char pieceChar, int row, int col
+    , Player *ply, Captured *ply_captures) 
 {
     QString iconPath = getIconPath(pieceChar);
     if (iconPath.isEmpty()) return;
@@ -94,7 +97,8 @@ void add_piece_to_cell(BoardCell *cell, char pieceChar, int row, int col)
         case 'k': piece_type = KING; break;
     }
 
-    DraggablePiece *pieceLabel = new DraggablePiece(cell, row, col, color, piece_type);
+    DraggablePiece *pieceLabel = new DraggablePiece(cell, ply, ply_captures, row, 
+                                        col, color, piece_type);
     
     pieceLabel->setObjectName(QString(pieceChar));
     
@@ -138,8 +142,8 @@ void add_captures(QVBoxLayout *capture_box, QLabel *ply_label, Captured *ply_cap
 }
 
 
-void display_board(QMainWindow *main_window, char **board, Captured *ply1_captures,
-     Captured *ply2_captures, int player_turn)
+void display_board(QMainWindow *main_window, char **board, Player *ply
+    , Captured *ply1_captures, Captured *ply2_captures, int player_turn)
 {
     QLabel *player2_msg = new QLabel("Player 2 (Black)");
     QLabel *player1_msg = new QLabel("Player 1 (White)");
@@ -166,16 +170,20 @@ void display_board(QMainWindow *main_window, char **board, Captured *ply1_captur
     QVBoxLayout *ply1_data = new QVBoxLayout();
     QVBoxLayout *ply2_data = new QVBoxLayout();
 
+    Captured *captures;
+
     add_captures(ply1_data, player1_msg, ply1_captures);
     add_captures(ply2_data, player2_msg, ply2_captures);
 
     if (player_turn == 1) 
     {
+        captures = ply1_captures; 
         gl->addLayout(ply2_data, 0, 0, 1, 8, Qt::AlignLeft);
         gl->addLayout(ply1_data, 9, 0, 1, 8, Qt::AlignLeft);
     }
     else
     {
+        captures = ply2_captures; 
         gl->addLayout(ply1_data, 0, 0, 1, 8, Qt::AlignLeft);
         gl->addLayout(ply2_data, 9, 0, 1, 8, Qt::AlignLeft);
     }
@@ -184,6 +192,8 @@ void display_board(QMainWindow *main_window, char **board, Captured *ply1_captur
     {
         for (int j = 0; j < 8; j++) 
         {
+            std::cout << board[i][j];
+
             // Use our custom class instead of QWidget
             BoardCell *cell = new BoardCell(i, j, &board); 
             cell->setFixedSize(70, 70);
@@ -199,7 +209,7 @@ void display_board(QMainWindow *main_window, char **board, Captured *ply1_captur
 
             if (!isEmpty(board, i, j))
             {
-                if (isCurrentPlayerPiece) add_piece_to_cell(cell, board[i][j], i, j);
+                if (isCurrentPlayerPiece) add_piece_to_cell(cell, board[i][j], i, j, ply, captures);
                 else add_piece_to_cell(cell, board[i][j]);
             }  
 

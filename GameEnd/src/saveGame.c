@@ -81,7 +81,7 @@ int loadGame(char*** boardPtr, Player* player1, Player* player2, Captured* ply1C
         if (ply1Captures->newCapture) capturePiece(player2, ply1Captures);
 
         totalMovesRead++;
-        updateBoard(*boardPtr, *player1, *player2);
+        updateBoard(*boardPtr, player1, player2);
         
         if (readData == 2) 
         {
@@ -89,7 +89,7 @@ int loadGame(char*** boardPtr, Player* player1, Player* player2, Captured* ply1C
             if (ply2Captures->newCapture) capturePiece(player1, ply2Captures);
 
             totalMovesRead++;
-            updateBoard(*boardPtr, *player1, *player2);
+            updateBoard(*boardPtr, player1, player2);
         }
     }    
     

@@ -42,16 +42,32 @@ void BoardCell::dropEvent(QDropEvent *event)
         };
         
         Player *ply = piece->getPlayer();
+        
+        Captured *ply_captures = piece->getCaptures();
+
         char **board = this->getBoard();
+        int *whiteEP, *blackEP;
 
         switch (piece->symbol)
         {
-            case PAWN: ; break;
-            case ROOK: ; break;
-            case KNIGHT: ; break;
-            case BISHOP: ; break;
-            case QUEEN: ; break;
-            case KING: ; break;
+            case PAWN: 
+                movePawn(board, ply, &move, ply_captures, whiteEP, blackEP, false, false); 
+                break;
+            case ROOK: 
+                ; 
+                break;
+            case KNIGHT: 
+                ; 
+                break;
+            case BISHOP: 
+                ; 
+                break;
+            case QUEEN: 
+                ; 
+                break;
+            case KING: 
+                ; 
+                break;
         }
 
         piece->hide(); 

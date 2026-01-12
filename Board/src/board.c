@@ -57,33 +57,29 @@ void addPieces(char** board, void* piecesArray, int numPieces, size_t piece_size
     }
 }
 
-void updateBoard(char** board, Player player1, Player player2)
+void updateBoard(char** board, Player *player1, Player *player2)
 {
     for(int i = 0; i < BOARD_SIZE; i++)
-    {
         for (int j = 0; j < BOARD_SIZE; j++)
-        {
             board[i][j] = EMPTY_SQUARE;
-        }
-    }
 
-    addPieces(board, player1.pawns, NUM_PAWNS, sizeof(Pawn));
-    addPieces(board, player2.pawns, NUM_PAWNS, sizeof(Pawn));
+    addPieces(board, player1->pawns, NUM_PAWNS, sizeof(Pawn));
+    addPieces(board, player2->pawns, NUM_PAWNS, sizeof(Pawn));
 
-    addPieces(board, player1.rooks, NUM_PIECES, sizeof(Rook));
-    addPieces(board, player2.rooks, NUM_PIECES, sizeof(Rook));
+    addPieces(board, player1->rooks, NUM_PIECES, sizeof(Rook));
+    addPieces(board, player2->rooks, NUM_PIECES, sizeof(Rook));
 
-    addPieces(board, player1.knights, NUM_PIECES, sizeof(Knight));
-    addPieces(board, player2.knights, NUM_PIECES, sizeof(Knight));
+    addPieces(board, player1->knights, NUM_PIECES, sizeof(Knight));
+    addPieces(board, player2->knights, NUM_PIECES, sizeof(Knight));
 
-    addPieces(board, player1.bishops, NUM_PIECES, sizeof(Bishop));
-    addPieces(board, player2.bishops, NUM_PIECES, sizeof(Bishop));
+    addPieces(board, player1->bishops, NUM_PIECES, sizeof(Bishop));
+    addPieces(board, player2->bishops, NUM_PIECES, sizeof(Bishop));
 
-    addPieces(board, player1.queen, 1, sizeof(Queen));
-    addPieces(board, player2.queen, 1, sizeof(Queen));
+    addPieces(board, player1->queen, 1, sizeof(Queen));
+    addPieces(board, player2->queen, 1, sizeof(Queen));
 
-    addPieces(board, player1.king, 1, sizeof(King));
-    addPieces(board, player2.king, 1, sizeof(King));
+    addPieces(board, player1->king, 1, sizeof(King));
+    addPieces(board, player2->king, 1, sizeof(King));
 
     for(int i = 0; i < BOARD_SIZE; i++)
     {   

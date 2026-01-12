@@ -26,14 +26,18 @@ void load_game(QMainWindow *main_window, char**& board, Player *ply1, Player *pl
                 , Captured *ply1_captures, Captured *ply2_captures, int *whiteEP, int *blackEP)
 {
     // Ensure the board is initialized
-    if (board == nullptr) board = initializeBoard();
+    if (board == nullptr) board = NULL;
 
     // Pass the pointers directly to loadGame
-    int player_turn = loadGame(board, ply1, ply2, ply1_captures, 
+    int player_turn = loadGame(&board, ply1, ply2, ply1_captures, 
             ply2_captures, whiteEP, blackEP);
 
-    updateBoard(board, *ply1, *ply2);
-    display_board(main_window, board, ply1_captures, ply2_captures, player_turn);
+    updateBoard(board, ply1, ply2);
+
+    if (player_turn == 1) 
+        display_board(main_window, board, ply1, ply1_captures, ply2_captures, player_turn);
+    else
+        display_board(main_window, board, ply2, ply1_captures, ply2_captures, player_turn);
 
     return;
 }
@@ -45,10 +49,10 @@ void start_game(QMainWindow *main_window, char**& board, Player *ply1, Player *p
     board = initializeBoard();
 
     // Sync board state using the data stored in the map
-    updateBoard(board, *ply1, *ply2);
+    updateBoard(board, ply1, ply2);
 
     // Render the board
-    display_board(main_window, board, ply1_captures, ply2_captures);
+    display_board(main_window, board, ply1, ply1_captures, ply2_captures);
 
     return;
 }

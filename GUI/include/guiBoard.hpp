@@ -16,5 +16,5 @@ extern "C"
 	#include "captures.h"
 }
 
-void display_board(QMainWindow *main_window, char **board,
-	 Captured *ply1_captures = nullptr, Captured *ply2_captures = nullptr, int player_turn = 1);
+void display_board(QMainWindow *main_window, char **board, Player *ply1
+    , Captured *ply1_captures, Captured *ply2_captures, int player_turn = 1);

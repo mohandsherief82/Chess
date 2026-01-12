@@ -18,6 +18,7 @@ class DraggablePiece : public QLabel
         int getRow() const { return row_pos; }
         int getCol() const { return col_pos; }
         Player *getPlayer() const { return ply; }
+        Captured *getCaptures() const { return ply_captures; }
         PieceColor color;
         PieceType symbol;
     protected:
