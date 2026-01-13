@@ -24,12 +24,13 @@ Table of Contents
 *   [1\. Overview](#overview)
 *   [2\. Technical Features](#technical)
 *   [3\. Build System](#build)
-*   [4\. Movement Logic](#movement)
-*   [5\. Game End States](#endstates)
-*   [6\. Persistence](#persistence)
-*   [7\. User Manual](#manual)
-*   [8\. Snapshots](#snapshots)
-*   [9\. References](#references)
+*   [4\. System Design](#Design)
+*   [5\. Movement Logic](#movement)
+*   [6\. Game End States](#endstates)
+*   [7\. Persistence](#persistence)
+*   [8\. User Manual](#manual)
+*   [9\. Snapshots](#snapshots)
+*   [10\. References](#references)
 
 1\. Overview
 ------------
@@ -120,10 +121,60 @@ CMake needed **CMakeLists.txt** files to be able to build the system, so in each
 
 The general *CMakeLists.txt* file builds the entire system where the subdirectories are added in the correct order so other files can actually use them. Also it has linked all the needed libraries like Qt for the gui and the subdirectories that are treated as libraries for the general project structure.
 
-4\. Movement Logic
+4\. System Design
 ------------------
 
-### 4.1 Pawn Movement & Promotion
+In order to get the board updates between the two users and the GUI used the observer behavioural pattern, which made the communication easier between the engine and the display.
+
+Also the use of this pattern helped with the communication between the python AI API and the game engine.
+
+Concrete Classes:
+
+    namespace Concrete
+    {
+        class Observer
+        {
+            public:
+                void update();
+        };
+
+        class Subject
+        {
+            public:
+                void addObserver(Observer observer);
+                void removeObserver(Observer observer);
+                void notifyObservers();
+        };
+    }
+
+Used Classes:
+
+    namespace Chess
+    {
+        class GInterface: Concrete::Observer
+        {
+            public:
+                void update();
+        };
+
+        class Board: Concrete::Subject
+        {
+            private:
+                char board[8][8];
+                std::string board_str;
+                std::vector<Concrete::Observer> observers_data;
+            public:
+                void addObserver(Concrete::Observer observer);
+                void removeObserver(Concrete::Observer observer);
+                void notifyObservers();
+                void updateBoard();
+        };
+    }
+
+5\. Movement Logic
+------------------
+
+### 5.1 Pawn Movement & Promotion
 
 The `movePawn` function is the most complex movement module. It validates:
 
@@ -132,35 +183,35 @@ The `movePawn` function is the most complex movement module. It validates:
 *   Promotion: Triggered when a pawn reaches the terminal ranks (Row 0 or 7).
 *   The `checkPromotedPawn` helper ensures that once a pawn is promoted, it adopts the movement logic of the new piece type.
 
-### 4.2 Rook Movement
+### 5.2 Rook Movement
 
 The rook moves in a _straight line_ shape so that the difference between two cells should not be equal to _zero_ in one direction, and the difference should be equal to _zero_ in the other direction.
 
 The `moveRook` function starts by finding the required rook that we want to move and then checks if it can be moved (e.g., pinned) and then checks the _straight-shaped_ condition by calculating the difference between the current cell and the required cell in the X and Y directions. If the _straight-shaped_ shape is valid, it checks each cell on the way. If there exists any piece on the way, the move cannot be done until it reaches the destination cell. If there exists a Piece, it captures it in case it's an enemy one; if it's friendly, then the move cannot be done.
 
-### 4.3 The Knight's Leap
+### 5.3 The Knight's Leap
 
 The knight moves in an _L_ shape so that the difference between two cells equals 2 in one direction, and the difference equals 1 in the other direction.
 
 The `moveKnight` function starts by finding the required knight that we want to move and then checks if it can be moved (e.g., pinned), then checks the L-shaped condition by calculating the difference between the current cell and the required cell in the X and Y directions. If the _L_ shape is valid, it checks the destination cell; if there is an enemy piece, it captures it, but if it is a friendly piece, then the move cannot be done.
 
-### 4.4 Bishop Movement
+### 5.4 Bishop Movement
 
 The bishop moves in a _diagonal_ shape so that the difference between two cells should be equal in both X and Y directions.
 
 The `moveBishop` function starts by finding the required bishop that we want to move and then checks if it can be moved (e.g., pinned), then checks the _diagonal_ shaped condition by calculating the difference between the current cell and the required cell in X and Y directions. If the diagonal shape is valid, it checks each cell on the way. If there exists any piece on the way, the move cannot be done until it reaches the destination cell. If there exists a piece , it captures it in case it's an enemy one; if it's friendly, then the move cannot be done.
 
-### 4.5 Queen's Sovereign Slide
+### 5.5 Queen's Sovereign Slide
 
 The queen's move is very similar to the bishop and the rook moves, so the implementation is the same , however for faster and better performance we combined the check for the diagonal and straight line motion in one loop.
 
-### 4.6 King Movement, Safety & Castling
+### 5.6 King Movement, Safety & Castling
 
 *   The `moveKing` function integrates with `isChecked`.
 *   **Castling**: Validates that neither the King nor Rook has moved, and ensures the King does not pass through "check" during transition.
 *   **Check Detection**: The `isChecked` function performs an "inverse scan" from the King's position to see if any enemy piece has a line of sight and is repsonsible for piece pinning which is done if an enemy piece is found that can attack this position and if a friendly piece is found the search for an enemy is stopped as there is no way that the current piece can be pinned.
 
-5\. Game End States
+6\. Game End States
 -------------------
 
 **Stalemate:** occurs when a player has no legal moves but is not in check. The engine detects this by simulating every possible move using `copyBoard` and `copyPlayer`. If no moves result in a safe state, and the King wasn't in check, a draw is declared.
@@ -169,7 +220,7 @@ The queen's move is very similar to the bishop and the rook moves, so the implem
 
 **Resignation:** when one of the players types 'r' in his turn, the game consider them resigned and the other player automatically wins.
 
-6\. Persistence: Save, Load, and Undo
+7\. Persistence: Save, Load, and Undo
 -------------------------------------
 
 To ensure games can be resumed, validated moves are appended to a binary file for space efficiency.
@@ -179,7 +230,7 @@ To ensure games can be resumed, validated moves are appended to a binary file fo
 *   **Undo**: Implemented by truncating the last `sizeof(Move)` bytes from the binary file and triggering a reload to revert state and storing the data of the undone move in a separate file for redoing.
 *   **Redo**: It checks if the redo file isn't empty and then read the last move from the file and then reload the game with the redone move again.
 
-7\. User Manual
+8\. User Manual
 ---------------
 
 *   **Start**: Enter `p` for a new game or `l` to load a game.
@@ -190,30 +241,30 @@ To ensure games can be resumed, validated moves are appended to a binary file fo
 *   **Resign**: Type `r` to resign and exit the application.
 *   **Promotion**: You will be prompted to enter `q`, `r`, `b`, or `n`.
 
-**Note:** Most of the game logic is case-insensitive; inputting upper or lower case characters will not make a difference.
 
-8\. Snapshots of the Game
+9\. Snapshots of the Game
 -------------------------
 
 ![Main Menu](image.png)
 
-8.1 Main Menu Interface
+9.1 Main Menu Interface
 
 ![Gameplay UI](image-1.png)
 
-8.2 Active Board Rendering
+9.2 Active Board Rendering
 
 ![Checkmate](image-2.png)
 
-8.3 End of Game State
+9.3 End of Game State
 
 * * *
 
-9\. References
+10\. References
 --------------
 
 *   **C memcpy Documentation:** [GeeksforGeeks](https://www.geeksforgeeks.org/cpp/memcpy-in-cc/)
 *   **Clear Console in C:** [GeeksforGeeks](https://www.geeksforgeeks.org/c/clear-console-c-language/)
 *   **C File I/O (Binary):** [Programiz](https://www.programiz.com/c-programming/c-file-input-output)
+*   **Design Patterns:** [GeeksforGeeks](https://www.geeksforgeeks.org/system-design/-pattern-set-1-introduction/)
 
 **Note:** Anything that has been used in the implementation of this project was either found in the course material or inquired about in person.

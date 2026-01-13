@@ -8,6 +8,7 @@
 
 #include "guiBoard.hpp"
 #include "startMenu.hpp"
+#include "interfaces.hpp"
 
 extern "C" 
 {
@@ -23,23 +24,10 @@ int main(int argc, char **argv)
     // Main Window Settings
     main_window->setStyleSheet("background-color: #0A1118;");
     main_window->setFixedSize(QGuiApplication::primaryScreen()->availableGeometry().size());
-    
-    Player ply1 { createPlayer(COLOR_WHITE) };
-    Player ply2 { createPlayer(COLOR_BLACK) };
 
-    Captured white_captured { initializeCapture(COLOR_WHITE) };
-    Captured black_captured { initializeCapture(COLOR_BLACK) };
-
-    char **board = initializeBoard();
-
-    int whiteEP {-1}, blackEP {-1};
-
-    display_start_window(main_window, &ply1, &ply2, &white_captured, &black_captured
-                            , board, &whiteEP, &blackEP);
+    Chess::Board *board = new Chess::Board();
 
     main_window->show();
-
-    freeBoard(&board, &ply1, &ply2);
 
     return app.exec();
 }

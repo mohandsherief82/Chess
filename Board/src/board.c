@@ -6,7 +6,6 @@
 #include "chessTypes.h"
 #include "player.h"
 #include "board.h"
-#include "captures.h"
 
 
 extern char* path;

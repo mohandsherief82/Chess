@@ -19,4 +19,4 @@ struct PlayerData
 
 void display_start_window(QMainWindow *main_window, Player *ply1, Player *ply2
                           , Captured *ply1_captures, Captured *ply2_captures,
-                            char**& board, int *whiteEP, int *blackEP);
+                            char ***&board, int *whiteEP, int *blackEP);

@@ -22,37 +22,37 @@ extern "C"
 }
 
 
-void load_game(QMainWindow *main_window, char**& board, Player *ply1, Player *ply2
+void load_game(QMainWindow *main_window, char***& board, Player *ply1, Player *ply2
                 , Captured *ply1_captures, Captured *ply2_captures, int *whiteEP, int *blackEP)
 {
     // Ensure the board is initialized
     if (board == nullptr) board = NULL;
 
     // Pass the pointers directly to loadGame
-    int player_turn = loadGame(&board, ply1, ply2, ply1_captures, 
+    int player_turn = loadGame(board, ply1, ply2, ply1_captures, 
             ply2_captures, whiteEP, blackEP);
 
-    updateBoard(board, ply1, ply2);
+    updateBoard(*board, ply1, ply2);
 
     if (player_turn == 1) 
-        display_board(main_window, board, ply1, ply1_captures, ply2_captures, player_turn);
+        display_board(main_window, *board, ply1, ply1_captures, ply2_captures, player_turn);
     else
-        display_board(main_window, board, ply2, ply1_captures, ply2_captures, player_turn);
+        display_board(main_window, *board, ply2, ply1_captures, ply2_captures, player_turn);
 
     return;
 }
 
 
-void start_game(QMainWindow *main_window, char**& board, Player *ply1, Player *ply2
+void start_game(QMainWindow *main_window, char***& board, Player *ply1, Player *ply2
                           , Captured *ply1_captures, Captured *ply2_captures) 
 {
-    board = initializeBoard();
+    *board = initializeBoard();
 
     // Sync board state using the data stored in the map
-    updateBoard(board, ply1, ply2);
+    updateBoard(*board, ply1, ply2);
 
     // Render the board
-    display_board(main_window, board, ply1, ply1_captures, ply2_captures);
+    display_board(main_window, *board, ply1, ply1_captures, ply2_captures);
 
     return;
 }
@@ -60,7 +60,7 @@ void start_game(QMainWindow *main_window, char**& board, Player *ply1, Player *p
 
 void display_start_window(QMainWindow *main_window, Player *ply1, Player *ply2
                           , Captured *ply1_captures, Captured *ply2_captures,
-                            char**& board, int *whiteEP, int *blackEP)
+                            char ***& board, int *whiteEP, int *blackEP)
 {
     QWidget *master_container = new QWidget();
     QVBoxLayout *main_layout = new QVBoxLayout(master_container);
