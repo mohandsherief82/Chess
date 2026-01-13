@@ -1,5 +1,5 @@
-#include "../include/king.h"
-#include "../../chessTypes.h"
+#include "king.h"
+#include "chessTypes.h"
 
 King createKing(PieceColor color, int row)
 {

@@ -1,5 +1,4 @@
-#include "../include/captures.h"
-#include "../../Board/include/board.h"
+#include "captures.h"
 
 #include <stdlib.h>
 #include <ctype.h>
@@ -13,12 +12,18 @@ Captured initializeCapture(PieceColor color)
     {
         captures.capturedSymbols[i] = ' ';
     }
-    
-    captures.capturedSymbols[MAXCAPTNUM - 1] = 'X';
+
     captures.captureCount = 0;
 
     return captures;
 }
+
+
+bool isEmpty(char** board, int r, int c)
+{
+    return board[r][c] == WHITE_SQUARE || board[r][c] == BLACK_SQUARE || board[r][c] == EMPTY_SQUARE;
+}
+
 
 PieceColor pieceColorAt(char** board, int row, int col)
 {    
@@ -105,6 +110,11 @@ void capturePiece(Player* player, Captured* captureData)
         }
     }
     
-    captureData->capturedSymbols[captureData->captureCount - 1] = captureData->capturedPiece.symbol;
+    char symbol;
+
+    if (player->color == COLOR_WHITE) tolower(sym);
+    else toupper(sym); 
+
+    captureData->capturedSymbols[captureData->captureCount - 1] = sym;
     captureData->newCapture = false;
 }

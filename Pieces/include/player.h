@@ -3,8 +3,8 @@
 #include "knight.h"
 #include "queen.h"
 #include "bishop.h"
-#include "rock.h"
-#include "../../chessTypes.h"
+#include "rook.h"
+#include "chessTypes.h"
 
 #ifndef PLAYER_H
 #define PLAYER_H
@@ -25,7 +25,7 @@ typedef struct
 
 Player createPlayer(PieceColor color);
 bool isValidSymbol(char symbol);
-void freePlayer(Player player);
+void freePlayer(Player *player);
 Move getMove();
 
 #endif

@@ -3,9 +3,39 @@
 #ifndef CHESS_TYPES_H
 #define CHESS_TYPES_H
 
-typedef enum {
+#define BOARD_SIZE 8
+#define BLACK_SQUARE '.'
+#define WHITE_SQUARE '-'
+#define EMPTY_SQUARE ' '
+
+
+typedef enum
+{
+    INVALID_MOVE,
+    VALID_MOVE,
+    FRIENDLY_CAPTURE,
+    ENEMY_CAPTURE,
+    PROMOTION,
+    CASTLING,
+    KING_CHECKED
+} MoveValidation;
+
+
+typedef enum
+{
+    PAWN, 
+    ROOK, 
+    QUEEN, 
+    BISHOP, 
+    KING, 
+    KNIGHT
+} PieceType;
+
+
+typedef enum 
+{
     COLOR_WHITE = 0,
-    COLOR_BLACK,
+    COLOR_BLACK
 } PieceColor;
 
 // Placeholder struct for adding pieces
@@ -21,7 +51,6 @@ typedef struct
 
 typedef struct
 {
-    char symbol;
     int colPrev;
     int rowPrev;
     int colNext;

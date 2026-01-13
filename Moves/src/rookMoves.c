@@ -1,13 +1,13 @@
-#include "../../Pieces/include/player.h"
-#include "../../Board/include/board.h"
-#include "../include/pawnMoves.h"
-#include "../include/captures.h"
+#include "player.h"
+#include "board.h"
+#include "pawnMoves.h"
+#include "captures.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
 
-bool moveRook(char** board ,Player* player, Move move, Captured* playerCaptures, bool legalCheck)
+MoveValidation moveRook(char** board ,Player* player, Move move, Captured* playerCaptures, bool legalCheck)
 {
     int diffrow, diffcol, rowstep = 0, colstep = 0, r, c;
     Rook* rock = (Rook*)checkPromotedPawn(player, move);
@@ -24,20 +24,10 @@ bool moveRook(char** board ,Player* player, Move move, Captured* playerCaptures,
         }
     }
 
-    if (rock == NULL)
-    {
-        if (!legalCheck) printf("No Rook At This Position, Try Again!!!\n");
-        return false;
-    }
-
     diffrow = move.rowNext - move.rowPrev;
     diffcol = move.colNext - move.colPrev;
 
-    if (diffrow != 0 && diffcol != 0) 
-    {
-        if (!legalCheck) printf("Invalid Rook Move, Try Again!!!\n");
-        return false;
-    }
+    if (diffrow != 0 && diffcol != 0) return INVALID_MOVE;
 
     if (diffrow != 0) rowstep = (diffrow > 0) ? 1 : -1;
     else colstep = (diffcol > 0) ? 1 : -1;
@@ -47,31 +37,33 @@ bool moveRook(char** board ,Player* player, Move move, Captured* playerCaptures,
 
     while (r != move.rowNext || c != move.colNext)
     {
-        if (!isEmpty(board, r, c)) 
-        {
-            if (!legalCheck) printf("Invalid Rook Move, Try Again!!!\n");
-            return false;
-        }
+        if (!isEmpty(board, r, c)) return INVALID_MOVE;
+
         r += rowstep;
         c += colstep;
     }
 
     if (!isEmpty(board, move.rowNext, move.colNext))
     {
-        if (pieceColorAt(board, move.rowNext, move.colNext) == rock->color)
-        {   
-            if (!legalCheck) printf("Can't Capture Friendly Piece, Try Again!!!\n"); 
-            return false;
-        }
+        if (pieceColorAt(board, move.rowNext, move.colNext) == rock->color) return FRIENDLY_CAPTURE;
 
         if (!legalCheck)
         {
             playerCaptures->capturedPiece.color = (isupper(board[move.rowNext][move.colNext])) ? COLOR_BLACK : COLOR_WHITE;
             playerCaptures->capturedPiece.colPosition = move.colNext;
+
             playerCaptures->capturedPiece.rowPosition = move.rowNext;
             playerCaptures->capturedPiece.symbol = board[move.rowNext][move.colNext];
             playerCaptures->captureCount++;
             playerCaptures->newCapture = true;
+
+            board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
+            board[move.rowNext][move.colNext] = rock->symbol;
+            rock->rowPosition = move.rowNext;
+            rock->colPosition = move.colNext;
+            rock->firstMove = false;
+
+            return ENEMY_CAPTURE;
         }
     }
 
@@ -81,5 +73,5 @@ bool moveRook(char** board ,Player* player, Move move, Captured* playerCaptures,
     rock->colPosition = move.colNext;
     rock->firstMove = false;
 
-    return true;
+    return VALID_MOVE;
 }

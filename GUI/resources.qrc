@@ -1,0 +1,17 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <qresource prefix="/">
+        <file>icons/white_pawn.svg</file>
+        <file>icons/black_pawn.svg</file>
+        <file>icons/white_rook.svg</file>
+        <file>icons/black_rook.svg</file>
+        <file>icons/white_knight.svg</file>
+        <file>icons/black_knight.svg</file>
+        <file>icons/white_bishop.svg</file>
+        <file>icons/black_bishop.svg</file>
+        <file>icons/white_queen.svg</file>
+        <file>icons/black_queen.svg</file>
+        <file>icons/white_king.svg</file>
+        <file>icons/black_king.svg</file>
+    </qresource>
+</RCC>

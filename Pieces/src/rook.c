@@ -1,6 +1,5 @@
-#include "../include/rock.h"
-#include "../../chessTypes.h"
-#include "../../Board/include/board.h"
+#include "rook.h"
+#include "chessTypes.h"
 
 #include <stdbool.h>
 #include<stdlib.h>

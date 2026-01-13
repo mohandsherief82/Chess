@@ -1,15 +1,14 @@
-#include  "../include/staleMate.h"
-#include "../../Moves/include/pawnMoves.h"
-#include "../../Moves/include/rookMoves.h"
-#include "../../Moves/include/knightMoves.h"
-#include "../../Moves/include/bishopMoves.h"
-#include "../../Moves/include/queenMoves.h"
-#include "../../Moves/include/kingMoves.h"
-#include "../../Moves/include/captures.h"
-#include  "../../Board/include/board.h"
-#include  "../../chessTypes.h"
-#include  "../../Pieces/include/player.h"
-#include "../include/check.h"
+#include "pawnMoves.h"
+#include "rookMoves.h"
+#include "knightMoves.h"
+#include "bishopMoves.h"
+#include "queenMoves.h"
+#include "kingMoves.h"
+#include "captures.h"
+#include "board.h"
+#include "chessTypes.h"
+#include "player.h"
+#include "check.h"
 
 #include <stdio.h>
 #include <stdbool.h>
@@ -84,7 +83,6 @@ bool legalMove(char** board, Player* player)
         {
             if (isEmpty(board, rPrev, cPrev) || pieceColorAt(board, rPrev, cPrev) != player->color) continue;
 
-            testMove.symbol = board[rPrev][cPrev];
             testMove.rowPrev = rPrev;
             testMove.colPrev = cPrev;
 
@@ -101,7 +99,8 @@ bool legalMove(char** board, Player* player)
                     testMove.colNext = cNext;
 
                     bool moveSuccessful = false;
-                    char pieceType = tolower(testMove.symbol);
+                    char pieceType = board[rPrev][cPrev];
+                    tolower(pieceType);
                     
                     if (pieceType == 'p') moveSuccessful = movePawn(cpyB, &cpyP, &testMove, &tempCapture, &plyEpCol, &oppEpCol, legalCheck, false);
                     else if (pieceType == 'r') moveSuccessful = moveRook(cpyB, &cpyP, testMove, &tempCapture, legalCheck);
