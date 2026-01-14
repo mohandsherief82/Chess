@@ -9,6 +9,8 @@ BoardCell::BoardCell(int r, int c, char ***board_ptr, QWidget *parent)
 {
     setAcceptDrops(true);
     setAttribute(Qt::WA_StyledBackground, true);
+
+    this->setFixedSize(70, 70);
 }
 
 void BoardCell::dragEnterEvent(QDragEnterEvent *event) 

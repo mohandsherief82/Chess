@@ -18,14 +18,16 @@ extern "C"
 
 int main(int argc, char **argv)
 {
+    QString label_style = "font-weight: bold; color: #f8e7bb;"
+                        " font-size: 20px; margin-bottom: 5px;"
+                        " padding-bottom: 2px;";
+
     QApplication app(argc, argv);
-    QMainWindow *main_window = new QMainWindow();
+    Chess::GInterface *main_window = new Chess::GInterface(label_style);  
 
-    // Main Window Settings
-    main_window->setStyleSheet("background-color: #0A1118;");
-    main_window->setFixedSize(QGuiApplication::primaryScreen()->availableGeometry().size());
+    Chess::Board *game_board = new Chess::Board();
 
-    Chess::Board *board = new Chess::Board();
+    display_start_window(main_window, game_board);
 
     main_window->show();
 

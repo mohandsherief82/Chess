@@ -26,8 +26,7 @@ namespace Concrete
     }
 
 
-    /*        }
-
+    /*
         @brief notifies all observers when called with an update to the board.
         @param none.
         @return none.
@@ -35,7 +34,7 @@ namespace Concrete
     void Subject::notifyObservers()
     {
         for (auto* observer : observers_data)
-            if (observer != nullptr) observer->update();
+            if (observer != nullptr) observer->update(this);
     }
 }
 
@@ -56,7 +55,7 @@ namespace Chess
     }
 
 
-    Board::Board(char ***board_ptr)
+    Board::Board(char ***board_ptr, int player_turn)
     {
         if (board_ptr == nullptr || *board_ptr == nullptr)
         {
@@ -73,6 +72,8 @@ namespace Chess
         this->ply2_captures = new Captured(initializeCapture(COLOR_BLACK));
 
         this->board_str = this->get_board_string();
+
+        this->player_turn = player_turn;
     }
 
 
@@ -104,5 +105,10 @@ namespace Chess
         updateBoard(*this->board_ptr, this->ply1, this->ply2);
 
         this->notifyObservers();
+    }
+
+    void AIOpponent::update(Concrete::Subject *subject)
+    {
+        // Implementation
     }
 }

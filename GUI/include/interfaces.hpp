@@ -13,11 +13,13 @@ extern "C"
 
 namespace Concrete
 {
+    class Subject;
+
     class Observer
     {
         public:
             virtual ~Observer() = default;
-            virtual void update() = 0;
+            virtual void update(Subject *subject) = 0;
     };
 
     class Subject
@@ -38,13 +40,7 @@ namespace Chess
     class AIOpponent: public Concrete::Observer
     {
         public:
-            void update() override;
-    };
-
-    class GInterface: public Concrete::Observer
-    {
-        public:
-            void update() override;
+            void update(Concrete::Subject *subject) override;
     };
 
     class Board: public Concrete::Subject
@@ -54,14 +50,26 @@ namespace Chess
             std::string board_str = "";
             Player *ply1 = nullptr, *ply2 = nullptr;
             Captured *ply1_captures, *ply2_captures;
-            int ply1EP = -1, ply2EP = -1;
+            int *ply1EP = new int(-1), *ply2EP = new int(-1);
+            int player_turn = 1;
         public:
             Board();
-            Board(char ***board_ptr);
+            Board(char ***board_ptr, int player_turn);
             ~Board() { freeBoard(board_ptr, ply1, ply2); }
             
             void update_board();
+            
             std::string get_board_string();
-            char **get_board_array() { return *board_ptr; }
+            
+            char **get_board_array() const { return *board_ptr; }
+            char ***get_board_ptr() const { return board_ptr; }
+            
+            Player *get_player(int ply_num) const { return (ply_num == 1) ? ply1: ply2; }
+            Captured *get_player_captures(int ply_num) const { return (ply_num == 1) ? ply1_captures: ply2_captures; }
+            
+            int *get_player_EP(int ply_num) const { return (ply_num == 1) ? ply1EP: ply2EP; }
+            int get_player_turn() const { return player_turn; }
+
+            void update_turn(int turn) { this->player_turn = turn; }
     };
 }
