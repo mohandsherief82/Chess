@@ -6,27 +6,30 @@
 
 #include <QLabel>
 
-QString getIconPath(char piece) 
-{
-    QString colorStr = (std::islower(piece)) ? "white" : "black";
-    QString typeStr;
 
-    switch (std::tolower(piece)) 
+namespace helpers
+{
+    QString getIconPath(char piece) 
     {
-        case 'p': typeStr = "pawn"; break;
-        case 'r': typeStr = "rook"; break;
-        case 'n': typeStr = "knight"; break;
-        case 'b': typeStr = "bishop"; break;
-        case 'q': typeStr = "queen"; break;
-        case 'k': typeStr = "king"; break;
-        default:  QString("");
+        QString colorStr = (std::islower(piece)) ? "white" : "black";
+        QString typeStr;
+
+        switch (std::tolower(piece)) 
+        {
+            case 'p': typeStr = "pawn"; break;
+            case 'r': typeStr = "rook"; break;
+            case 'n': typeStr = "knight"; break;
+            case 'b': typeStr = "bishop"; break;
+            case 'q': typeStr = "queen"; break;
+            case 'k': typeStr = "king"; break;
+            default:  QString("");
+        }
+
+        return QString(":/icons/%1_%2.svg").arg(colorStr).arg(typeStr);
     }
 
-    return QString(":/icons/%1_%2.svg").arg(colorStr).arg(typeStr);
-}
 
-
-void clear_items(QGridLayout *gl) 
+    void clear_items(QGridLayout *gl) 
 {
     if (!gl) return;
 
@@ -40,33 +43,6 @@ void clear_items(QGridLayout *gl)
         delete item;
     }
 }
-
-namespace Chess
-{
-    GInterface::GInterface(QString label_style)
-    {
-        this->setStyleSheet("background-color: #0A1118;");
-        this->setFixedSize(QGuiApplication::primaryScreen()->availableGeometry().size());
-
-        this->player2_msg = new QLabel("Player 2 (Black)");
-        this->player1_msg = new QLabel("Player 1 (White)");
-
-        this->player2_msg->setStyleSheet(label_style);
-        this->player1_msg->setStyleSheet(label_style);
-
-        this->master_container = new QWidget();
-        this->container_central = new QWidget();
-        
-        this->gl = new QGridLayout(container_central);
-        
-        this->master_layout = new QVBoxLayout(this->master_container);
-        
-        this->master_layout->setContentsMargins(20, 10, 20, 10);
-        this->master_layout->setSpacing(5);
-        
-        this->ply2_data = new QVBoxLayout();
-        this->ply1_data = new QVBoxLayout();
-    }
 
 
     void add_piece_to_cell(QWidget *cell, char pieceChar) 
@@ -97,8 +73,7 @@ namespace Chess
     }
 
 
-    void add_piece_to_cell(BoardCell *cell, char pieceChar, int row, int col
-        , Player *ply, Captured *ply_captures) 
+    void add_piece_to_cell(BoardCell *cell, char pieceChar, int row, int col, Chess::Board *&game_board) 
     {
         QString iconPath = getIconPath(pieceChar);
         if (iconPath.isEmpty()) return;
@@ -124,7 +99,7 @@ namespace Chess
             case 'k': piece_type = KING; break;
         }
 
-        DraggablePiece *pieceLabel = new DraggablePiece(cell, ply, ply_captures, row, 
+        DraggablePiece *pieceLabel = new DraggablePiece(cell, game_board, row, 
                                             col, color, piece_type);
         
         pieceLabel->setObjectName(QString(pieceChar));
@@ -137,6 +112,35 @@ namespace Chess
         pieceLabel->setAlignment(Qt::AlignCenter);
 
         layout->addWidget(pieceLabel);
+    }
+}
+
+
+namespace Chess
+{
+    GInterface::GInterface(QString label_style)
+    {
+        this->setStyleSheet("background-color: #0A1118;");
+        this->setFixedSize(QGuiApplication::primaryScreen()->availableGeometry().size());
+
+        this->player2_msg = new QLabel("Player 2 (Black)");
+        this->player1_msg = new QLabel("Player 1 (White)");
+
+        this->player2_msg->setStyleSheet(label_style);
+        this->player1_msg->setStyleSheet(label_style);
+
+        this->master_container = new QWidget();
+        this->container_central = new QWidget();
+        
+        this->gl = new QGridLayout(container_central);
+        
+        this->master_layout = new QVBoxLayout(this->master_container);
+        
+        this->master_layout->setContentsMargins(20, 10, 20, 10);
+        this->master_layout->setSpacing(5);
+        
+        this->ply2_data = new QVBoxLayout();
+        this->ply1_data = new QVBoxLayout();
     }
 
 
@@ -170,7 +174,7 @@ namespace Chess
             QWidget *cell = new QWidget();
             cell->setFixedSize(30, 30);
 
-            if (i < ply_captures->captureCount) add_piece_to_cell(cell, ply_captures->capturedSymbols[i]);
+            if (i < ply_captures->captureCount) helpers::add_piece_to_cell(cell, ply_captures->capturedSymbols[i]);
 
             gl->addWidget(cell, 1, i);
         }
@@ -182,28 +186,28 @@ namespace Chess
     }
 
 
-    void GInterface::display_board(Board *&board)
+    void GInterface::display_board(Board *&game_board)
     {        
         this->gl->setSpacing(0);
         this->gl->setContentsMargins(0, 0, 0, 0);
 
-        int player_turn = board->get_player_turn();
-        char ***board_ptr = board->get_board_ptr();
-        Player *ply = board->get_player(player_turn);
+        int player_turn = game_board->get_player_turn();
+        char ***board_ptr = game_board->get_board_ptr();
+        Player *ply = game_board->get_player(player_turn);
         Captured *captures = NULL;
 
-        this->add_captures(PLAYER1, board->get_player_captures(PLAYER1));
-        this->add_captures(PLAYER2, board->get_player_captures(PLAYER2));
+        this->add_captures(PLAYER1, game_board->get_player_captures(PLAYER1));
+        this->add_captures(PLAYER2, game_board->get_player_captures(PLAYER2));
 
         if (player_turn == PLAYER1) 
         {
-            captures = board->get_player_captures(1);
+            captures = game_board->get_player_captures(1);
             gl->addLayout(this->ply2_data, 0, 0, 1, 8, Qt::AlignLeft);
             gl->addLayout(this->ply1_data, 9, 0, 1, 8, Qt::AlignLeft);
         }
         else
         {
-            captures = board->get_player_captures(2); 
+            captures = game_board->get_player_captures(2); 
             gl->addLayout(this->ply1_data, 0, 0, 1, 8, Qt::AlignLeft);
             gl->addLayout(this->ply2_data, 9, 0, 1, 8, Qt::AlignLeft);
         }
@@ -226,8 +230,8 @@ namespace Chess
 
                 if (!isEmpty(*board_ptr, i, j))
                 {
-                    if (isCurrentPlayerPiece) add_piece_to_cell(cell, (*board_ptr)[i][j], i, j, ply, captures);
-                    else add_piece_to_cell(cell, (*board_ptr)[i][j]);
+                    if (isCurrentPlayerPiece) helpers::add_piece_to_cell(cell, (*board_ptr)[i][j], i, j, game_board);
+                    else helpers::add_piece_to_cell(cell, (*board_ptr)[i][j]);
                 }  
 
                 int displayRow = (player_turn == PLAYER1) ? (i + 1) : ((7 - i) + 1);

@@ -24,7 +24,7 @@ bool loadPlayerTurn(char** board, Player* player, Move move, Captured* capture, 
     bool state = false;
     char sym = board[move.rowPrev][move.colPrev];
 
-    if (sym == 'p') state = movePawn(board, player, &move, capture, whiteEnPassantCol,
+    if (sym == 'p') state = movePawn(board, player, move, capture, whiteEnPassantCol,
                                          blackEnPassantCol, false, true);
     else if (sym == 'r') state = moveRook(board, player, move, capture, false);
     else if (sym == 'n') state = moveKnight(board, player, move, capture, false);

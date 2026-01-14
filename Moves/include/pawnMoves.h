@@ -5,7 +5,7 @@
 #include "captures.h"
 
 Piece* checkPromotedPawn(Player* player, Move move);
-MoveValidation movePawn(char** board, Player* player, Move* move
+MoveValidation movePawn(char** board, Player* player, Move move
         , Captured* playerCaptures, int *plyEnPassantCol, int *oppEnPassantCol
                 , bool legalCheck, bool load);
 

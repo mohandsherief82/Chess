@@ -13,39 +13,44 @@ BoardCell::BoardCell(int r, int c, char ***board_ptr, QWidget *parent)
     this->setFixedSize(70, 70);
 }
 
+
 void BoardCell::dragEnterEvent(QDragEnterEvent *event) 
 {
-    // Debug: This should print as soon as you drag over a square
-    std::cout << "Dragging over square: " << row_pos << "," << col_pos << std::endl;
     event->acceptProposedAction();
 }
+
 
 void BoardCell::dragMoveEvent(QDragMoveEvent *event) 
 {
     event->acceptProposedAction();
 }
 
+
 void BoardCell::dropEvent(QDropEvent *event)
 {
-    std::cout << "Drop event triggered!" << std::endl;
-
     DraggablePiece *piece = qobject_cast<DraggablePiece*>(event->source());
+    Chess::Board *game_board = piece->get_game_board();
+    int player_turn = game_board->get_player_turn();
     
     if (piece)
-    {        
-        std::cout << "MOVE: [" << piece->getRow() << "," << piece->getCol() << "] -> [" 
-                  << this->row_pos << "," << this->col_pos << "]" << std::endl;
-
+    {
         Move move {
             .colPrev = piece->getCol(),
             .rowPrev = piece->getRow(),
+
             .colNext = this->getCol(),
             .rowNext = this->getRow()
         };
+
+
+        std::cout << "MOVE: [" << move.rowPrev << "," << move.colPrev << "] -> [" 
+                  << move.rowNext << "," << move.colNext << "]" << std::endl;
+
+        MoveValidation move_state {};
         
-        Player *ply = piece->getPlayer();
+        Player *ply = game_board->get_player(player_turn);
         
-        Captured *ply_captures = piece->getCaptures();
+        Captured *ply_captures = game_board->get_player_captures(player_turn);
 
         char **board = this->getBoard();
         int *whiteEP, *blackEP;
@@ -53,27 +58,35 @@ void BoardCell::dropEvent(QDropEvent *event)
         switch (piece->symbol)
         {
             case PAWN: 
-                movePawn(board, ply, &move, ply_captures, whiteEP, blackEP, false, false); 
+                move_state = movePawn(board, ply, move, ply_captures, whiteEP, blackEP, false, false);
                 break;
             case ROOK: 
-                ; 
+                move_state = moveRook(board, ply, move, ply_captures, false); 
                 break;
             case KNIGHT: 
-                ; 
+                move_state = moveKnight(board, ply, move, ply_captures, false); 
                 break;
             case BISHOP: 
-                ; 
+                move_state = moveBishop(board, ply, move, ply_captures, false); 
                 break;
             case QUEEN: 
-                ; 
+                move_state = moveQueen(board, ply, move, ply_captures, false); 
                 break;
             case KING: 
-                ; 
+                move_state = moveKing(board, ply, move, ply_captures, false); 
                 break;
         }
 
-        piece->hide(); 
-        event->acceptProposedAction();
+        if (move_state == VALID_MOVE) 
+        {
+            piece->hide(); 
+            event->acceptProposedAction();
+
+            // Add functionality to update the board
+        }
+
+        // Handling other valid move cases
+
+        else std::cout << "Invalid Move" << move_state << std::endl; // pop up saying invalid move
     }
-    else std::cout << "Drop error: Source is not a DraggablePiece" << std::endl;
 }

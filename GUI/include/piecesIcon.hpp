@@ -1,6 +1,9 @@
 #pragma once
+
 #include <QLabel>
 #include <QMouseEvent>
+
+#include "interfaces.hpp"
 
 extern "C"
 {
@@ -13,18 +16,18 @@ class DraggablePiece : public QLabel
 {
     Q_OBJECT
     public:
-        DraggablePiece(QWidget *parent, int row_pos, int col_pos, PieceColor color, PieceType symbol);
-        DraggablePiece(QWidget *parent, Player *ply, Captured *ply_captures, int row_pos, int col_pos, PieceColor color, PieceType symbol);
+        DraggablePiece(QWidget *parent, Chess::Board *&game_board, int row_pos, int col_pos, PieceColor color, PieceType symbol);
+        
         int getRow() const { return row_pos; }
         int getCol() const { return col_pos; }
-        Player *getPlayer() const { return ply; }
-        Captured *getCaptures() const { return ply_captures; }
+        
+        Chess::Board *get_game_board() { return game_board; }
+        
         PieceColor color;
         PieceType symbol;
     protected:
         void mousePressEvent(QMouseEvent *event) override;
     private:
         int col_pos, row_pos;
-        Player *ply;
-        Captured *ply_captures;
+        Chess::Board *game_board = nullptr;
 };
