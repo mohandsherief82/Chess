@@ -3,6 +3,8 @@
 #include <QLabel>
 #include <QMouseEvent>
 
+#include <memory>
+
 #include "interfaces.hpp"
 
 extern "C"
@@ -16,12 +18,10 @@ class DraggablePiece : public QLabel
 {
     Q_OBJECT
     public:
-        DraggablePiece(QWidget *parent, Chess::Board *&game_board, int row_pos, int col_pos, PieceColor color, PieceType symbol);
+        DraggablePiece(QWidget *parent, int row_pos, int col_pos, PieceColor color, PieceType symbol);
         
         int getRow() const { return row_pos; }
         int getCol() const { return col_pos; }
-        
-        Chess::Board *get_game_board() { return game_board; }
         
         PieceColor color;
         PieceType symbol;
@@ -29,5 +29,4 @@ class DraggablePiece : public QLabel
         void mousePressEvent(QMouseEvent *event) override;
     private:
         int col_pos, row_pos;
-        Chess::Board *game_board = nullptr;
 };

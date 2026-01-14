@@ -4,16 +4,14 @@
 #include <QMimeData>
 
 
-DraggablePiece::DraggablePiece(QWidget *parent, Chess::Board *&game_board, int row_pos,
-             int col_pos, PieceColor color, PieceType symbol) : QLabel (parent)
+DraggablePiece::DraggablePiece(QWidget *parent, int row_pos, int col_pos
+    , PieceColor color, PieceType symbol) : QLabel (parent)
 {
     this->color = color;
     this->symbol = symbol;
 
     this->row_pos = row_pos;
     this->col_pos = col_pos;
-
-    this->game_board = game_board;
 }
 
 

@@ -22,7 +22,7 @@ namespace helpers
             case 'b': typeStr = "bishop"; break;
             case 'q': typeStr = "queen"; break;
             case 'k': typeStr = "king"; break;
-            default:  QString("");
+            default:  return QString("");  
         }
 
         return QString(":/icons/%1_%2.svg").arg(colorStr).arg(typeStr);
@@ -61,7 +61,7 @@ namespace helpers
         QLabel *pieceLabel = new QLabel(cell);
 
         QIcon icon(iconPath);
-        QPixmap pixmap = icon.pixmap(QSize(60, 60));
+        QPixmap pixmap = icon.pixmap(QSize(PIECE_ICON_SIZE, PIECE_ICON_SIZE));
 
         pieceLabel->setPixmap(pixmap);
         pieceLabel->setScaledContents(true);
@@ -73,7 +73,7 @@ namespace helpers
     }
 
 
-    void add_piece_to_cell(BoardCell *cell, char pieceChar, int row, int col, Chess::Board *&game_board) 
+    void add_piece_to_cell(BoardCell *cell, char pieceChar, int row, int col) 
     {
         QString iconPath = getIconPath(pieceChar);
         if (iconPath.isEmpty()) return;
@@ -99,19 +99,19 @@ namespace helpers
             case 'k': piece_type = KING; break;
         }
 
-        DraggablePiece *pieceLabel = new DraggablePiece(cell, game_board, row, 
+        DraggablePiece *piece_label = new DraggablePiece(cell, row, 
                                             col, color, piece_type);
         
-        pieceLabel->setObjectName(QString(pieceChar));
+        piece_label->setObjectName(QString(pieceChar));
         
         QIcon icon(iconPath);
-        QPixmap pixmap = icon.pixmap(QSize(60, 60));
+        QPixmap pixmap = icon.pixmap(QSize(PIECE_ICON_SIZE, PIECE_ICON_SIZE));
         
-        pieceLabel->setPixmap(pixmap);
-        pieceLabel->setScaledContents(true);
-        pieceLabel->setAlignment(Qt::AlignCenter);
+        piece_label->setPixmap(pixmap);
+        piece_label->setScaledContents(true);
+        piece_label->setAlignment(Qt::AlignCenter);
 
-        layout->addWidget(pieceLabel);
+        layout->addWidget(piece_label);
     }
 }
 
@@ -119,28 +119,27 @@ namespace helpers
 namespace Chess
 {
     GInterface::GInterface(QString label_style)
+        : player2_msg(new QLabel("Player 2 (Black)")),
+          player1_msg(new QLabel("Player 1 (White)")),
+          master_container(new QWidget()),
+          container_central(new QWidget()),
+          gl(nullptr),
+          master_layout(nullptr),
+          ply2_data(new QVBoxLayout()),
+          ply1_data(new QVBoxLayout())
     {
         this->setStyleSheet("background-color: #0A1118;");
         this->setFixedSize(QGuiApplication::primaryScreen()->availableGeometry().size());
 
-        this->player2_msg = new QLabel("Player 2 (Black)");
-        this->player1_msg = new QLabel("Player 1 (White)");
-
         this->player2_msg->setStyleSheet(label_style);
         this->player1_msg->setStyleSheet(label_style);
 
-        this->master_container = new QWidget();
-        this->container_central = new QWidget();
-        
         this->gl = new QGridLayout(container_central);
         
         this->master_layout = new QVBoxLayout(this->master_container);
         
         this->master_layout->setContentsMargins(20, 10, 20, 10);
         this->master_layout->setSpacing(5);
-        
-        this->ply2_data = new QVBoxLayout();
-        this->ply1_data = new QVBoxLayout();
     }
 
 
@@ -172,7 +171,7 @@ namespace Chess
         for (int i = 0; i < MAXCAPTNUM; i++)
         {
             QWidget *cell = new QWidget();
-            cell->setFixedSize(30, 30);
+            cell->setFixedSize(CAPTURE_CELL_SIZE, CAPTURE_CELL_SIZE);
 
             if (i < ply_captures->captureCount) helpers::add_piece_to_cell(cell, ply_captures->capturedSymbols[i]);
 
@@ -186,7 +185,7 @@ namespace Chess
     }
 
 
-    void GInterface::display_board(Board *&game_board)
+    void GInterface::display_board(std::shared_ptr<Board> &game_board)
     {        
         this->gl->setSpacing(0);
         this->gl->setContentsMargins(0, 0, 0, 0);
@@ -217,7 +216,7 @@ namespace Chess
             for (int j = 0; j < 8; j++) 
             {
                 // Use our custom class instead of QWidget
-                BoardCell *cell = new BoardCell(i, j, board_ptr); 
+                BoardCell *cell = new BoardCell(i, j, game_board); 
 
                 QString color = ((i + j) % 2 == 0) ? "#f8e7bb" : "#004474";
                 cell->setStyleSheet(QString(
@@ -230,7 +229,7 @@ namespace Chess
 
                 if (!isEmpty(*board_ptr, i, j))
                 {
-                    if (isCurrentPlayerPiece) helpers::add_piece_to_cell(cell, (*board_ptr)[i][j], i, j, game_board);
+                    if (isCurrentPlayerPiece) helpers::add_piece_to_cell(cell, (*board_ptr)[i][j], i, j);
                     else helpers::add_piece_to_cell(cell, (*board_ptr)[i][j]);
                 }  
 
@@ -245,6 +244,7 @@ namespace Chess
 
         return;
     }
+
 
     void GInterface::update(Concrete::Subject *subject)
     {

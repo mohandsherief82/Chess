@@ -11,6 +11,9 @@ extern "C"
     #include "chessTypes.h"
 }
 
+#define PLAYER1 1
+#define PLAYER2 2
+
 namespace Concrete
 {
     class Subject;
@@ -49,13 +52,17 @@ namespace Chess
             char ***board_ptr = nullptr;
             std::string board_str = "";
             Player *ply1 = nullptr, *ply2 = nullptr;
-            Captured *ply1_captures, *ply2_captures;
+            Captured *ply1_captures = nullptr, *ply2_captures = nullptr;
             int *ply1EP = new int(-1), *ply2EP = new int(-1);
             int player_turn = 1;
         public:
             Board();
             Board(char ***board_ptr, int player_turn);
-            ~Board() { freeBoard(board_ptr, ply1, ply2); }
+            ~Board();
+            
+            // Prevent copying to avoid double-free issues
+            Board(const Board&) = delete;
+            Board& operator=(const Board&) = delete;
             
             void update_board();
             

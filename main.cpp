@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <string>
+#include <memory>
 
 #include "guiBoard.hpp"
 #include "startMenu.hpp"
@@ -23,13 +24,15 @@ int main(int argc, char **argv)
                         " padding-bottom: 2px;";
 
     QApplication app(argc, argv);
-    Chess::GInterface *main_window = new Chess::GInterface(label_style);  
+    std::unique_ptr<Chess::GInterface> main_window = std::make_unique<Chess::GInterface>(label_style);  
 
-    Chess::Board *game_board = new Chess::Board();
+    std::shared_ptr<Chess::Board> game_board = std::make_shared<Chess::Board>();
 
     display_start_window(main_window, game_board);
 
     main_window->show();
 
-    return app.exec();
+    int result = app.exec();
+    
+    return result;
 }

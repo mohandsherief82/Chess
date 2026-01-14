@@ -80,7 +80,7 @@ MoveValidation movePawn(char** board, Player* player, Move move, Captured* playe
     }    
 
     if (pawn == NULL) return INVALID_MOVE;
-
+    
     int moveDirection = (pawn->color == COLOR_WHITE) ? -1 : 1; 
     int rowDiff = move.rowNext - move.rowPrev;
     int colDiff = move.colNext - move.colPrev;
@@ -96,8 +96,11 @@ MoveValidation movePawn(char** board, Player* player, Move move, Captured* playe
             {
                 pawn->rowPosition = move.rowNext;
                 pawn->colPosition = move.colNext;
+
                 if (pawn->firstMove) pawn->firstMove = false;
+
                 promotePawn(pawn, move, load);
+                      
                 board[move.rowNext][move.colNext] = pawn->symbol;
                 
                 if (pawn->promoted) return PROMOTION;
@@ -120,7 +123,9 @@ MoveValidation movePawn(char** board, Player* player, Move move, Captured* playe
             {
                 pawn->rowPosition = move.rowNext;
                 pawn->colPosition = move.colNext;
+
                 pawn->firstMove = false;
+                
                 *plyEnPassantCol = move.colNext;
             }
             

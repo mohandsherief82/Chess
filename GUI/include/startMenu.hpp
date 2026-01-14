@@ -11,10 +11,5 @@ extern "C"
     #include "Pieces/include/captures.h"
 }
 
-struct PlayerData
-{
-    Player player;
-    Captured ply_captures;
-};
 
-void display_start_window(Chess::GInterface *&main_window, Chess::Board *&boar);
+void display_start_window(std::unique_ptr<Chess::GInterface> &main_window, std::shared_ptr<Chess::Board> &game_board);

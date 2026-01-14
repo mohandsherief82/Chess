@@ -1,16 +1,17 @@
 #include "boardCell.hpp"
 #include "piecesIcon.hpp"
+#include "guiBoard.hpp"
 
 #include <QDragMoveEvent> 
 #include <iostream>
 
-BoardCell::BoardCell(int r, int c, char ***board_ptr, QWidget *parent) 
-    : QWidget(parent), row_pos(r), col_pos(c), board_ptr(board_ptr)
+BoardCell::BoardCell(int r, int c, std::shared_ptr<Chess::Board> game_board, QWidget *parent) 
+    : QWidget(parent), row_pos(r), col_pos(c), game_board(game_board)
 {
     setAcceptDrops(true);
     setAttribute(Qt::WA_StyledBackground, true);
 
-    this->setFixedSize(70, 70);
+    this->setFixedSize(CELL_SIZE, CELL_SIZE);
 }
 
 
@@ -29,12 +30,12 @@ void BoardCell::dragMoveEvent(QDragMoveEvent *event)
 void BoardCell::dropEvent(QDropEvent *event)
 {
     DraggablePiece *piece = qobject_cast<DraggablePiece*>(event->source());
-    Chess::Board *game_board = piece->get_game_board();
-    int player_turn = game_board->get_player_turn();
+    int player_turn = this->game_board->get_player_turn();
     
     if (piece)
     {
-        Move move {
+        Move move 
+        {
             .colPrev = piece->getCol(),
             .rowPrev = piece->getRow(),
 
@@ -42,23 +43,21 @@ void BoardCell::dropEvent(QDropEvent *event)
             .rowNext = this->getRow()
         };
 
-
-        std::cout << "MOVE: [" << move.rowPrev << "," << move.colPrev << "] -> [" 
-                  << move.rowNext << "," << move.colNext << "]" << std::endl;
-
         MoveValidation move_state {};
         
-        Player *ply = game_board->get_player(player_turn);
+        Player *ply = this->game_board->get_player(player_turn);
         
-        Captured *ply_captures = game_board->get_player_captures(player_turn);
+        Captured *ply_captures = this->game_board->get_player_captures(player_turn);
 
-        char **board = this->getBoard();
-        int *whiteEP, *blackEP;
+        char **board = this->game_board->get_board_array();
+        int player_turn = this->game_board->get_player_turn();
+        int *plyEP = this->game_board->get_player_EP(player_turn)
+            , *oppEP = this->game_board->get_player_EP( (player_turn == PLAYER1) ? PLAYER2: PLAYER1 );
 
         switch (piece->symbol)
         {
             case PAWN: 
-                move_state = movePawn(board, ply, move, ply_captures, whiteEP, blackEP, false, false);
+                move_state = movePawn(board, ply, move, ply_captures, plyEP, oppEP, false, false);
                 break;
             case ROOK: 
                 move_state = moveRook(board, ply, move, ply_captures, false); 
@@ -83,6 +82,7 @@ void BoardCell::dropEvent(QDropEvent *event)
             event->acceptProposedAction();
 
             // Add functionality to update the board
+            this->game_board->update_board();
         }
 
         // Handling other valid move cases

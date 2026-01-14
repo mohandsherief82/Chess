@@ -10,12 +10,16 @@
 #include <QLabel>
 #include <QIcon>
 
+#include <memory>
+
 #include "interfaces.hpp"
 
 #include <cctype>
 
-#define PLAYER1 1
-#define PLAYER2 2
+// GUI Constants
+#define CELL_SIZE 70
+#define PIECE_ICON_SIZE 60
+#define CAPTURE_CELL_SIZE 30
 
 extern "C"
 {
@@ -38,7 +42,7 @@ namespace Chess
             void add_captures(int ply_num, Captured *ply_captures);
         public:
             GInterface(QString label_style);
-            void display_board(Board *&board);
+            void display_board(std::shared_ptr<Board> &game_board);
             void update(Concrete::Subject *subject) override;
     };
 }

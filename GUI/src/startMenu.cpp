@@ -6,7 +6,7 @@
 #include <QLabel>
 #include <QDebug>
 
-#include <unordered_map>
+#include <memory>
 #include <string>
 #include <iostream>
 
@@ -22,7 +22,7 @@ extern "C"
 }
 
 
-void load_game(Chess::GInterface *main_window, Chess::Board *&game_board)
+void load_game(std::unique_ptr<Chess::GInterface> &main_window, std::shared_ptr<Chess::Board> &game_board)
 {
     char ***board_ptr = game_board->get_board_ptr();
 
@@ -44,7 +44,6 @@ void load_game(Chess::GInterface *main_window, Chess::Board *&game_board)
 
     // Update game board
     updateBoard(*board_ptr, ply1, ply2);
-
     game_board->update_turn(player_turn);
 
     // Render the main board
@@ -54,7 +53,7 @@ void load_game(Chess::GInterface *main_window, Chess::Board *&game_board)
 }
 
 
-void start_game(Chess::GInterface *main_window, Chess::Board *&game_board) 
+void start_game(std::unique_ptr<Chess::GInterface> &main_window, std::shared_ptr<Chess::Board> &game_board) 
 {
     char ***board_ptr = game_board->get_board_ptr();
     *board_ptr = initializeBoard();
@@ -72,7 +71,7 @@ void start_game(Chess::GInterface *main_window, Chess::Board *&game_board)
 }
 
 
-void display_start_window(Chess::GInterface *&main_window, Chess::Board *&game_board)
+void display_start_window(std::unique_ptr<Chess::GInterface> &main_window, std::shared_ptr<Chess::Board> &game_board)
 {
     QWidget *master_container = new QWidget();
     

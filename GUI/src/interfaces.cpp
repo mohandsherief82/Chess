@@ -1,5 +1,7 @@
 #include "interfaces.hpp"
+
 #include <algorithm>
+#include <iostream>
 
 namespace Concrete
 {
@@ -105,6 +107,26 @@ namespace Chess
         updateBoard(*this->board_ptr, this->ply1, this->ply2);
 
         this->notifyObservers();
+
+        this->update_turn((this->player_turn == PLAYER1) ? PLAYER2 : PLAYER1);
+        return;
+    }
+
+    Board::~Board()
+    {
+        // Clean up EP pointers
+        delete ply1EP;
+        delete ply2EP;
+        
+        // Clean up captures
+        delete ply1_captures;
+        delete ply2_captures;
+        
+        // Clean up board and players (freeBoard handles ply1 and ply2)
+        freeBoard(board_ptr, ply1, ply2);
+        
+        // Clean up the outer pointer
+        delete board_ptr;
     }
 
     void AIOpponent::update(Concrete::Subject *subject)
