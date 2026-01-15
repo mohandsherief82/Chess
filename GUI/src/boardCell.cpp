@@ -31,11 +31,14 @@ void BoardCell::dropEvent(QDropEvent *event)
 {
     DraggablePiece *piece = qobject_cast<DraggablePiece*>(event->source());
     int player_turn = this->game_board->get_player_turn();
-    
+    char sym;
+
     if (piece)
     {
         Move move 
         {
+            .symbol = piece->symbol,
+
             .colPrev = piece->getCol(),
             .rowPrev = piece->getRow(),
 
@@ -58,21 +61,27 @@ void BoardCell::dropEvent(QDropEvent *event)
         {
             case PAWN: 
                 move_state = movePawn(board, ply, move, ply_captures, plyEP, oppEP, false, false);
+                move.symbol = (ply->color == COLOR_WHITE) ? tolower(sym) : toupper(sym);
                 break;
             case ROOK: 
                 move_state = moveRook(board, ply, move, ply_captures, false); 
+                move.symbol = (ply->color == COLOR_WHITE) ? tolower(sym) : toupper(sym);
                 break;
             case KNIGHT: 
                 move_state = moveKnight(board, ply, move, ply_captures, false); 
+                move.symbol = (ply->color == COLOR_WHITE) ? tolower(sym) : toupper(sym);
                 break;
             case BISHOP: 
                 move_state = moveBishop(board, ply, move, ply_captures, false); 
+                move.symbol = (ply->color == COLOR_WHITE) ? tolower(sym) : toupper(sym);
                 break;
             case QUEEN: 
                 move_state = moveQueen(board, ply, move, ply_captures, false); 
+                move.symbol = (ply->color == COLOR_WHITE) ? tolower(sym) : toupper(sym);
                 break;
             case KING: 
                 move_state = moveKing(board, ply, move, ply_captures, false); 
+                move.symbol = (ply->color == COLOR_WHITE) ? tolower(sym) : toupper(sym);
                 break;
         }
 

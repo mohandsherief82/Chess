@@ -51,6 +51,7 @@ typedef struct
 
 typedef struct
 {
+    char symbol;
     int colPrev;
     int rowPrev;
     int colNext;
