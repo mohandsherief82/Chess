@@ -1,5 +1,7 @@
 #include "interfaces.hpp"
+
 #include <algorithm>
+#include <iostream>
 
 namespace Concrete
 {
@@ -26,8 +28,7 @@ namespace Concrete
     }
 
 
-    /*        }
-
+    /*
         @brief notifies all observers when called with an update to the board.
         @param none.
         @return none.
@@ -56,7 +57,7 @@ namespace Chess
     }
 
 
-    Board::Board(char ***board_ptr)
+    Board::Board(char ***board_ptr, int player_turn)
     {
         if (board_ptr == nullptr || *board_ptr == nullptr)
         {
@@ -73,6 +74,8 @@ namespace Chess
         this->ply2_captures = new Captured(initializeCapture(COLOR_BLACK));
 
         this->board_str = this->get_board_string();
+
+        this->player_turn = player_turn;
     }
 
 
@@ -99,10 +102,38 @@ namespace Chess
         return board_str;
     }
 
+    
+    Board::~Board()
+    {
+        // Clean up EP pointers
+        delete ply1EP;
+        delete ply2EP;
+        
+        // Clean up captures
+        delete ply1_captures;
+        delete ply2_captures;
+        
+        // Clean up board and players (freeBoard handles ply1 and ply2)
+        freeBoard(board_ptr, ply1, ply2);
+        
+        // Clean up the outer pointer
+        delete board_ptr;
+    }
+    
+
     void Board::update_board()
     {
         updateBoard(*this->board_ptr, this->ply1, this->ply2);
 
+        this->update_turn((this->player_turn == PLAYER1) ? PLAYER2 : PLAYER1);
+        
         this->notifyObservers();
+        return;
+    }
+
+
+    void AIOpponent::update()
+    {
+        // Implementation
     }
 }

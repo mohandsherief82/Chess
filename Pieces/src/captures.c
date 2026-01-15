@@ -8,12 +8,10 @@ Captured initializeCapture(PieceColor color)
     Captured captures;
     captures.newCapture = false;
 
-    for (int i = 0; i < MAXCAPTNUM; i++)
-    {
-        captures.capturedSymbols[i] = ' ';
-    }
+    for (int i = 0; i < MAXCAPTNUM; i++) captures.capturedSymbols[i] = ' ';
 
     captures.captureCount = 0;
+    captures.color = color;
 
     return captures;
 }
@@ -38,6 +36,7 @@ void capturePiece(Player* player, Captured* captureData)
 {
     if (!captureData->newCapture) return;
 
+    
     char sym = tolower(captureData->capturedPiece.symbol);
     bool found = false;
 
@@ -109,11 +108,9 @@ void capturePiece(Player* player, Captured* captureData)
             }
         }
     }
-    
-    char symbol;
 
-    if (player->color == COLOR_WHITE) tolower(sym);
-    else toupper(sym); 
+    if (captureData->color == COLOR_BLACK) sym = tolower(captureData->capturedPiece.symbol);
+    else if (captureData->color == COLOR_WHITE) sym = toupper(captureData->capturedPiece.symbol);
 
     captureData->capturedSymbols[captureData->captureCount - 1] = sym;
     captureData->newCapture = false;

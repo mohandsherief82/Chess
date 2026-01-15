@@ -92,13 +92,29 @@ void updateBoard(char** board, Player *player1, Player *player2)
 
 void freeBoard(char*** board, Player *player1, Player *player2)
 {
-    for (int i = 0; i < BOARD_SIZE; i++) free(board[0][i]);
+    // Check if board is valid
+    if (board == NULL || board[0] == NULL) return;
+    
+    // Free each row
+    for (int i = 0; i < BOARD_SIZE; i++) 
+    {
+        if (board[0][i] != NULL) 
+        {
+            free(board[0][i]);
+            board[0][i] = NULL;
+        }
+    }
+    
+    // Free the 2D array pointer
     free(board[0]);
+    board[0] = NULL;
+    
+    // NOTE: The outermost pointer (board itself) is managed by C++ code
+    // and will be deleted in the Board destructor
 
+    // Free players
     freePlayer(player1);
     freePlayer(player2);
-
-    board[0] = NULL;
 
     return;
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <memory>
 #include <string>
 
 extern "C"
@@ -11,8 +12,13 @@ extern "C"
     #include "chessTypes.h"
 }
 
+#define PLAYER1 1
+#define PLAYER2 2
+
 namespace Concrete
 {
+    class Subject;
+
     class Observer
     {
         public:
@@ -41,27 +47,37 @@ namespace Chess
             void update() override;
     };
 
-    class GInterface: public Concrete::Observer
-    {
-        public:
-            void update() override;
-    };
-
-    class Board: public Concrete::Subject
+    class Board: public Concrete::Subject, public std::enable_shared_from_this<Board>
     {
         private:
             char ***board_ptr = nullptr;
             std::string board_str = "";
             Player *ply1 = nullptr, *ply2 = nullptr;
-            Captured *ply1_captures, *ply2_captures;
-            int ply1EP = -1, ply2EP = -1;
+            Captured *ply1_captures = nullptr, *ply2_captures = nullptr;
+            int *ply1EP = new int(-1), *ply2EP = new int(-1);
+            int player_turn = 1;
         public:
             Board();
-            Board(char ***board_ptr);
-            ~Board() { freeBoard(board_ptr, ply1, ply2); }
+            Board(char ***board_ptr, int player_turn);
+            ~Board();
+            
+            // Prevent copying to avoid double-free issues
+            Board(const Board&) = delete;
+            Board& operator=(const Board&) = delete;
             
             void update_board();
+            
             std::string get_board_string();
-            char **get_board_array() { return *board_ptr; }
+            
+            char **get_board_array() const { return *board_ptr; }
+            char ***get_board_ptr() const { return board_ptr; }
+            
+            Player *get_player(int ply_num) const { return (ply_num == 1) ? ply1: ply2; }
+            Captured *get_player_captures(int ply_num) const { return (ply_num == 1) ? ply1_captures: ply2_captures; }
+            
+            int *get_player_EP(int ply_num) const { return (ply_num == 1) ? ply1EP: ply2EP; }
+            int get_player_turn() const { return player_turn; }
+
+            void update_turn(int turn) { this->player_turn = turn; }
     };
 }

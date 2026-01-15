@@ -6,7 +6,7 @@
 #include <QLabel>
 #include <QDebug>
 
-#include <unordered_map>
+#include <memory>
 #include <string>
 #include <iostream>
 
@@ -22,64 +22,66 @@ extern "C"
 }
 
 
-void load_game(QMainWindow *main_window, char***& board, Player *ply1, Player *ply2
-                , Captured *ply1_captures, Captured *ply2_captures, int *whiteEP, int *blackEP)
+void load_game(std::unique_ptr<Chess::GInterface> &main_window, std::shared_ptr<Chess::Board> &game_board)
 {
+    char ***board_ptr = game_board->get_board_ptr();
+
+    Player *ply1 = game_board->get_player(PLAYER1);
+    Player *ply2 = game_board->get_player(PLAYER2);
+
+    Captured *ply1_captures = game_board->get_player_captures(PLAYER1);
+    Captured *ply2_captures = game_board->get_player_captures(PLAYER2);
+
+    int *whiteEP = game_board->get_player_EP(PLAYER1);
+    int *blackEP = game_board->get_player_EP(PLAYER2);
+
     // Ensure the board is initialized
-    if (board == nullptr) board = NULL;
+    if (board_ptr == nullptr) board_ptr = NULL;
 
     // Pass the pointers directly to loadGame
-    int player_turn = loadGame(board, ply1, ply2, ply1_captures, 
+    int player_turn = loadGame(board_ptr, ply1, ply2, ply1_captures, 
             ply2_captures, whiteEP, blackEP);
 
-    updateBoard(*board, ply1, ply2);
+    // Update game board
+    updateBoard(*board_ptr, ply1, ply2);
+    game_board->update_turn(player_turn);
 
-    if (player_turn == 1) 
-        display_board(main_window, *board, ply1, ply1_captures, ply2_captures, player_turn);
-    else
-        display_board(main_window, *board, ply2, ply1_captures, ply2_captures, player_turn);
+    // Render the main board
+    main_window->update();
 
     return;
 }
 
 
-void start_game(QMainWindow *main_window, char***& board, Player *ply1, Player *ply2
-                          , Captured *ply1_captures, Captured *ply2_captures) 
+void start_game(std::unique_ptr<Chess::GInterface> &main_window, std::shared_ptr<Chess::Board> &game_board) 
 {
-    *board = initializeBoard();
+    char ***board_ptr = game_board->get_board_ptr();
+    *board_ptr = initializeBoard();
+
+    Player *ply1 = game_board->get_player(PLAYER1);
+    Player *ply2 = game_board->get_player(PLAYER2);
 
     // Sync board state using the data stored in the map
-    updateBoard(*board, ply1, ply2);
+    updateBoard(*board_ptr, ply1, ply2);
 
     // Render the board
-    display_board(main_window, *board, ply1, ply1_captures, ply2_captures);
+    main_window->update();
 
     return;
 }
 
 
-void display_start_window(QMainWindow *main_window, Player *ply1, Player *ply2
-                          , Captured *ply1_captures, Captured *ply2_captures,
-                            char ***& board, int *whiteEP, int *blackEP)
+void display_start_window(std::unique_ptr<Chess::GInterface> &main_window, std::shared_ptr<Chess::Board> &game_board)
 {
     QWidget *master_container = new QWidget();
+    
     QVBoxLayout *main_layout = new QVBoxLayout(master_container);
     QHBoxLayout *button_layout = new QHBoxLayout();
     
     QLabel *start_msg = new QLabel("Welcome To Chess");
+    
     QPushButton *start_button = new QPushButton("Start a New Game");
     QPushButton *load_button = new QPushButton("Load a Game");
-
-    // Button Functionality with lambda functions
-    QObject::connect(start_button, &QPushButton::clicked, [=, &board]() 
-    {
-        start_game(main_window, board, ply1, ply2, ply1_captures, ply2_captures);
-    });
-
-    QObject::connect(load_button, &QPushButton::clicked, [=, &board]() 
-    {
-        load_game(main_window, board, ply1, ply2, ply1_captures, ply2_captures, whiteEP, blackEP);
-    });
 
     QString button_style = 
             "QPushButton { background-color: #004474; color: #f8e7bb; "
@@ -110,4 +112,19 @@ void display_start_window(QMainWindow *main_window, Player *ply1, Player *ply2
     main_layout->addStretch(3);
 
     main_window->setCentralWidget(master_container);
+
+    // Button Functionality with lambda functions
+    QObject::connect(start_button, &QPushButton::clicked, [&]() 
+            {
+                start_game(main_window, game_board);
+            }
+    );
+
+    QObject::connect(load_button, &QPushButton::clicked, [&]() 
+            {
+                load_game(main_window, game_board);
+            }
+    );
+
+    return;
 }

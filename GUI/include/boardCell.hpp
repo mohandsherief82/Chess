@@ -1,3 +1,6 @@
+#pragma once
+#include "interfaces.hpp"
+
 #include <QWidget>
 #include <QDragEnterEvent>
 #include <QDropEvent>
@@ -5,6 +8,8 @@
 #include <QGridLayout>
 #include <QLabel>
 #include <QDebug>
+
+#include <memory>
 
 extern "C"
 {
@@ -21,12 +26,11 @@ class BoardCell : public QWidget
     Q_OBJECT
     private:
         int row_pos, col_pos;
-        char ***board_ptr;
+        std::shared_ptr<Chess::Board> game_board = nullptr;
     public:
-        BoardCell(int r, int c, char ***board_ptr = nullptr, QWidget *parent = nullptr);
+        BoardCell(int r, int c, std::shared_ptr<Chess::Board> game_board, QWidget *parent = nullptr);
         int getRow() { return row_pos; }
         int getCol() { return col_pos; }
-        char **getBoard() { return (board_ptr != nullptr) ? *board_ptr : nullptr; }
     protected:
         void dragEnterEvent(QDragEnterEvent *event) override;
         void dropEvent(QDropEvent *event) override;

@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <string>
+#include <memory>
 
 #include "guiBoard.hpp"
 #include "startMenu.hpp"
@@ -18,16 +19,23 @@ extern "C"
 
 int main(int argc, char **argv)
 {
+    QString label_style = "font-weight: bold; color: #f8e7bb;"
+                        " font-size: 20px; margin-bottom: 5px;"
+                        " padding-bottom: 2px;";
+
     QApplication app(argc, argv);
-    QMainWindow *main_window = new QMainWindow();
+    
+    std::shared_ptr<Chess::Board> game_board = std::make_shared<Chess::Board>();
+    
+    std::unique_ptr<Chess::GInterface> main_window = std::make_unique<Chess::GInterface>(label_style, game_board);
+    
+    game_board->addObserver(main_window.get());
 
-    // Main Window Settings
-    main_window->setStyleSheet("background-color: #0A1118;");
-    main_window->setFixedSize(QGuiApplication::primaryScreen()->availableGeometry().size());
-
-    Chess::Board *board = new Chess::Board();
+    display_start_window(main_window, game_board);
 
     main_window->show();
 
-    return app.exec();
+    int result = app.exec();
+    
+    return result;
 }
