@@ -39,11 +39,13 @@ namespace Chess
             QWidget *master_container = nullptr, *container_central = nullptr;
             QVBoxLayout *master_layout = nullptr, *ply1_data = nullptr, *ply2_data = nullptr;
 
+            std::shared_ptr<Board> game_board = nullptr;
+
             void add_captures(int ply_num, Captured *ply_captures);
         public:
-            GInterface(QString label_style);
-            void display_board(std::shared_ptr<Board> &game_board);
-            void update(Concrete::Subject *subject) override;
+            GInterface(QString label_style, std::shared_ptr<Board> game_board);
+            void update() override;
+        protected:
+            void keyPressEvent(QKeyEvent *event) override;
     };
 }
-

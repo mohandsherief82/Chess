@@ -36,7 +36,7 @@ namespace Concrete
     void Subject::notifyObservers()
     {
         for (auto* observer : observers_data)
-            if (observer != nullptr) observer->update(this);
+            if (observer != nullptr) observer->update();
     }
 }
 
@@ -102,16 +102,7 @@ namespace Chess
         return board_str;
     }
 
-    void Board::update_board()
-    {
-        updateBoard(*this->board_ptr, this->ply1, this->ply2);
-
-        this->notifyObservers();
-
-        this->update_turn((this->player_turn == PLAYER1) ? PLAYER2 : PLAYER1);
-        return;
-    }
-
+    
     Board::~Board()
     {
         // Clean up EP pointers
@@ -128,8 +119,20 @@ namespace Chess
         // Clean up the outer pointer
         delete board_ptr;
     }
+    
 
-    void AIOpponent::update(Concrete::Subject *subject)
+    void Board::update_board()
+    {
+        updateBoard(*this->board_ptr, this->ply1, this->ply2);
+
+        this->update_turn((this->player_turn == PLAYER1) ? PLAYER2 : PLAYER1);
+        
+        this->notifyObservers();
+        return;
+    }
+
+
+    void AIOpponent::update()
     {
         // Implementation
     }

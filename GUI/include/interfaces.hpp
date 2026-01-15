@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <memory>
 #include <string>
 
 extern "C"
@@ -22,7 +23,7 @@ namespace Concrete
     {
         public:
             virtual ~Observer() = default;
-            virtual void update(Subject *subject) = 0;
+            virtual void update() = 0;
     };
 
     class Subject
@@ -43,10 +44,10 @@ namespace Chess
     class AIOpponent: public Concrete::Observer
     {
         public:
-            void update(Concrete::Subject *subject) override;
+            void update() override;
     };
 
-    class Board: public Concrete::Subject
+    class Board: public Concrete::Subject, public std::enable_shared_from_this<Board>
     {
         private:
             char ***board_ptr = nullptr;

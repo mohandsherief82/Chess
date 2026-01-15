@@ -76,17 +76,22 @@ void BoardCell::dropEvent(QDropEvent *event)
                 break;
         }
 
-        if (move_state == VALID_MOVE) 
+        if (move_state == VALID_MOVE || move_state == CASTLING) 
         {
             piece->hide(); 
             event->acceptProposedAction();
 
-            // Add functionality to update the board
             this->game_board->update_board();
         }
+        else if (move_state == ENEMY_CAPTURE)
+        {
+            capturePiece(game_board->get_player((player_turn == PLAYER1) ? PLAYER2: PLAYER1), ply_captures);
 
-        // Handling other valid move cases
+            piece->hide(); 
+            event->acceptProposedAction();
 
+            this->game_board->update_board();
+        }
         else std::cout << "Invalid Move" << move_state << std::endl; // pop up saying invalid move
     }
 }

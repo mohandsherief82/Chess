@@ -47,7 +47,7 @@ void load_game(std::unique_ptr<Chess::GInterface> &main_window, std::shared_ptr<
     game_board->update_turn(player_turn);
 
     // Render the main board
-    main_window->display_board(game_board);
+    main_window->update();
 
     return;
 }
@@ -65,7 +65,7 @@ void start_game(std::unique_ptr<Chess::GInterface> &main_window, std::shared_ptr
     updateBoard(*board_ptr, ply1, ply2);
 
     // Render the board
-    main_window->display_board(game_board);
+    main_window->update();
 
     return;
 }
