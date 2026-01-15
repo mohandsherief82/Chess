@@ -10,6 +10,7 @@
 
 typedef struct 
 {
+    PieceColor color;
     Piece capturedPiece;
     int captureCount;
     char capturedSymbols[MAXCAPTNUM];
