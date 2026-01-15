@@ -15,7 +15,7 @@
 #include "../Pieces/include/player.h"
 #include "../Game-End/include/check.h"
 
-extern char *path;
+extern char *loadPath;
 
 bool playerTurn(char** board, Player* player, Captured* capture, int* plyEnPassantCol, int* opponentEnPassantCol)
 {
@@ -98,8 +98,8 @@ int main ()
         }
         else
         {
-            remove(path);
-            FILE *fptr = fopen(path, "wb");
+            remove(loadPath);
+            FILE *fptr = fopen(loadPath, "wb");
             if (fptr != NULL) fclose(fptr);
             currentPlayerTurn = 1;
             break;
@@ -157,7 +157,7 @@ int main ()
         clearScreen();
         printf("Done, Game Saved!!!\n");
     }
-    else remove(path);
+    else remove(loadPath);
 
     return 0;
 }

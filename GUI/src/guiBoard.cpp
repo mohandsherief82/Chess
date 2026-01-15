@@ -3,6 +3,8 @@
 #include "boardCell.hpp"
 
 #include <iostream>
+#include <array>
+#include <fstream>
 
 #include <QLabel>
 
@@ -26,6 +28,32 @@ namespace helpers
         }
 
         return QString(":/icons/%1_%2.svg").arg(colorStr).arg(typeStr);
+    }
+
+
+    std::array<Move, 16> read_moves() 
+    {
+        std::array<Move, 16> lastMoves = {};
+
+        std::ifstream file(loadPath, std::ios::binary | std::ios::ate);
+
+        if (!file.is_open()) return lastMoves;
+
+        std::streamsize fileSize = file.tellg();
+
+        int totalMoves = fileSize / sizeof(Move);
+        int countToRead = (totalMoves < 16) ? totalMoves : 16;
+
+        if (countToRead > 0) 
+        {
+            file.seekg(-(static_cast<std::streamoff>(countToRead) * sizeof(Move)), std::ios::end);
+            
+            file.read(reinterpret_cast<char*>(lastMoves.data()), countToRead * sizeof(Move));
+        }
+
+        file.close();
+
+        return lastMoves;
     }
 
 
@@ -180,6 +208,8 @@ namespace Chess
 
     void GInterface::update()
     {
+        std::array<Move, 16> move_array { helpers::read_moves() };
+
         this->gl->setSpacing(0);
         this->gl->setContentsMargins(0, 0, 0, 0);
 

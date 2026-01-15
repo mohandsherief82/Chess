@@ -81,6 +81,8 @@ void BoardCell::dropEvent(QDropEvent *event)
             piece->hide(); 
             event->acceptProposedAction();
 
+            saveMove(move);
+
             this->game_board->update_board();
         }
         else if (move_state == ENEMY_CAPTURE)
@@ -89,6 +91,8 @@ void BoardCell::dropEvent(QDropEvent *event)
 
             piece->hide(); 
             event->acceptProposedAction();
+
+            saveMove(move);
 
             this->game_board->update_board();
         }

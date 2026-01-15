@@ -19,6 +19,9 @@ extern "C"
     #include "bishopMoves.h"
     #include "queenMoves.h"
     #include "kingMoves.h"
+    #include "saveGame.h"
+    
+    extern char *loadPath;
 }
 
 class BoardCell : public QWidget 
