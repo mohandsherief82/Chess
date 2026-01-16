@@ -34,12 +34,14 @@ target_sources(
             include/piecesIcon.hpp
             include/boardCell.hpp
             include/interfaces.hpp
+            include/helpers.hpp
     PRIVATE
         src/guiBoard.cpp
         src/startMenu.cpp
         src/piecesIcon.cpp
         src/boardCell.cpp
         src/interfaces.cpp
+        src/helpers.cpp
 )
 
 # Ensure the compiler can find your headers

@@ -15,8 +15,8 @@
 #include "chessTypes.h"
 #include "check.h"
 
-const char* loadPath = "./build/GameBin/Load/game.bin";
-const char* redoPath = "./build/GameBin/Redo/redo.bin";
+const char* loadPath = "./GameBin/Load/game.bin";
+const char* redoPath = "./GameBin/Redo/redo.bin";
 
 
 bool loadPlayerTurn(char** board, Player* player, Move move, Captured* capture, int *whiteEnPassantCol, int *blackEnPassantCol) 
