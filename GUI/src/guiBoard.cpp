@@ -261,9 +261,6 @@ namespace Chess
         master_layout->setContentsMargins(20, 10, 20, 10);
         master_layout->setSpacing(5);
 
-        ply1_data->addLayout(gl);
-        ply2_data->addLayout(gl);
-
         master_layout->addWidget(container_central, 0, Qt::AlignCenter);
 
         this->setCentralWidget(master_container);
@@ -271,11 +268,9 @@ namespace Chess
         return;
     }
 
+
     void GInterface::keyPressEvent(QKeyEvent *event) 
     {
         if (event->matches(QKeySequence::Quit) || event->matches(QKeySequence::Close)) this->close();
     }
 }
-
-
-

@@ -61,7 +61,7 @@ Piece* findPiece(Player* player, Move move, char symbol)
 }
 
 
-MoveValidation isChecked(char** board, Player* player, bool legalCheck)
+bool isChecked(char** board, Player* player, bool legalCheck)
 {
     King* king = player->king;
     
@@ -96,7 +96,7 @@ MoveValidation isChecked(char** board, Player* player, bool legalCheck)
                         printf("King is checked by a Knight at (%c%d)!!!\n", c + 'A', 8 - r);
                     }
 
-                    return KING_CHECKED;
+                    return true;
                 }
             }
         }
@@ -130,7 +130,7 @@ MoveValidation isChecked(char** board, Player* player, bool legalCheck)
                             printf("King is checked by a %s at (%c%d)!!!\n", (pType == 'q' ? "Queen" : (pType == 'r' ? "Rook" : "Bishop")), c + 'A', 8 - r);
                         }
 
-                        return KING_CHECKED;
+                        return true;
                     }
                     
                     if (step == 1 && isDiagonal && pType == 'p')
@@ -143,14 +143,14 @@ MoveValidation isChecked(char** board, Player* player, bool legalCheck)
                                 printf("King checked by Pawn at (%c%d)!\n", c + 'A', 8 - r);
                             }
 
-                            return KING_CHECKED;
+                            return true;
                         }
                     }
 
                     if (step == 1 && pType == 'k')
                     {
                         if (!legalCheck) king->isChecked = true;
-                        return KING_CHECKED;
+                        return true;
                     }
 
                     break;
@@ -180,5 +180,5 @@ MoveValidation isChecked(char** board, Player* player, bool legalCheck)
         }
     }
 
-    return VALID_MOVE;
+    return false;
 }

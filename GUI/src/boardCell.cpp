@@ -85,7 +85,7 @@ void BoardCell::dropEvent(QDropEvent *event)
                 break;
         }
 
-        if (move_state == VALID_MOVE || move_state == CASTLING) 
+        if (move_state == VALID_MOVE) 
         {
             piece->hide(); 
             event->acceptProposedAction();

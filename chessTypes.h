@@ -15,9 +15,7 @@ typedef enum
     VALID_MOVE,
     FRIENDLY_CAPTURE,
     ENEMY_CAPTURE,
-    PROMOTION,
-    CASTLING,
-    KING_CHECKED
+    PROMOTION
 } MoveValidation;
 
 
