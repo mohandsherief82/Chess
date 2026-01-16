@@ -37,16 +37,11 @@ namespace Chess
 	class GInterface: public Concrete::Observer, public QMainWindow
     {
         private:
-            QGridLayout *gl = nullptr;
-            QLabel *player2_msg = nullptr, *player1_msg = nullptr;
-            QWidget *master_container = nullptr, *container_central = nullptr;
-            QVBoxLayout *master_layout = nullptr, *ply1_data = nullptr, *ply2_data = nullptr;
-
             std::shared_ptr<Board> game_board = nullptr;
 
-            void add_captures(int ply_num, Captured *ply_captures);
+            void add_captures(QVBoxLayout *ply_data, QLabel *ply_msg, Captured *ply_captures);
         public:
-            GInterface(QString label_style, std::shared_ptr<Board> game_board);
+            GInterface(std::shared_ptr<Board> game_board);
             void update() override;
         protected:
             void keyPressEvent(QKeyEvent *event) override;

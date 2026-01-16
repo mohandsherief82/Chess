@@ -144,43 +144,17 @@ namespace helpers
 
 namespace Chess
 {
-    GInterface::GInterface(QString label_style, std::shared_ptr<Board> game_board)
-        : player2_msg(new QLabel("Player 2 (Black)")),
-          player1_msg(new QLabel("Player 1 (White)")),
-          master_container(new QWidget()),
-          container_central(new QWidget()),
-          gl(nullptr),
-          master_layout(nullptr),
-          ply2_data(new QVBoxLayout()),
-          ply1_data(new QVBoxLayout()),
-          game_board(game_board)
+    GInterface::GInterface(std::shared_ptr<Board> game_board)
+        : game_board(game_board)
     {
         this->setStyleSheet("background-color: #0A1118;");
         this->setFixedSize(QGuiApplication::primaryScreen()->availableGeometry().size());
-
-        this->player2_msg->setStyleSheet(label_style);
-        this->player1_msg->setStyleSheet(label_style);
-
-        this->gl = new QGridLayout(container_central);
-
-        this->master_layout = new QVBoxLayout(this->master_container);
-
-        this->master_layout->setContentsMargins(20, 10, 20, 10);
-        this->master_layout->setSpacing(5);
-
-        this->ply1_data->addLayout(gl);
-        this->ply2_data->addLayout(gl);
-
-        this->master_layout->addWidget(container_central, 0, Qt::AlignCenter);
     }
 
 
-    void GInterface::add_captures(int ply_num, Captured *ply_captures)
+    void GInterface::add_captures(QVBoxLayout *ply_data, QLabel *ply_msg, Captured *ply_captures)
     {
-        QVBoxLayout *&capture_box = (ply_num == PLAYER1) ? ply1_data : ply2_data;
-        QLabel *ply_label = (ply_num == PLAYER1) ? player1_msg : player2_msg;
-
-        capture_box->addWidget(ply_label);
+        ply_data->addWidget(ply_msg);
 
         QGridLayout *gl = new QGridLayout();
 
@@ -199,8 +173,8 @@ namespace Chess
             gl->addWidget(cell, 1, i);
         }
 
-        capture_box->addLayout(gl);
-        capture_box->addSpacing(15);
+        ply_data->addLayout(gl);
+        ply_data->addSpacing(15);
 
         return;
     }
@@ -208,30 +182,53 @@ namespace Chess
 
     void GInterface::update()
     {
+        QWidget *master_container { new QWidget() };
+        QWidget *container_central { new QWidget() };
+
+        QVBoxLayout *master_layout { new QVBoxLayout(master_container) };
+        
+        QGridLayout *gl { new QGridLayout(container_central) };
+
+        QString label_style = "font-weight: bold; color: #f8e7bb;"
+                    " font-size: 20px; margin-bottom: 5px;"
+                    " padding-bottom: 2px;";
+
+        QLabel *player2_msg { new QLabel("Player 2 (Black)") };
+        QLabel *player1_msg { new QLabel("Player 1 (White)") };
+
+        player2_msg->setStyleSheet(label_style);
+        player1_msg->setStyleSheet(label_style);
+
+        QVBoxLayout *ply2_data { new QVBoxLayout() };
+        QVBoxLayout *ply1_data { new QVBoxLayout() };
+        
         std::array<Move, 16> move_array { helpers::read_moves() };
 
-        this->gl->setSpacing(0);
-        this->gl->setContentsMargins(0, 0, 0, 0);
+        gl->setSpacing(0);
+        gl->setContentsMargins(0, 0, 0, 0);
 
         int player_turn = this->game_board->get_player_turn();
+
         char ***board_ptr = this->game_board->get_board_ptr();
+
         Player *ply = this->game_board->get_player(player_turn);
+
         Captured *captures = NULL;
 
-        this->add_captures(PLAYER1, this->game_board->get_player_captures(PLAYER1));
-        this->add_captures(PLAYER2, this->game_board->get_player_captures(PLAYER2));
+        this->add_captures(ply1_data, player1_msg, this->game_board->get_player_captures(PLAYER1));
+        this->add_captures(ply2_data, player2_msg, this->game_board->get_player_captures(PLAYER2));
 
         if (player_turn == PLAYER1)
         {
             captures = this->game_board->get_player_captures(1);
-            gl->addLayout(this->ply2_data, 0, 0, 1, 8, Qt::AlignLeft);
-            gl->addLayout(this->ply1_data, 9, 0, 1, 8, Qt::AlignLeft);
+            gl->addLayout(ply2_data, 0, 0, 1, 8, Qt::AlignLeft);
+            gl->addLayout(ply1_data, 9, 0, 1, 8, Qt::AlignLeft);
         }
         else
         {
             captures = this->game_board->get_player_captures(2);
-            gl->addLayout(this->ply1_data, 0, 0, 1, 8, Qt::AlignLeft);
-            gl->addLayout(this->ply2_data, 9, 0, 1, 8, Qt::AlignLeft);
+            gl->addLayout(ply1_data, 0, 0, 1, 8, Qt::AlignLeft);
+            gl->addLayout(ply2_data, 9, 0, 1, 8, Qt::AlignLeft);
         }
 
         for (int i = 0; i < 8; i++)
@@ -261,7 +258,15 @@ namespace Chess
             }
         }
 
-        this->setCentralWidget(this->master_container);
+        master_layout->setContentsMargins(20, 10, 20, 10);
+        master_layout->setSpacing(5);
+
+        ply1_data->addLayout(gl);
+        ply2_data->addLayout(gl);
+
+        master_layout->addWidget(container_central, 0, Qt::AlignCenter);
+
+        this->setCentralWidget(master_container);
 
         return;
     }
@@ -271,3 +276,6 @@ namespace Chess
         if (event->matches(QKeySequence::Quit) || event->matches(QKeySequence::Close)) this->close();
     }
 }
+
+
+
