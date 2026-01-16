@@ -42,12 +42,10 @@ void load_game(std::unique_ptr<Chess::GInterface> &main_window, std::shared_ptr<
     int player_turn = loadGame(board_ptr, ply1, ply2, ply1_captures, 
             ply2_captures, whiteEP, blackEP);
 
-    // Update game board
-    updateBoard(*board_ptr, ply1, ply2);
-    game_board->update_turn(player_turn);
+    std::cout << player_turn << std::endl;
 
-    // Render the main board
-    main_window->update();
+    // Update game board
+    game_board->update_board();
 
     return;
 }

@@ -1,22 +1,6 @@
-Terminal Chess Engine Technical Report
+Chess Engine
 ======================================
 
-#### **CSE211: Programming I**
-
-#### [Github Repository](https://github.com/mohandsherief82/Chess)
-
-Project Contributors & Supervision
-----------------------------------
-
-### Supervision
-
-*   **Prof. Dr. Marwan Torki**
-*   **Eng. Karim Alaa**
-
-### Contributors
-
-*   **Mohand Sherief Mohamed Ali**
-*   **Moaz Gaballah Ahmed**
 
 Table of Contents
 -----------------
@@ -264,7 +248,6 @@ To ensure games can be resumed, validated moves are appended to a binary file fo
 
 *   **C memcpy Documentation:** [GeeksforGeeks](https://www.geeksforgeeks.org/cpp/memcpy-in-cc/)
 *   **Clear Console in C:** [GeeksforGeeks](https://www.geeksforgeeks.org/c/clear-console-c-language/)
+*   **Design Patterns:** [W3Schools](https://www.geeksforgeeks.org/system-design/-pattern-set-1-introduction/)
+*   **C++ File I/O (Binary):** [GeeksforGeeks](https://www.w3schools.com/cpp/cpp_files.asp)
 *   **C File I/O (Binary):** [Programiz](https://www.programiz.com/c-programming/c-file-input-output)
-*   **Design Patterns:** [GeeksforGeeks](https://www.geeksforgeeks.org/system-design/-pattern-set-1-introduction/)
-
-**Note:** Anything that has been used in the implementation of this project was either found in the course material or inquired about in person.

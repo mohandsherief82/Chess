@@ -17,7 +17,7 @@
 #include "./include/checkMate.h"
 #include "./include/check.h"
 
-extern char *path;
+extern char *loadPath;
 
 char playerTurn(char** board, Player* player, Captured* capture, int* plyEnPassantCol, int* opponentEnPassantCol)
 {
@@ -105,8 +105,8 @@ int main ()
         }
         else
         {
-            remove(path);
-            FILE *fptr = fopen(path, "wb");
+            remove(loadPath);
+            FILE *fptr = fopen(loadPath, "wb");
             if (fptr != NULL) fclose(fptr);
             currentPlayerTurn = 1;
             break;
@@ -163,7 +163,7 @@ int main ()
             if (checkMate(board, &ply2))
             {
                 printf("Game Ended By Checkmate.\nPlayer 1 wins!!!\n");
-                remove(path);
+                remove(loadPath);
                 break;
             }
 
@@ -206,7 +206,7 @@ int main ()
             if (checkMate(board, &ply1))
             {
                 printf("Game Ended By Checkmate.\nPlayer 2 wins!!!\n");
-                remove(path);
+                remove(loadPath);
                 break;
             }
 
@@ -221,7 +221,7 @@ int main ()
         clearScreen();
         printf("Done, Game Saved!!!\n");
     }
-    else remove(path);
+    else remove(loadPath);
 
     printf("-----------------------------------------------------------------------------------------------------------------------"
             "--------------------------------------------------------\n");

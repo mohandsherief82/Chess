@@ -15,8 +15,8 @@
 #include "chessTypes.h"
 #include "check.h"
 
-const char* path = "./build/GameBin/Load/game.bin";
-const char* redoPath = "./build/GameBin/Redo/redo.bin";
+const char* loadPath = "./GameBin/Load/game.bin";
+const char* redoPath = "./GameBin/Redo/redo.bin";
 
 
 bool loadPlayerTurn(char** board, Player* player, Move move, Captured* capture, int *whiteEnPassantCol, int *blackEnPassantCol) 
@@ -63,7 +63,7 @@ int loadGame(char*** boardPtr, Player* player1, Player* player2, Captured* ply1C
     *ply1Captures = initializeCapture(COLOR_WHITE);
     *ply2Captures = initializeCapture(COLOR_BLACK);
 
-    FILE* fptr = fopen(path, "rb");
+    FILE* fptr = fopen(loadPath, "rb");
 
     if (fptr == NULL) 
     {
@@ -114,7 +114,7 @@ bool undoLastMove(char*** boardPtr, Player* player1, Player* player2, Captured* 
     }
     else board = *boardPtr;
 
-    FILE* fptr = fopen(path, "rb");
+    FILE* fptr = fopen(loadPath, "rb");
     if (!fptr) return false;
 
     fseek(fptr, 0, SEEK_END);
@@ -150,7 +150,7 @@ bool undoLastMove(char*** boardPtr, Player* player1, Player* player2, Captured* 
     }
     fclose(fptr); 
     
-    fptr = fopen(path, "wb");
+    fptr = fopen(loadPath, "wb");
     if (fptr) 
     {
         if (backMove) 
@@ -170,7 +170,7 @@ bool undoLastMove(char*** boardPtr, Player* player1, Player* player2, Captured* 
 
 void saveMove(Move move)
 {
-    FILE* fptr = fopen(path, "ab");
+    FILE* fptr = fopen(loadPath, "ab");
 
     if (fptr) 
     {

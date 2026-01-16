@@ -8,7 +8,7 @@
 #include "board.h"
 
 
-extern char* path;
+extern char* loadPath;
 
 
 char** initializeBoard()

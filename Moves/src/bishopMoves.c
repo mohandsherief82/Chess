@@ -39,7 +39,7 @@ MoveValidation moveBishop(char** board, Player* player, Move move, Captured* pla
     r = move.rowPrev + rowStep;
     c = move.colPrev + colStep;
 
-    // Check for blocking pieces along the path
+    // Check for blocking pieces along the loadPath
     while (r != move.rowNext)
     {
         if (!isEmpty(board, r, c)) return INVALID_MOVE;

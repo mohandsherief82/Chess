@@ -5,6 +5,6 @@
 
 #include "player.h"
 
-MoveValidation isChecked(char** board, Player* player, bool legalCheck);
+bool isChecked(char** board, Player* player, bool legalCheck);
 
 #endif
