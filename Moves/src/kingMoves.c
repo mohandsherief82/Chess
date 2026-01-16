@@ -135,12 +135,9 @@ bool moveKing(char** board, Player* player, Move move, Captured* playerCaptures,
     King *king = player->king; 
 
     if (king->rowPosition != move.rowPrev || king->colPosition != move.colPrev)
-    {
-        if (!legalCheck) printf("No King at This Position, Try Again!!!\n");
-        return false;
-    }
+        return INVALID_MOVE;
     
-    if (performCastling(board, player, move, legalCheck)) return true;
+    if (performCastling(board, player, move, legalCheck)) return CASTLING;
 
     for (int i = 0; i < 8; i++)
     {
@@ -151,10 +148,7 @@ bool moveKing(char** board, Player* player, Move move, Captured* playerCaptures,
             if (!isEmpty(board, move.rowNext, move.colNext))
             {
                 if (pieceColorAt(board, move.rowNext, move.colNext) == player->color)
-                {
-                    if (!legalCheck) printf("Can't Capture Friendly piece, Try Again!!!\n");
-                    return false;
-                }
+                    return INVALID_MOVE;
                 capturedSymbol = board[move.rowNext][move.colNext];
             }
 
@@ -173,8 +167,7 @@ bool moveKing(char** board, Player* player, Move move, Captured* playerCaptures,
                 board[move.rowPrev][move.colPrev] = king->symbol;
                 board[move.rowNext][move.colNext] = capturedSymbol;
 
-                if (!legalCheck) printf("Invalid King Move: Move leaves King in check, Try Again!!!\n");
-                return false;
+                return INVALID_MOVE;
             }
 
             if (legalCheck)
@@ -183,25 +176,28 @@ bool moveKing(char** board, Player* player, Move move, Captured* playerCaptures,
                 king->colPosition = oldCol;
                 board[move.rowPrev][move.colPrev] = king->symbol;
                 board[move.rowNext][move.colNext] = capturedSymbol;
-                return true;
+                
+                return VALID_MOVE;
             }
 
             if (capturedSymbol != EMPTY_SQUARE)
             {
                 playerCaptures->capturedPiece.color = (isupper(capturedSymbol)) ? COLOR_BLACK : COLOR_WHITE;
+                
                 playerCaptures->capturedPiece.colPosition = move.colNext;
                 playerCaptures->capturedPiece.rowPosition = move.rowNext;
+                
                 playerCaptures->capturedPiece.symbol = capturedSymbol;
                 playerCaptures->capturedPiece.isActive = false;
+                
                 playerCaptures->captureCount++;
                 playerCaptures->newCapture = true;
             }
 
             king->firstMove = false;
-            return true;
+            return VALID_MOVE;
         }
     }
 
-    if (!legalCheck) printf("Invalid King Move, Try Again!!!\n");
-    return false;
+    return INVALID_MOVE;
 }
