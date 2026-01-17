@@ -12,6 +12,7 @@
 
 #include "guiBoard.hpp"
 #include "startMenu.hpp"
+#include "helpers.hpp"
 
 extern "C" 
 {
@@ -58,6 +59,8 @@ void start_game(std::unique_ptr<Chess::GInterface> &main_window, std::shared_ptr
 
     Player *ply1 = game_board->get_player(PLAYER1);
     Player *ply2 = game_board->get_player(PLAYER2);
+
+    game_board->udpate_game_path(helpers::get_formatted_time());
 
     // Sync board state using the data stored in the map
     updateBoard(*board_ptr, ply1, ply2);

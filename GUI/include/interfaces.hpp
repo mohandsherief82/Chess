@@ -56,6 +56,7 @@ namespace Chess
             Captured *ply1_captures = nullptr, *ply2_captures = nullptr;
             int *ply1EP = new int(-1), *ply2EP = new int(-1);
             int player_turn = 1;
+            std::string game_path {};
         public:
             Board();
             Board(char ***board_ptr, int player_turn);
@@ -78,6 +79,9 @@ namespace Chess
             int *get_player_EP(int ply_num) const { return (ply_num == 1) ? ply1EP: ply2EP; }
             int get_player_turn() const { return player_turn; }
 
+            std::string get_game_path() { return this->game_path; }
+
             void update_turn(int turn) { this->player_turn = turn; }
+            void udpate_game_path(std::string path) { this->game_path = path; }
     };
 }

@@ -22,7 +22,10 @@ namespace Chess
 
     void GInterface::add_moves_view()
     {
-        std::array<Move, MOVES_READ> moves { helpers::read_moves() };
+        std::string path { loadPath };
+        path.append(this->game_board->get_game_path());
+
+        std::array<Move, MOVES_READ> moves { helpers::read_moves(path) };
 
         QWidget *central = this->centralWidget();
         if (!central || !central->layout()) return;

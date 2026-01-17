@@ -11,6 +11,11 @@
 #include <array>
 #include <fstream>
 #include <cctype>
+#include <chrono>
+#include <ctime>
+#include <iomanip>
+#include <sstream>
+#include <string>
 
 #include "boardCell.hpp"
 #include "piecesIcon.hpp"
@@ -30,8 +35,9 @@ extern "C"
 namespace helpers
 {
     QString getIconPath(char piece);
-    std::array<Move, MOVES_READ> read_moves();
+    std::array<Move, MOVES_READ> read_moves(std::string path);
     void clear_items(QLayout *gl);
     void add_piece_to_cell(QWidget *cell, char pieceChar);
     void add_piece_to_cell(BoardCell *cell, char pieceChar, int row, int col);
+    std::string get_formatted_time();
 }

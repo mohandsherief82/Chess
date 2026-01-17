@@ -105,6 +105,6 @@ void BoardCell::dropEvent(QDropEvent *event)
 
             this->game_board->update_board();
         }
-        else std::cout << "Invalid Move" << move_state << std::endl; // pop up saying invalid move
+        else {}
     }
 }
