@@ -22,9 +22,7 @@ namespace Chess
 
     void GInterface::add_moves_view()
     {
-        std::string path { loadPath };
-        path.append(this->game_board->get_game_path());
-
+        std::string path { this->game_board->get_game_path() };
         std::array<Move, MOVES_READ> moves { helpers::read_moves(path) };
 
         QWidget *central = this->centralWidget();
@@ -36,6 +34,7 @@ namespace Chess
         {
             sidebar = new QWidget();
             sidebar->setObjectName("moveHistorySidebar");
+            
             sidebar->setFixedWidth(380);
             sidebar->setFixedHeight(650);
             
@@ -46,20 +45,26 @@ namespace Chess
             }
             
             QVBoxLayout *side_layout = new QVBoxLayout(sidebar);
+
             side_layout->setContentsMargins(0, 0, 0, 0);
             side_layout->setSpacing(5);
 
             QLabel *title = new QLabel("Moves");
+
             title->setObjectName("sidebarTitle");
             title->setAlignment(Qt::AlignCenter);
+
             side_layout->addWidget(title);
 
             QScrollArea *scroll = new QScrollArea();
+
             scroll->setWidgetResizable(true);
             scroll->setStyleSheet("background: transparent; border: none;");
             
             QWidget *table_container = new QWidget();
+
             table_container->setObjectName("tableContainer");
+
             new QGridLayout(table_container);
             
             scroll->setWidget(table_container);
@@ -71,21 +76,28 @@ namespace Chess
                             " padding-bottom: 2px;";
 
         QLabel *title = sidebar->findChild<QLabel*>("sidebarTitle");
+
         if (title) title->setStyleSheet(label_style + "font-size: 22px;");
 
         QWidget *table_container = sidebar->findChild<QWidget*>("tableContainer");
+
         QGridLayout *grid_view = qobject_cast<QGridLayout*>(table_container->layout());
         helpers::clear_items(grid_view);
 
         grid_view->setSpacing(2);
         grid_view->setContentsMargins(0, 0, 0, 0);
 
+        grid_view->setColumnStretch(0, 1);
+        grid_view->setColumnStretch(1, 1);
+
         QString headerStyle = label_style + "background-color: #1A2634; border-bottom: 2px solid #f8e7bb; padding: 10px;";
         
         QLabel *whiteHeader = new QLabel("White");
         QLabel *blackHeader = new QLabel("Black");
+
         whiteHeader->setStyleSheet(headerStyle);
         blackHeader->setStyleSheet(headerStyle);
+
         whiteHeader->setAlignment(Qt::AlignCenter);
         blackHeader->setAlignment(Qt::AlignCenter);
 
@@ -100,30 +112,37 @@ namespace Chess
 
             QWidget *cell = new QWidget();
             cell->setStyleSheet(QString("background-color: %1;").arg(rowBg));
+
             QHBoxLayout *cell_layout = new QHBoxLayout(cell);
-            cell_layout->setContentsMargins(5, 2, 5, 2);
-            cell_layout->setSpacing(5);
+            cell_layout->setContentsMargins(10, 2, 10, 2);
+
+            cell_layout->setSpacing(6);
+            cell_layout->setAlignment(Qt::AlignLeft);
 
             if (moves[i].symbol != 0)
             {
                 QLabel *iconLabel = new QLabel();
                 QPixmap pix = QIcon(helpers::getIconPath(moves[i].symbol)).pixmap(24, 24);
+
                 iconLabel->setPixmap(pix);
                 cell_layout->addWidget(iconLabel);
 
-                QString move_text = QString("(%1,%2)->(%3,%4)")
-                    .arg(moves[i].rowPrev).arg(moves[i].colPrev)
-                    .arg(moves[i].rowNext).arg(moves[i].colNext);
+                QString move_text = QString("%1%2 -> %3%4")
+                    .arg((char)(moves[i].colPrev + 'A')).arg(8 - moves[i].rowPrev)
+                    .arg((char)(moves[i].colNext + 'A')).arg(8 - moves[i].rowNext);
                 
                 QLabel *textLabel = new QLabel(move_text);
+
                 textLabel->setStyleSheet(label_style + "font-size: 14px; background: transparent; padding: 0; margin: 0;");
                 cell_layout->addWidget(textLabel);
+
+                cell_layout->addStretch();
             }
             else
             {
                 QLabel *emptyLabel = new QLabel("");
+
                 emptyLabel->setStyleSheet(label_style + "font-size: 14px; background: transparent;");
-                emptyLabel->setAlignment(Qt::AlignCenter);
                 cell_layout->addWidget(emptyLabel);
             }
 

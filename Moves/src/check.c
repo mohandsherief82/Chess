@@ -90,11 +90,7 @@ bool isChecked(char** board, Player* player, bool legalCheck)
             {
                 if (tolower(board[r][c]) == 'n' && (islower(king->symbol) != islower(board[r][c])))
                 {
-                    if (!legalCheck) 
-                    {
-                        king->isChecked = true;
-                        printf("King is checked by a Knight at (%c%d)!!!\n", c + 'A', 8 - r);
-                    }
+                    if (!legalCheck) king->isChecked = true;
 
                     return true;
                 }
@@ -124,11 +120,7 @@ bool isChecked(char** board, Player* player, bool legalCheck)
                 {
                     if ((isOrthogonal && (pType == 'r' || pType == 'q')) || (isDiagonal && (pType == 'b' || pType == 'q')))
                     {
-                        if (!legalCheck) 
-                        {
-                            king->isChecked = true;
-                            printf("King is checked by a %s at (%c%d)!!!\n", (pType == 'q' ? "Queen" : (pType == 'r' ? "Rook" : "Bishop")), c + 'A', 8 - r);
-                        }
+                        if (!legalCheck) king->isChecked = true;
 
                         return true;
                     }
@@ -137,11 +129,7 @@ bool isChecked(char** board, Player* player, bool legalCheck)
                     {
                         if ((islower(king->symbol) && movesRBRow[d] == -1) || (isupper(king->symbol) && movesRBRow[d] == 1))
                         {
-                            if (!legalCheck) 
-                            {
-                                king->isChecked = true;
-                                printf("King checked by Pawn at (%c%d)!\n", c + 'A', 8 - r);
-                            }
+                            if (!legalCheck) king->isChecked = true;
 
                             return true;
                         }

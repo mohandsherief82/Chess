@@ -34,8 +34,6 @@ void BoardCell::dropEvent(QDropEvent *event)
 
     if (piece)
     {
-        std::cout << piece->symbol << std::endl;
-
         Move move 
         {
             .colPrev = piece->getCol(),
@@ -52,7 +50,9 @@ void BoardCell::dropEvent(QDropEvent *event)
         Captured *ply_captures = this->game_board->get_player_captures(player_turn);
 
         char **board = this->game_board->get_board_array();
+
         int player_turn = this->game_board->get_player_turn();
+
         int *plyEP = this->game_board->get_player_EP(player_turn)
             , *oppEP = this->game_board->get_player_EP( (player_turn == PLAYER1) ? PLAYER2: PLAYER1 );
 
@@ -83,8 +83,6 @@ void BoardCell::dropEvent(QDropEvent *event)
                 move.symbol = (ply->color == COLOR_WHITE) ? 'k' : 'K';
                 break;
         }
-
-        std::cout << piece->symbol << move.symbol << std::endl;
 
         if (move_state == VALID_MOVE) 
         {
