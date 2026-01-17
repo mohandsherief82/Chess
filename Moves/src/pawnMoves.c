@@ -140,23 +140,30 @@ MoveValidation movePawn(char** board, Player* player, Move move, Captured* playe
             if (pieceColorAt(board, move.rowNext, move.colNext) == pawn->color) return INVALID_MOVE;
 
             char capturedSymbol = board[move.rowNext][move.colNext];
+            
             board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
             board[move.rowNext][move.colNext] = pawn->symbol;
 
             if (!legalCheck)
             {
                 playerCaptures->capturedPiece.color = (isupper(capturedSymbol)) ? COLOR_BLACK : COLOR_WHITE;
+
                 playerCaptures->capturedPiece.colPosition = move.colNext;
                 playerCaptures->capturedPiece.rowPosition = move.rowNext;
+
                 playerCaptures->capturedPiece.symbol = capturedSymbol;
                 playerCaptures->capturedPiece.isActive = false;
+
                 playerCaptures->captureCount++;
                 playerCaptures->newCapture = true;
 
                 pawn->rowPosition = move.rowNext;
                 pawn->colPosition = move.colNext;
+                
                 if (pawn->firstMove) pawn->firstMove = false;
+
                 promotePawn(pawn, move, load);
+                
                 board[move.rowNext][move.colNext] = pawn->symbol;
 
                 if (pawn->promoted) return PROMOTION;

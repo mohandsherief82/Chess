@@ -23,11 +23,11 @@ namespace helpers
     }
 
 
-    std::array<Move, MOVES_READ> read_moves() 
+    std::array<Move, MOVES_READ> read_moves(std::string path) 
     {
         std::array<Move, MOVES_READ> lastMoves = {};
 
-        std::ifstream file(loadPath, std::ios::binary | std::ios::ate);
+        std::ifstream file(path, std::ios::binary | std::ios::ate);
 
         if (!file.is_open()) return lastMoves;
 
@@ -130,5 +130,20 @@ namespace helpers
         piece_label->setAlignment(Qt::AlignCenter);
 
         layout->addWidget(piece_label);
+    }
+
+    std::string get_formatted_time()
+    {
+        auto now = std::chrono::system_clock::now();
+
+        std::time_t now_c = std::chrono::system_clock::to_time_t(now);
+
+        std::tm now_tm = *std::localtime(&now_c);
+
+        std::stringstream ss;
+        
+        ss << std::put_time(&now_tm, "%Y-%m-%d %H:%M:%S") << ".bin";
+
+        return ss.str();
     }
 }
