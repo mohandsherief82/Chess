@@ -25,6 +25,7 @@ extern "C"
     #include "saveGame.h"
 
     extern char *loadPath;
+    extern char *redoPath;
 }
 
 namespace Chess

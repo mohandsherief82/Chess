@@ -22,7 +22,7 @@ const char* redoPath = "./GameBin/Redo/";
 bool loadPlayerTurn(char** board, Player* player, Move move, Captured* capture, int *whiteEnPassantCol, int *blackEnPassantCol) 
 {
     bool state = false;
-    char sym = tolower(board[move.rowPrev][move.colPrev]);
+    char sym = tolower(move.symbol);
 
     if (sym == 'p') state = movePawn(board, player, move, capture, whiteEnPassantCol,
                                          blackEnPassantCol, false, true);

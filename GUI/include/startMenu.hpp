@@ -1,8 +1,14 @@
 #pragma once
 
+#include <filesystem>
 #include <vector>
+#include <string>
 
+#include <QListWidgetItem>
+#include <QListWidget>
 #include <QMainWindow>
+#include <QDialog>
+#include <QStyle>
 #include <QLabel>
 
 extern "C"

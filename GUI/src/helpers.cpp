@@ -142,7 +142,7 @@ namespace helpers
 
         std::stringstream ss;
         
-        ss << std::put_time(&now_tm, "%Y-%m-%d %H:%M:%S");
+        ss << std::put_time(&now_tm, "%Y-%m-%d %H:%M:%S") << ".bin";
 
         return ss.str();
     }

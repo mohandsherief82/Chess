@@ -50,10 +50,8 @@ typedef struct
 typedef struct
 {
     char symbol;
-    int colPrev;
-    int rowPrev;
-    int colNext;
-    int rowNext;
+    int colPrev, rowPrev;
+    int colNext, rowNext;
     char promotedPawn;
 } Move;
 

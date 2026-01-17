@@ -29,12 +29,8 @@ bool performCastling(char** board, Player* player, Move move, bool legalCheck)
                 board[row][3] = player->king->symbol;
                 player->king->colPosition = 3;
 
-                printf("Switched\n");
-
                 if (isChecked(board, player, true)) 
                 {
-                    printf("Switched Invalid\n");
-
                     board[row][3] = EMPTY_SQUARE;
                     board[row][4] = player->king->symbol;
                     player->king->colPosition = 4;
@@ -45,13 +41,9 @@ bool performCastling(char** board, Player* player, Move move, bool legalCheck)
                 board[row][3] = EMPTY_SQUARE;
                 board[row][2] = player->king->symbol;
                 player->king->colPosition = 2;
-
-                printf("Switched\n");
                 
                 if (isChecked(board, player, true)) 
                 {
-                    printf("Switched Invalid\n");
-
                     board[row][2] = EMPTY_SQUARE;
                     board[row][4] = player->king->symbol;
                     player->king->colPosition = 4;
@@ -61,8 +53,6 @@ bool performCastling(char** board, Player* player, Move move, bool legalCheck)
                 
                 if (legalCheck) 
                 {
-                    printf("Switched\n");
-
                     board[row][2] = EMPTY_SQUARE;
                     board[row][4] = player->king->symbol;
                     player->king->colPosition = 4;
@@ -159,8 +149,6 @@ MoveValidation moveKing(char** board, Player* player, Move move, Captured* playe
                 capturedSymbol = board[move.rowNext][move.colNext];
             }
 
-            printf("Valid %d\n", i + 1);
-
             int oldRow = king->rowPosition;
             int oldCol = king->colPosition;
 
@@ -172,8 +160,6 @@ MoveValidation moveKing(char** board, Player* player, Move move, Captured* playe
 
             if (isChecked(board, player, true))
             {
-                printf("Valid %d\n", i + 1);
-
                 king->rowPosition = oldRow;
                 king->colPosition = oldCol;
                 board[move.rowPrev][move.colPrev] = king->symbol;
