@@ -22,7 +22,7 @@ const char* redoPath = "./GameBin/Redo/";
 bool loadPlayerTurn(char** board, Player* player, Move move, Captured* capture, int *whiteEnPassantCol, int *blackEnPassantCol) 
 {
     bool state = false;
-    char sym = board[move.rowPrev][move.colPrev];
+    char sym = tolower(board[move.rowPrev][move.colPrev]);
 
     if (sym == 'p') state = movePawn(board, player, move, capture, whiteEnPassantCol,
                                          blackEnPassantCol, false, true);
@@ -37,16 +37,12 @@ bool loadPlayerTurn(char** board, Player* player, Move move, Captured* capture, 
 
 
 int loadGame(char*** boardPtr, Player* player1, Player* player2, Captured* ply1Captures, 
-    Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol)
+    Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol, const char *game_path)
 {
     if (boardPtr == NULL) return -1;
     else if (*boardPtr == NULL) *boardPtr = initializeBoard();
 
-    if (*boardPtr == NULL)
-    {
-        printf("HHHHHH\n");
-        exit(1);
-    }
+    if (*boardPtr == NULL) exit(1);
 
     for (int i = 0; i < BOARD_SIZE; i++) 
         for (int j = 0; j < BOARD_SIZE; j++) boardPtr[0][i][j] = EMPTY_SQUARE;
@@ -63,13 +59,7 @@ int loadGame(char*** boardPtr, Player* player1, Player* player2, Captured* ply1C
     *ply1Captures = initializeCapture(COLOR_WHITE);
     *ply2Captures = initializeCapture(COLOR_BLACK);
 
-    FILE* fptr = fopen(loadPath, "rb");
-
-    if (fptr == NULL) 
-    {
-        printf("No Game to Load, Starting a New Game!!!\n");
-        return 1; 
-    }
+    FILE* fptr = fopen(game_path, "rb");
 
     Move move[2];
     int readData;
@@ -103,7 +93,7 @@ int loadGame(char*** boardPtr, Player* player1, Player* player2, Captured* ply1C
 
 
 bool undoLastMove(char*** boardPtr, Player* player1, Player* player2, Captured* ply1Captures,
-     Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol)
+     Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol, const char *game_path)
 {
     char **board;
 
@@ -162,15 +152,15 @@ bool undoLastMove(char*** boardPtr, Player* player1, Player* player2, Captured* 
         fclose(fptr);
     }
 
-    loadGame(boardPtr, player1, player2, ply1Captures, ply2Captures, whiteEnPassantCol, blackEnPassantCol);
+    loadGame(boardPtr, player1, player2, ply1Captures, ply2Captures, whiteEnPassantCol, blackEnPassantCol, game_path);
 
     return true;
 }
 
 
-void saveMove(Move move)
+void saveMove(Move move, const char* game_path)
 {
-    FILE* fptr = fopen(loadPath, "ab");
+    FILE* fptr = fopen(game_path, "ab");
 
     if (fptr) 
     {
@@ -180,8 +170,8 @@ void saveMove(Move move)
 }
 
 
-bool redoLastMove(char*** boardPtr, Player* player1, Player* player2,
-     Captured* ply1Captures, Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol)
+bool redoLastMove(char*** boardPtr, Player* player1, Player* player2, Captured* ply1Captures
+    , Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol, const char *game_path, const char *redo_path)
 {
     char **board;
 
@@ -192,7 +182,7 @@ bool redoLastMove(char*** boardPtr, Player* player1, Player* player2,
     }
     else board = *boardPtr;
 
-    FILE* fptr = fopen(redoPath, "rb");
+    FILE* fptr = fopen(redo_path, "rb");
 
     if (fptr == NULL) 
     {
@@ -238,8 +228,9 @@ bool redoLastMove(char*** boardPtr, Player* player1, Player* player2,
         fclose(fptr);
     }
     
-    saveMove(redoMove);
-    loadGame(boardPtr, player1, player2, ply1Captures, ply2Captures, whiteEnPassantCol, blackEnPassantCol);
+    saveMove(redoMove, game_path);
+    loadGame(boardPtr, player1, player2, ply1Captures, ply2Captures
+                , whiteEnPassantCol, blackEnPassantCol, game_path);
     
     return true;
 }
