@@ -93,7 +93,8 @@ int loadGame(char*** boardPtr, Player* player1, Player* player2, Captured* ply1C
 
 
 bool undoLastMove(char*** boardPtr, Player* player1, Player* player2, Captured* ply1Captures,
-     Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol, const char *game_path)
+     Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol
+     , const char *game_path, const char *redo_path)
 {
     char **board;
 
@@ -121,7 +122,7 @@ bool undoLastMove(char*** boardPtr, Player* player1, Player* player2, Captured* 
     Move lastMove;
     fread(&lastMove, sizeof(Move), 1, fptr);
     
-    FILE* redoFile = fopen(redoPath, "ab");
+    FILE* redoFile = fopen(redo_path, "ab");
     if (redoFile) 
     {
         fwrite(&lastMove, sizeof(Move), 1, redoFile);
@@ -140,7 +141,7 @@ bool undoLastMove(char*** boardPtr, Player* player1, Player* player2, Captured* 
     }
     fclose(fptr); 
     
-    fptr = fopen(loadPath, "wb");
+    fptr = fopen(game_path, "wb");
     if (fptr) 
     {
         if (backMove) 
@@ -215,7 +216,7 @@ bool redoLastMove(char*** boardPtr, Player* player1, Player* player2, Captured* 
 
     fclose(fptr);
     
-    fptr = fopen(redoPath, "wb");
+    fptr = fopen(redo_path, "wb");
     if (fptr) 
     {
         if (remainingMoves) 
@@ -237,8 +238,8 @@ bool redoLastMove(char*** boardPtr, Player* player1, Player* player2, Captured* 
 }
 
 
-void clearRedo()
+void clearRedo(const char *redo_path)
 {
-    FILE* fptr = fopen(redoPath, "wb");
+    FILE* fptr = fopen(redo_path, "wb");
     if (fptr != NULL) fclose(fptr);
 }

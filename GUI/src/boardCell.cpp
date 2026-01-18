@@ -90,6 +90,7 @@ void BoardCell::dropEvent(QDropEvent *event)
             event->acceptProposedAction();
 
             saveMove(move, (this->game_board->get_game_path()).c_str());
+            clearRedo((this->game_board->get_redo_path()).c_str());
 
             this->game_board->update_board();
         }
@@ -101,6 +102,7 @@ void BoardCell::dropEvent(QDropEvent *event)
             event->acceptProposedAction();
 
             saveMove(move, (this->game_board->get_game_path()).c_str());
+            clearRedo((this->game_board->get_redo_path()).c_str());
 
             this->game_board->update_board();
         }
