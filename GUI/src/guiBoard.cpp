@@ -173,38 +173,39 @@ namespace Chess
         undo_button->setIconSize(QSize(REDO_BUTTON_SIZE, REDO_BUTTON_SIZE));
         redo_button->setIconSize(QSize(REDO_BUTTON_SIZE, REDO_BUTTON_SIZE));
         
-        QObject::connect(undo_button, &QPushButton::clicked, [&]()
+        QObject::connect(undo_button, &QPushButton::clicked, [=]()
             {
                 undoLastMove(
-                        this->game_board->get_board_ptr()
-                        , this->game_board->get_player(PLAYER1)
-                        , this->game_board->get_player(PLAYER2)
-                        , this->game_board->get_player_captures(PLAYER1)
-                        , this->game_board->get_player_captures(PLAYER2)
-                        , this->game_board->get_player_EP(PLAYER1)
-                        , this->game_board->get_player_EP(PLAYER2)
-                        , (this->game_board->get_game_path()).c_str()
+                        this->game_board->get_board_ptr(),
+                        this->game_board->get_player(PLAYER1),
+                        this->game_board->get_player(PLAYER2),
+                        this->game_board->get_player_captures(PLAYER1),
+                        this->game_board->get_player_captures(PLAYER2),
+                        this->game_board->get_player_EP(PLAYER1),
+                        this->game_board->get_player_EP(PLAYER2),
+                        (this->game_board->get_game_path()).c_str(),
+                        (this->game_board->get_redo_path()).c_str()
                     );
 
-                this->game_board->notifyObservers();
+                this->game_board->update_board();
             }
         );
 
-        QObject::connect(redo_button, &QPushButton::clicked, [&]()
+        QObject::connect(redo_button, &QPushButton::clicked, [=]()
             {
                 redoLastMove(
-                        this->game_board->get_board_ptr()
-                        , this->game_board->get_player(PLAYER1)
-                        , this->game_board->get_player(PLAYER2)
-                        , this->game_board->get_player_captures(PLAYER1)
-                        , this->game_board->get_player_captures(PLAYER2)
-                        , this->game_board->get_player_EP(PLAYER1)
-                        , this->game_board->get_player_EP(PLAYER2)
-                        , (this->game_board->get_game_path()).c_str()
-                        , (this->game_board->get_redo_path()).c_str()
+                        this->game_board->get_board_ptr(),
+                        this->game_board->get_player(PLAYER1),
+                        this->game_board->get_player(PLAYER2),
+                        this->game_board->get_player_captures(PLAYER1),
+                        this->game_board->get_player_captures(PLAYER2),
+                        this->game_board->get_player_EP(PLAYER1),
+                        this->game_board->get_player_EP(PLAYER2),
+                        (this->game_board->get_game_path()).c_str(),
+                        (this->game_board->get_redo_path()).c_str()
                     );
 
-                this->game_board->notifyObservers();
+                this->game_board->update_board();
             }
         );
 
@@ -220,13 +221,13 @@ namespace Chess
     }
 
 
-    void GInterface::add_captures(QVBoxLayout *ply_data, QLabel *ply_msg, Captured *ply_captures)
+    void GInterface::add_captures(QVBoxLayout *ply_data, QLabel *ply_msg, Captured *ply_captures, bool redo_flag)
     {
         QHBoxLayout *msg_box { new QHBoxLayout() };
 
         msg_box->addWidget(ply_msg);
 
-        this->add_redo_undo(msg_box);
+        if (redo_flag) this->add_redo_undo(msg_box);
         
         ply_data->addLayout(msg_box);
 
@@ -287,22 +288,29 @@ namespace Chess
 
         Captured *captures = NULL;
 
-        this->add_captures(ply1_data, player1_msg, this->game_board->get_player_captures(PLAYER1));
-        this->add_captures(ply2_data, player2_msg, this->game_board->get_player_captures(PLAYER2));
+        
 
         this->setCentralWidget(master_container);
 
         if (player_turn == PLAYER1)
         {
             captures = this->game_board->get_player_captures(1);
+
             gl->addLayout(ply2_data, 0, 0, 1, 8, Qt::AlignLeft);
             gl->addLayout(ply1_data, 9, 0, 1, 8, Qt::AlignLeft);
+
+            this->add_captures(ply1_data, player1_msg, this->game_board->get_player_captures(PLAYER1), true);
+            this->add_captures(ply2_data, player2_msg, this->game_board->get_player_captures(PLAYER2), false);
         }
         else
         {
             captures = this->game_board->get_player_captures(2);
+
             gl->addLayout(ply1_data, 0, 0, 1, 8, Qt::AlignLeft);
             gl->addLayout(ply2_data, 9, 0, 1, 8, Qt::AlignLeft);
+
+            this->add_captures(ply1_data, player1_msg, this->game_board->get_player_captures(PLAYER1), false);
+            this->add_captures(ply2_data, player2_msg, this->game_board->get_player_captures(PLAYER2), true);
         }
 
         for (int i = 0; i < 8; i++)
