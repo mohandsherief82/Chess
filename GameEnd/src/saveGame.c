@@ -104,7 +104,7 @@ bool undoLastMove(char*** boardPtr, Player* player1, Player* player2, Captured* 
     }
     else board = *boardPtr;
 
-    FILE* fptr = fopen(loadPath, "rb");
+    FILE* fptr = fopen(game_path, "rb");
     if (!fptr) return false;
 
     fseek(fptr, 0, SEEK_END);
@@ -154,6 +154,8 @@ bool undoLastMove(char*** boardPtr, Player* player1, Player* player2, Captured* 
 
     loadGame(boardPtr, player1, player2, ply1Captures, ply2Captures, whiteEnPassantCol, blackEnPassantCol, game_path);
 
+    updateBoard(*boardPtr, player1, player2);
+
     return true;
 }
 
@@ -184,10 +186,7 @@ bool redoLastMove(char*** boardPtr, Player* player1, Player* player2, Captured* 
 
     FILE* fptr = fopen(redo_path, "rb");
 
-    if (fptr == NULL) 
-    {
-        return false;
-    }
+    if (fptr == NULL) return false;
     
     fseek(fptr, 0, SEEK_END);
     long fileSize = ftell(fptr);
@@ -232,6 +231,8 @@ bool redoLastMove(char*** boardPtr, Player* player1, Player* player2, Captured* 
     loadGame(boardPtr, player1, player2, ply1Captures, ply2Captures
                 , whiteEnPassantCol, blackEnPassantCol, game_path);
     
+    updateBoard(*boardPtr, player1, player2);
+
     return true;
 }
 

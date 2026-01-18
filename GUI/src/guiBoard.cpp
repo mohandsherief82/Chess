@@ -155,11 +155,11 @@ namespace Chess
 
     void GInterface::add_redo_undo(QHBoxLayout *box)
     {
-        QString redo_path { helpers::getIconPath('d') };   
-        QString undo_path { helpers::getIconPath('u') };
+        QString redo_icon_path { helpers::getIconPath('d') };   
+        QString undo_icon_path { helpers::getIconPath('u') };
 
-        QPushButton *undo_button = new QPushButton(QIcon(undo_path), "Undo");
-        QPushButton *redo_button = new QPushButton(QIcon(redo_path), "Redo");
+        QPushButton *undo_button = new QPushButton(QIcon(undo_icon_path), "Undo");
+        QPushButton *redo_button = new QPushButton(QIcon(redo_icon_path), "Redo");
 
         QString flat_style = "QPushButton { color: #f8e7bb; border: none; background: transparent; font-size: 20px; padding: 0px; } "
                             "QPushButton:hover { background-color: #6c6451; color: white; }";
@@ -172,6 +172,41 @@ namespace Chess
 
         undo_button->setIconSize(QSize(REDO_BUTTON_SIZE, REDO_BUTTON_SIZE));
         redo_button->setIconSize(QSize(REDO_BUTTON_SIZE, REDO_BUTTON_SIZE));
+        
+        QObject::connect(undo_button, &QPushButton::clicked, [&]()
+            {
+                undoLastMove(
+                        this->game_board->get_board_ptr()
+                        , this->game_board->get_player(PLAYER1)
+                        , this->game_board->get_player(PLAYER2)
+                        , this->game_board->get_player_captures(PLAYER1)
+                        , this->game_board->get_player_captures(PLAYER2)
+                        , this->game_board->get_player_EP(PLAYER1)
+                        , this->game_board->get_player_EP(PLAYER2)
+                        , (this->game_board->get_game_path()).c_str()
+                    );
+
+                this->game_board->notifyObservers();
+            }
+        );
+
+        QObject::connect(redo_button, &QPushButton::clicked, [&]()
+            {
+                redoLastMove(
+                        this->game_board->get_board_ptr()
+                        , this->game_board->get_player(PLAYER1)
+                        , this->game_board->get_player(PLAYER2)
+                        , this->game_board->get_player_captures(PLAYER1)
+                        , this->game_board->get_player_captures(PLAYER2)
+                        , this->game_board->get_player_EP(PLAYER1)
+                        , this->game_board->get_player_EP(PLAYER2)
+                        , (this->game_board->get_game_path()).c_str()
+                        , (this->game_board->get_redo_path()).c_str()
+                    );
+
+                this->game_board->notifyObservers();
+            }
+        );
 
         box->setSpacing(0);
         box->setContentsMargins(0, 0, 0, 0);

@@ -174,7 +174,6 @@ void display_start_window(std::unique_ptr<Chess::GInterface> &main_window, std::
     start_msg->setStyleSheet("font-weight: bold; color: #f8e7bb; font-size: 60px; margin-bottom: 20px;");
     start_msg->setAlignment(Qt::AlignCenter);
 
-    // Layout assembly
     main_layout->addStretch(2);
     main_layout->addWidget(start_msg);
     main_layout->addSpacing(40);
@@ -192,7 +191,6 @@ void display_start_window(std::unique_ptr<Chess::GInterface> &main_window, std::
 
     main_window->setCentralWidget(master_container);
 
-    // Button Functionality with lambda functions
     QObject::connect(start_button, &QPushButton::clicked, [&]() 
             {
                 start_game(main_window, game_board);
