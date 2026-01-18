@@ -38,6 +38,7 @@ namespace Chess
             std::shared_ptr<Board> game_board = nullptr;
 
             void add_captures(QVBoxLayout *ply_data, QLabel *ply_msg, Captured *ply_captures);
+            void add_redo_undo(QHBoxLayout *box);
             void add_moves_view();
         public:
             GInterface(std::shared_ptr<Board> game_board);

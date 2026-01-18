@@ -6,8 +6,8 @@
 #include <array>
 #include <fstream>
 
-#include <QLabel>
 #include <QScrollArea>
+#include <QLabel>
 
 
 namespace Chess
@@ -40,7 +40,7 @@ namespace Chess
             
             if (QHBoxLayout *hLayout = qobject_cast<QHBoxLayout*>(central->layout())) 
             {
-                hLayout->addSpacing(95); 
+                hLayout->addSpacing(50); 
                 hLayout->addWidget(sidebar, 0, Qt::AlignVCenter);
             }
             
@@ -153,9 +153,47 @@ namespace Chess
     }
 
 
+    void GInterface::add_redo_undo(QHBoxLayout *box)
+    {
+        QString redo_path { helpers::getIconPath('d') };   
+        QString undo_path { helpers::getIconPath('u') };
+
+        QPushButton *undo_button = new QPushButton(QIcon(undo_path), "Undo");
+        QPushButton *redo_button = new QPushButton(QIcon(redo_path), "Redo");
+
+        QString flat_style = "QPushButton { color: #f8e7bb; border: none; background: transparent; font-size: 20px; padding: 0px; } "
+                            "QPushButton:hover { background-color: #6c6451; color: white; }";
+
+        undo_button->setStyleSheet(flat_style);
+        redo_button->setStyleSheet(flat_style);
+
+        undo_button->setFixedSize(REDO_BUTTON_SIZE * 3, REDO_BUTTON_SIZE);
+        redo_button->setFixedSize(REDO_BUTTON_SIZE * 3, REDO_BUTTON_SIZE);
+
+        undo_button->setIconSize(QSize(REDO_BUTTON_SIZE, REDO_BUTTON_SIZE));
+        redo_button->setIconSize(QSize(REDO_BUTTON_SIZE, REDO_BUTTON_SIZE));
+
+        box->setSpacing(0);
+        box->setContentsMargins(0, 0, 0, 0);
+        
+        box->addStretch(1);
+
+        box->addWidget(undo_button);
+        box->addWidget(redo_button);
+
+        box->addSpacing(10);
+    }
+
+
     void GInterface::add_captures(QVBoxLayout *ply_data, QLabel *ply_msg, Captured *ply_captures)
     {
-        ply_data->addWidget(ply_msg);
+        QHBoxLayout *msg_box { new QHBoxLayout() };
+
+        msg_box->addWidget(ply_msg);
+
+        this->add_redo_undo(msg_box);
+        
+        ply_data->addLayout(msg_box);
 
         QGridLayout *gl = new QGridLayout();
 

@@ -6,20 +6,22 @@ namespace helpers
     QString getIconPath(char piece)
     {
         QString colorStr = (std::islower(piece)) ? "white" : "black";
-        QString typeStr;
+        QString type_str;
 
         switch (std::tolower(piece))
         {
-            case 'p': typeStr = "pawn"; break;
-            case 'r': typeStr = "rook"; break;
-            case 'n': typeStr = "knight"; break;
-            case 'b': typeStr = "bishop"; break;
-            case 'q': typeStr = "queen"; break;
-            case 'k': typeStr = "king"; break;
+            case 'p': type_str = "pawn"; break;
+            case 'r': type_str = "rook"; break;
+            case 'n': type_str = "knight"; break;
+            case 'b': type_str = "bishop"; break;
+            case 'q': type_str = "queen"; break;
+            case 'k': type_str = "king"; break;
+            case 'd': return QString(":/icons/redo.svg");
+            case 'u': return QString(":/icons/undo.svg");
             default: return QString("");
         }
 
-        return QString(":/icons/%1_%2.svg").arg(colorStr).arg(typeStr);
+        return QString(":/icons/%1_%2.svg").arg(colorStr).arg(type_str);
     }
 
 
@@ -131,6 +133,7 @@ namespace helpers
 
         layout->addWidget(piece_label);
     }
+
 
     std::string get_formatted_time()
     {
