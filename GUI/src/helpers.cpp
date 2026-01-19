@@ -16,8 +16,12 @@ namespace helpers
             case 'b': type_str = "bishop"; break;
             case 'q': type_str = "queen"; break;
             case 'k': type_str = "king"; break;
+
             case 'd': return QString(":/icons/redo.svg");
             case 'u': return QString(":/icons/undo.svg");
+            case 's': return QString(":/icons/save.svg");
+            case 'l': return QString(":/icons/load.svg");
+
             default: return QString("");
         }
 

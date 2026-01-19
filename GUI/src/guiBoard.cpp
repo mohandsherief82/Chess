@@ -144,6 +144,54 @@ namespace Chess
     }
 
 
+    void GInterface::add_left_menu(QWidget *container)
+    {
+        QVBoxLayout *layout { new QVBoxLayout(container) };
+
+        container->setFixedSize(250, 500); 
+        container->setStyleSheet("background-color: #111c28; border-radius: 10px;");
+
+        QString save_icon_path { helpers::getIconPath('s') };
+        QString load_icon_path { helpers::getIconPath('l') };
+
+        QString flat_style =
+                    "QPushButton {"
+                    "   color: #f8e7bb; "
+                    "   border: 2px solid transparent;" 
+                    "   background: transparent;"
+                    "   font-size: 22px;" 
+                    "   padding: 10px;" 
+                    "   text-align: left;" // Keeps icon and text aligned within the button
+                    "}"
+                    "QPushButton:hover {"
+                    "   background-color: #1c2b3a;"
+                    "   border-radius: 5px;"
+                    "}";
+
+        QPushButton *save_button { new QPushButton(QIcon(save_icon_path), "  Save Game") };
+        QPushButton *load_button { new QPushButton(QIcon(load_icon_path), "  Load Game") };
+
+        save_button->setStyleSheet(flat_style);
+        load_button->setStyleSheet(flat_style);
+
+        save_button->setFixedSize(200, 50);
+        load_button->setFixedSize(200, 50);
+
+        save_button->setIconSize(QSize(SAVE_BUTTON_SIZE, SAVE_BUTTON_SIZE));
+        load_button->setIconSize(QSize(SAVE_BUTTON_SIZE, SAVE_BUTTON_SIZE));
+
+        layout->setSpacing(20);
+        layout->setContentsMargins(0, 0, 0, 0);
+
+        layout->addStretch(1);
+
+        layout->addWidget(save_button, 0, Qt::AlignCenter);
+        layout->addWidget(load_button, 0, Qt::AlignCenter);
+        
+        layout->addStretch(1);
+    }
+
+
     void GInterface::add_redo_undo(QHBoxLayout *box)
     {
         QString redo_icon_path { helpers::getIconPath('d') };   
@@ -252,7 +300,9 @@ namespace Chess
     void GInterface::update()
     {
         QWidget *master_container { new QWidget() };
+
         QWidget *container_central { new QWidget() };
+        QWidget *container_left { new QWidget() };
 
         QHBoxLayout *master_layout { new QHBoxLayout(master_container) };
         
@@ -280,9 +330,7 @@ namespace Chess
 
         Player *ply = this->game_board->get_player(player_turn);
 
-        Captured *captures = NULL;
-
-        
+        Captured *captures = NULL;        
 
         this->setCentralWidget(master_container);
 
@@ -335,6 +383,11 @@ namespace Chess
 
         master_layout->setContentsMargins(20, 10, 20, 10);
         master_layout->setSpacing(0);
+
+        master_layout->addStretch(1);
+
+        this->add_left_menu(container_left);
+        master_layout->addWidget(container_left, 0, Qt::AlignLeft);
 
         master_layout->addStretch(1);
         master_layout->addWidget(container_central, 0, Qt::AlignCenter);

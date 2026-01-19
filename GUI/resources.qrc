@@ -15,5 +15,7 @@
     <file>icons/black_king.svg</file>
     <file>icons/redo.svg</file>
     <file>icons/undo.svg</file>
+    <file>icons/save.svg</file>
+    <file>icons/load.svg</file>
   </qresource>
 </RCC>

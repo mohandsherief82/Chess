@@ -27,6 +27,7 @@
 #define CAPTURE_CELL_SIZE 30
 #define MOVES_READ 32
 #define REDO_BUTTON_SIZE 32
+#define SAVE_BUTTON_SIZE 30
 
 // External variables used for file reading
 extern "C" 
