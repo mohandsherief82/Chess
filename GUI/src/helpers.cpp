@@ -3,6 +3,67 @@
 
 namespace helpers
 {
+    std::string load_menu(QWidget* parent, const std::string& folderPath) 
+    {
+        QDialog dialog(parent);
+
+        dialog.setWindowTitle("Load Game");
+        dialog.setFixedSize(350, 450);
+
+        QVBoxLayout* layout = new QVBoxLayout(&dialog);
+        layout->addWidget(new QLabel("Select a save file to continue:"));
+
+        QListWidget* listWidget = new QListWidget(&dialog);
+        
+        try 
+        {
+            if (fs::exists(folderPath) && fs::is_directory(folderPath)) 
+            {
+                for (const auto& entry : fs::directory_iterator(folderPath)) 
+                    if (entry.is_regular_file() && entry.path().extension() == ".bin") 
+                        listWidget->addItem(QString::fromStdString(entry.path().filename().string()));
+            }
+        } 
+        catch (const fs::filesystem_error& e) { layout->addWidget(new QLabel("Error accessing folder!")); }
+
+        bool hasFiles = listWidget->count() > 0;
+
+        if (!hasFiles) listWidget->addItem("No .bin files found in folder.");
+        else
+        {
+            listWidget->setCurrentRow(0);
+            listWidget->sortItems(Qt::DescendingOrder);
+        }
+
+        layout->addWidget(listWidget);
+
+        QPushButton* loadBtn = new QPushButton("Load Selection", &dialog);
+        loadBtn->setEnabled(hasFiles);
+        layout->addWidget(loadBtn);
+
+        std::string finalPath = "";
+        
+        auto onConfirm = [&]() 
+        {
+            if (listWidget->currentItem() && hasFiles) 
+            {
+                QString filename = listWidget->currentItem()->text();
+                fs::path p = fs::path(folderPath) / filename.toStdString();
+
+                finalPath = p.string();
+                dialog.accept();
+            }
+        };
+
+        QObject::connect(loadBtn, &QPushButton::clicked, onConfirm);
+        QObject::connect(listWidget, &QListWidget::itemDoubleClicked, onConfirm);
+
+        if (dialog.exec() == QDialog::Accepted) return finalPath;
+
+        return ""; 
+    }
+
+
     QString getIconPath(char piece)
     {
         QString colorStr = (std::islower(piece)) ? "white" : "black";

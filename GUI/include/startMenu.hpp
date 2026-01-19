@@ -19,3 +19,4 @@ extern "C"
 
 
 void display_start_window(std::unique_ptr<Chess::GInterface> &main_window, std::shared_ptr<Chess::Board> &game_board);
+void load_game(Chess::GInterface *&main_window, std::shared_ptr<Chess::Board> &game_board);

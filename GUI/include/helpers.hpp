@@ -2,24 +2,29 @@
 
 #include <QVBoxLayout>
 #include <QPushButton>
+#include <QListWidget>
 #include <QString>
 #include <QLayout>
 #include <QWidget>
+#include <QDialog>
 #include <QLabel>
 #include <QIcon>
 #include <QPixmap>
 
-#include <array>
+#include <filesystem>
 #include <fstream>
+#include <sstream>
+#include <iomanip>
 #include <cctype>
 #include <chrono>
-#include <ctime>
-#include <iomanip>
-#include <sstream>
 #include <string>
+#include <ctime>
+#include <array>
 
 #include "boardCell.hpp"
 #include "piecesIcon.hpp"
+
+namespace fs = std::filesystem;
 
 // GUI Constants
 #define CELL_SIZE 70
@@ -46,4 +51,6 @@ namespace helpers
 
     void add_piece_to_cell(BoardCell *cell, char pieceChar, int row, int col);
     std::string get_formatted_time();
+
+    std::string load_menu(QWidget* parent, const std::string& folderPath);
 }

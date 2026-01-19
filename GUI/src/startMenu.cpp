@@ -25,70 +25,9 @@ extern "C"
 namespace fs = std::filesystem;
 
 
-std::string load_menu(QWidget* parent, const std::string& folderPath) 
-{
-    QDialog dialog(parent);
-
-    dialog.setWindowTitle("Load Game");
-    dialog.setMinimumSize(350, 450);
-
-    QVBoxLayout* layout = new QVBoxLayout(&dialog);
-    layout->addWidget(new QLabel("Select a save file to continue:"));
-
-    QListWidget* listWidget = new QListWidget(&dialog);
-    
-    try 
-    {
-        if (fs::exists(folderPath) && fs::is_directory(folderPath)) 
-        {
-            for (const auto& entry : fs::directory_iterator(folderPath)) 
-                if (entry.is_regular_file() && entry.path().extension() == ".bin") 
-                    listWidget->addItem(QString::fromStdString(entry.path().filename().string()));
-        }
-    } 
-    catch (const fs::filesystem_error& e) { layout->addWidget(new QLabel("Error accessing folder!")); }
-
-    bool hasFiles = listWidget->count() > 0;
-
-    if (!hasFiles) listWidget->addItem("No .bin files found in folder.");
-    else
-    {
-        listWidget->setCurrentRow(0);
-        listWidget->sortItems(Qt::DescendingOrder);
-    }
-
-    layout->addWidget(listWidget);
-
-    QPushButton* loadBtn = new QPushButton("Load Selection", &dialog);
-    loadBtn->setEnabled(hasFiles);
-    layout->addWidget(loadBtn);
-
-    std::string finalPath = "";
-    
-    auto onConfirm = [&]() 
-    {
-        if (listWidget->currentItem() && hasFiles) 
-        {
-            QString filename = listWidget->currentItem()->text();
-            fs::path p = fs::path(folderPath) / filename.toStdString();
-
-            finalPath = p.string();
-            dialog.accept();
-        }
-    };
-
-    QObject::connect(loadBtn, &QPushButton::clicked, onConfirm);
-    QObject::connect(listWidget, &QListWidget::itemDoubleClicked, onConfirm);
-
-    if (dialog.exec() == QDialog::Accepted) return finalPath;
-
-    return ""; 
-}
-
-
 void load_game(std::unique_ptr<Chess::GInterface> &main_window, std::shared_ptr<Chess::Board> &game_board)
 {
-    std::string game_path = load_menu(main_window.get(), loadPath);
+    std::string game_path = helpers::load_menu(main_window.get(), loadPath);
 
     if (game_path.empty()) return;
 

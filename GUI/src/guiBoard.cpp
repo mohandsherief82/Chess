@@ -144,6 +144,37 @@ namespace Chess
     }
 
 
+    void GInterface::load_game()
+    {
+        std::string game_path { helpers::load_menu(this, loadPath) };
+
+        if (game_path.empty()) return;
+
+        char ***board_ptr = this->game_board->get_board_ptr();
+
+        Player *ply1 = this->game_board->get_player(PLAYER1);
+        Player *ply2 = this->game_board->get_player(PLAYER2);
+
+        Captured *ply1_captures = this->game_board->get_player_captures(PLAYER1);
+        Captured *ply2_captures = this->game_board->get_player_captures(PLAYER2);
+
+        int *whiteEP = this->game_board->get_player_EP(PLAYER1);
+        int *blackEP = this->game_board->get_player_EP(PLAYER2);
+
+        if (*board_ptr == nullptr) *board_ptr = initializeBoard();
+
+        int player_turn = loadGame(board_ptr, ply1, ply2, ply1_captures, 
+                ply2_captures, whiteEP, blackEP, game_path.c_str());
+
+        this->game_board->update_board();
+        this->game_board->udpate_game_path(game_path);
+        
+        this->update();
+
+        return;
+    }
+
+
     void GInterface::add_left_menu(QWidget *container)
     {
         QVBoxLayout *layout { new QVBoxLayout(container) };
@@ -180,6 +211,12 @@ namespace Chess
         save_button->setIconSize(QSize(SAVE_BUTTON_SIZE, SAVE_BUTTON_SIZE));
         load_button->setIconSize(QSize(SAVE_BUTTON_SIZE, SAVE_BUTTON_SIZE));
 
+        QObject::connect(load_button, &QPushButton::clicked, [=]()
+                {
+                    this->load_game();
+                }  
+        );
+
         layout->setSpacing(20);
         layout->setContentsMargins(0, 0, 0, 0);
 
@@ -187,7 +224,7 @@ namespace Chess
 
         layout->addWidget(save_button, 0, Qt::AlignCenter);
         layout->addWidget(load_button, 0, Qt::AlignCenter);
-        
+
         layout->addStretch(1);
     }
 
