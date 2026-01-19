@@ -1,13 +1,4 @@
 #include "guiBoard.hpp"
-#include "piecesIcon.hpp"
-#include "boardCell.hpp"
-
-#include <iostream>
-#include <array>
-#include <fstream>
-
-#include <QScrollArea>
-#include <QLabel>
 
 
 namespace Chess
@@ -216,6 +207,9 @@ namespace Chess
 
         box->addWidget(undo_button);
         box->addWidget(redo_button);
+
+        undo_button->setVisible( fs::exists(this->game_board->get_game_path()) && fs::file_size(this->game_board->get_game_path()) > 0 );
+        redo_button->setVisible( fs::exists(this->game_board->get_redo_path()) && fs::file_size(this->game_board->get_redo_path()) > 0 );
 
         box->addSpacing(10);
     }

@@ -5,18 +5,25 @@
 #include <QVBoxLayout>
 #include <QMainWindow>
 #include <QDockWidget>
+#include <QScrollArea>
 #include <QScreen>
 #include <QWidget>
 #include <QString>
 #include <QLabel>
 #include <QIcon>
 
-#include <memory>
 
 #include "interfaces.hpp"
 #include "helpers.hpp"
+#include "piecesIcon.hpp"
+#include "boardCell.hpp"
 
+#include <filesystem>
+#include <iostream>
+#include <fstream>
 #include <cctype>
+#include <memory>
+#include <array>
 
 extern "C"
 {
@@ -27,6 +34,8 @@ extern "C"
     extern char *loadPath;
     extern char *redoPath;
 }
+
+namespace fs = std::filesystem;
 
 namespace Chess
 {
@@ -39,6 +48,7 @@ namespace Chess
 
             void add_captures(QVBoxLayout *ply_data, QLabel *ply_msg, Captured *ply_captures, bool redo_flag);
             void add_redo_undo(QHBoxLayout *box);
+            void add_left_menu(QWidget *container);
             void add_moves_view();
         public:
             GInterface(std::shared_ptr<Board> game_board);
