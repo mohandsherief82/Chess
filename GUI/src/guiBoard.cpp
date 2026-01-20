@@ -225,7 +225,7 @@ namespace Chess
                     "   background: transparent;"
                     "   font-size: 22px;" 
                     "   padding: 10px;" 
-                    "   text-align: left;" // Keeps icon and text aligned within the button
+                    "   text-align: left;"
                     "}"
                     "QPushButton:hover {"
                     "   background-color: #1c2b3a;"
@@ -270,8 +270,19 @@ namespace Chess
         QPushButton *undo_button = new QPushButton(QIcon(undo_icon_path), "Undo");
         QPushButton *redo_button = new QPushButton(QIcon(redo_icon_path), "Redo");
 
-        QString flat_style = "QPushButton { color: #f8e7bb; border: none; background: transparent; font-size: 20px; padding: 0px; } "
-                            "QPushButton:hover { background-color: #6c6451; color: white; }";
+        QString flat_style = 
+                    "QPushButton {"
+                    "   color: #f8e7bb; "
+                    "   border: 2px solid transparent;" 
+                    "   background: transparent;"
+                    "   font-size: 22px;" 
+                    "   padding: 10px;" 
+                    "   text-align: left;"
+                    "}"
+                    "QPushButton:hover {"
+                    "   background-color: #1c2b3a;"
+                    "   border-radius: 5px;"
+                    "}";
 
         undo_button->setStyleSheet(flat_style);
         redo_button->setStyleSheet(flat_style);
