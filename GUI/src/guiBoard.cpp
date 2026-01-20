@@ -215,9 +215,6 @@ namespace Chess
         container->setFixedSize(250, 500); 
         container->setStyleSheet("background-color: #111c28; border-radius: 10px;");
 
-        QString save_icon_path { helpers::getIconPath('s') };
-        QString load_icon_path { helpers::getIconPath('l') };
-
         QString flat_style =
                     "QPushButton {"
                     "   color: #f8e7bb; "
@@ -232,21 +229,30 @@ namespace Chess
                     "   border-radius: 5px;"
                     "}";
 
-        QPushButton *save_button { new QPushButton(QIcon(save_icon_path), "  Save Game") };
-        QPushButton *load_button { new QPushButton(QIcon(load_icon_path), "  Load Game") };
+        QPushButton *save_button { new QPushButton( QIcon( helpers::getIconPath('s') ), "  Save Game") };
+        QPushButton *load_button { new QPushButton( QIcon( helpers::getIconPath('l') ), "  Load Game") };
+        QPushButton *start_button { new QPushButton( QIcon( helpers::getIconPath('a') ), "  Start New Game") };
 
         save_button->setStyleSheet(flat_style);
         load_button->setStyleSheet(flat_style);
+        start_button->setStyleSheet(flat_style);
 
         save_button->setFixedSize(200, 50);
         load_button->setFixedSize(200, 50);
 
         save_button->setIconSize(QSize(SAVE_BUTTON_SIZE, SAVE_BUTTON_SIZE));
         load_button->setIconSize(QSize(SAVE_BUTTON_SIZE, SAVE_BUTTON_SIZE));
+        start_button->setIconSize(QSize(SAVE_BUTTON_SIZE, SAVE_BUTTON_SIZE));
 
         QObject::connect(load_button, &QPushButton::clicked, [=]()
                 {
                     this->load_game();
+                }  
+        );
+
+        QObject::connect(start_button, &QPushButton::clicked, [=]()
+                {
+                    this->start_game();
                 }  
         );
 
@@ -257,6 +263,7 @@ namespace Chess
 
         layout->addWidget(save_button, 0, Qt::AlignCenter);
         layout->addWidget(load_button, 0, Qt::AlignCenter);
+        layout->addWidget(start_button, 0, Qt::AlignCenter);
 
         layout->addStretch(1);
     }
@@ -273,10 +280,10 @@ namespace Chess
         QString flat_style = 
                     "QPushButton {"
                     "   color: #f8e7bb; "
-                    "   border: 2px solid transparent;" 
+                    "   border: none;" 
                     "   background: transparent;"
-                    "   font-size: 22px;" 
-                    "   padding: 10px;" 
+                    "   font-size: 20px;" 
+                    "   padding: 0px;" 
                     "   text-align: left;"
                     "}"
                     "QPushButton:hover {"
