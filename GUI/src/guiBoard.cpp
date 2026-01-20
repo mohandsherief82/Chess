@@ -396,9 +396,8 @@ namespace Chess
         
         QGridLayout *gl { new QGridLayout(container_central) };
 
-        QString label_style = "font-weight: bold; color: #f8e7bb;"
-                    " font-size: 20px; margin-bottom: 5px;"
-                    " padding-bottom: 2px;";
+        QString label_style = "font-weight: bold; color: #f8e7bb; font-size: 20px; margin-bottom: 5px; padding-bottom: 2px;";
+        QString edge_label_style = "color: #f8e7bb; font-weight: bold; font-size: 14px; min-width: 25px; min-height: 25px;";
 
         QLabel *player2_msg { new QLabel("Player 2 (Black)") };
         QLabel *player1_msg { new QLabel("Player 1 (White)") };
@@ -410,62 +409,83 @@ namespace Chess
         QVBoxLayout *ply1_data { new QVBoxLayout() };
 
         gl->setSpacing(0);
-        gl->setContentsMargins(0, 0, 0, 0);
+        gl->setContentsMargins(10, 10, 10, 10);
 
         int player_turn = this->game_board->get_player_turn();
 
         char ***board_ptr = this->game_board->get_board_ptr();
 
-        Player *ply = this->game_board->get_player(player_turn);
-
-        Captured *captures = NULL;        
-
         this->setCentralWidget(master_container);
 
         if (player_turn == PLAYER1)
         {
-            captures = this->game_board->get_player_captures(1);
-
-            gl->addLayout(ply2_data, 0, 0, 1, 8, Qt::AlignLeft);
-            gl->addLayout(ply1_data, 9, 0, 1, 8, Qt::AlignLeft);
+            gl->addLayout(ply2_data, 0, 1, 1, 8, Qt::AlignLeft);
+            gl->addLayout(ply1_data, 11, 1, 1, 8, Qt::AlignLeft);
 
             this->add_captures(ply1_data, player1_msg, this->game_board->get_player_captures(PLAYER1), true);
             this->add_captures(ply2_data, player2_msg, this->game_board->get_player_captures(PLAYER2), false);
         }
         else
         {
-            captures = this->game_board->get_player_captures(2);
+            gl->addLayout(ply1_data, 0, 1, 1, 8, Qt::AlignLeft);
+            gl->addLayout(ply2_data, 11, 1, 1, 8, Qt::AlignLeft);
 
-            gl->addLayout(ply1_data, 0, 0, 1, 8, Qt::AlignLeft);
-            gl->addLayout(ply2_data, 9, 0, 1, 8, Qt::AlignLeft);
-
-            this->add_captures(ply1_data, player1_msg, this->game_board->get_player_captures(PLAYER1), false);
             this->add_captures(ply2_data, player2_msg, this->game_board->get_player_captures(PLAYER2), true);
+            this->add_captures(ply1_data, player1_msg, this->game_board->get_player_captures(PLAYER1), false);
         }
 
         for (int i = 0; i < 8; i++)
         {
+            int actual_row = (player_turn == PLAYER1) ? i : (7 - i);
+            int rank_num = (player_turn == PLAYER1) ? (8 - i) : (i + 1);
+
+            QLabel *left_rank { new QLabel(QString::number(rank_num)) };
+            QLabel *right_rank { new QLabel(QString::number(rank_num)) };
+
+            left_rank->setStyleSheet(edge_label_style);
+            right_rank->setStyleSheet(edge_label_style);
+
+            left_rank->setAlignment(Qt::AlignCenter);
+            right_rank->setAlignment(Qt::AlignCenter);
+
+            gl->addWidget(left_rank, i + 2, 0);
+            gl->addWidget(right_rank, i + 2, 9);
+
             for (int j = 0; j < 8; j++)
             {
-                BoardCell *cell = new BoardCell(i, j, this->game_board);
+                int actual_col = (player_turn == PLAYER1) ? j : (7 - j);
 
-                QString color = ((i + j) % 2 == 0) ? "#f8e7bb" : "#004474";
-                cell->setStyleSheet(QString(
-                    "background-color: %1; border: none; margin: 0px;"
-                ).arg(color));
-
-                bool isCurrentPlayerPiece = (player_turn == PLAYER1) ?
-                                            std::islower((*board_ptr)[i][j]) :
-                                            std::isupper((*board_ptr)[i][j]);
-
-                if (!isEmpty(*board_ptr, i, j))
+                if (i == 0)
                 {
-                    if (isCurrentPlayerPiece) helpers::add_piece_to_cell(cell, (*board_ptr)[i][j], i, j);
-                    else helpers::add_piece_to_cell(cell, (*board_ptr)[i][j]);
+                    char fileChar = (player_turn == PLAYER1) ? ('a' + j) : ('h' - j);
+                    QLabel *top_file { new QLabel(QString(fileChar)) };
+                    QLabel *bottom_file { new QLabel(QString(fileChar)) };
+                    
+                    top_file->setStyleSheet(edge_label_style);
+                    bottom_file->setStyleSheet(edge_label_style);
+                    top_file->setAlignment(Qt::AlignCenter);
+                    bottom_file->setAlignment(Qt::AlignCenter);
+
+                    gl->addWidget(top_file, 1, j + 1);
+                    gl->addWidget(bottom_file, 10, j + 1);
                 }
 
-                int displayRow = (player_turn == PLAYER1) ? (i + 1) : ((7 - i) + 1);
-                gl->addWidget(cell, displayRow, j);
+                BoardCell *cell = new BoardCell(actual_row, actual_col, this->game_board);
+
+                QString color = ((actual_row + actual_col) % 2 == 0) ? "#f8e7bb" : "#004474";
+                cell->setStyleSheet(QString("background-color: %1; border: none; margin: 0px;").arg(color));
+
+                bool isCurrentPlayerPiece = (player_turn == PLAYER1) ?
+                                            std::islower((*board_ptr)[actual_row][actual_col]) :
+                                            std::isupper((*board_ptr)[actual_row][actual_col]);
+
+                if (!isEmpty(*board_ptr, actual_row, actual_col))
+                {
+                    if (isCurrentPlayerPiece) helpers::add_piece_to_cell(cell, (*board_ptr)[actual_row][actual_col], actual_row, actual_col);
+                    else helpers::add_piece_to_cell(cell, (*board_ptr)[actual_row][actual_col]);
+                }
+
+                gl->addWidget(cell, i + 2, j + 1);
             }
         }
 
