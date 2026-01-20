@@ -179,6 +179,51 @@ namespace Chess
     }
 
 
+    void GInterface::save_game_as()
+    {
+        bool ok;
+        QString text = QInputDialog::getText(this, tr("Save Game"),
+                                            tr("Enter save file name:"), QLineEdit::Normal,
+                                            tr("MyChessGame"), &ok);
+        
+        if (ok && !text.isEmpty())
+        {
+            try 
+            {
+                std::string filename = text.toStdString();
+                if (filename.length() < 4 || filename.substr(filename.length() - 4) != ".bin") 
+                    filename += ".bin";
+
+                std::string current_game_path = this->game_board->get_game_path();
+                fs::path g_old(current_game_path);
+                fs::path g_new = g_old.parent_path() / filename;
+
+                if (fs::exists(g_old)) 
+                {
+                    fs::rename(g_old, g_new);
+                    this->game_board->udpate_game_path(g_new.string());
+                }
+
+                std::string current_redo_path = this->game_board->get_redo_path();
+                fs::path r_old(current_redo_path);
+                fs::path r_new = r_old.parent_path() / filename;
+
+                if (fs::exists(r_old)) 
+                {
+                    fs::rename(r_old, r_new);
+                    this->game_board->udpate_redo_path(r_new.string());
+                }
+                
+                QMessageBox::information(this, "Success", "Game and Redo history saved as: " + QString::fromStdString(filename));
+            } 
+            catch (const fs::filesystem_error& e) 
+            {
+                QMessageBox::critical(this, "File Error", "Could not rename files: " + QString::fromStdString(e.what()));
+            }
+        }
+    }
+
+
     void GInterface::start_game() 
     {
         char ***board_ptr = this->game_board->get_board_ptr();
@@ -268,17 +313,18 @@ namespace Chess
         start_button->setIconSize(QSize(SAVE_BUTTON_SIZE, SAVE_BUTTON_SIZE));
         resign_button->setIconSize(QSize(SAVE_BUTTON_SIZE, SAVE_BUTTON_SIZE));
 
-        QObject::connect(load_button, &QPushButton::clicked, [=]()
-                {
-                    this->load_game();
-                }  
-        );
+        // Connect the save button to the new dialog function
+        QObject::connect(save_button, &QPushButton::clicked, [=](){
+            this->save_game_as();
+        });
 
-        QObject::connect(start_button, &QPushButton::clicked, [=]()
-                {
-                    this->start_game();
-                }  
-        );
+        QObject::connect(load_button, &QPushButton::clicked, [=](){
+            this->load_game();
+        });
+
+        QObject::connect(start_button, &QPushButton::clicked, [=](){
+            this->start_game();
+        });
 
         layout->setSpacing(20);
         layout->setContentsMargins(0, 0, 0, 0);

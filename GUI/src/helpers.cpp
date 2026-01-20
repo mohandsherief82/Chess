@@ -11,7 +11,7 @@ namespace helpers
         dialog.setFixedSize(350, 450);
 
         QVBoxLayout* layout = new QVBoxLayout(&dialog);
-        layout->addWidget(new QLabel("Select a save file to continue:"));
+        layout->addWidget(new QLabel("Select a save file to load:"));
 
         QListWidget* listWidget = new QListWidget(&dialog);
         
@@ -24,15 +24,21 @@ namespace helpers
                         listWidget->addItem(QString::fromStdString(entry.path().filename().string()));
             }
         } 
-        catch (const fs::filesystem_error& e) { layout->addWidget(new QLabel("Error accessing folder!")); }
+        catch (const fs::filesystem_error& e) 
+        { 
+            layout->addWidget(new QLabel("Error accessing folder!")); 
+        }
 
         bool hasFiles = listWidget->count() > 0;
 
-        if (!hasFiles) listWidget->addItem("No .bin files found in folder.");
+        if (!hasFiles) 
+        {
+            listWidget->addItem("No .bin files found in folder.");
+        }
         else
         {
+            listWidget->sortItems(Qt::AscendingOrder);
             listWidget->setCurrentRow(0);
-            listWidget->sortItems(Qt::DescendingOrder);
         }
 
         layout->addWidget(listWidget);

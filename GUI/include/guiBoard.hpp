@@ -2,6 +2,8 @@
 
 #include <QGuiApplication>
 #include <QGridLayout>
+#include <QMessageBox>
+#include <QInputDialog>
 #include <QVBoxLayout>
 #include <QMainWindow>
 #include <QDockWidget>
@@ -11,7 +13,6 @@
 #include <QString>
 #include <QLabel>
 #include <QIcon>
-
 
 #include "interfaces.hpp"
 #include "helpers.hpp"
@@ -50,6 +51,7 @@ namespace Chess
             void add_redo_undo(QHBoxLayout *box);
             void add_left_menu(QWidget *container);
             void add_moves_view();
+            void save_game_as();
         public:
             GInterface(std::shared_ptr<Board> game_board);
             void update() override;
