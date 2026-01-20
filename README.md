@@ -135,23 +135,24 @@ Used Classes:
 
     namespace Chess
     {
-        class GInterface: Concrete::Observer
-        {
-            public:
-                void update();
-        };
+        class Board;
 
-        class Board: Concrete::Subject
+        class GInterface: public Concrete::Observer, public QMainWindow
         {
             private:
-                char board[8][8];
-                std::string board_str;
-                std::vector<Concrete::Observer> observers_data;
+                std::shared_ptr<Board> game_board = nullptr;
+
+                void add_captures(QVBoxLayout *ply_data, QLabel *ply_msg, Captured *ply_captures, bool redo_flag);
+                void add_redo_undo(QHBoxLayout *box);
+                void add_left_menu(QWidget *container);
+                void add_moves_view();
             public:
-                void addObserver(Concrete::Observer observer);
-                void removeObserver(Concrete::Observer observer);
-                void notifyObservers();
-                void updateBoard();
+                GInterface(std::shared_ptr<Board> game_board);
+                void update() override;
+                void load_game();
+                void start_game();
+            protected:
+                void keyPressEvent(QKeyEvent *event) override;
         };
     }
 
