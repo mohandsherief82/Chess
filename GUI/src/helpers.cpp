@@ -83,6 +83,7 @@ namespace helpers
             case 's': return QString(":/icons/save.svg");
             case 'l': return QString(":/icons/load.svg");
             case 'a': return QString(":/icons/start.svg");
+            case 'g': return QString(":/icons/resign.svg");
 
             default: return QString("");
         }

@@ -232,17 +232,21 @@ namespace Chess
         QPushButton *save_button { new QPushButton( QIcon( helpers::getIconPath('s') ), "  Save Game") };
         QPushButton *load_button { new QPushButton( QIcon( helpers::getIconPath('l') ), "  Load Game") };
         QPushButton *start_button { new QPushButton( QIcon( helpers::getIconPath('a') ), "  Start New Game") };
+        QPushButton *resign_button { new QPushButton( QIcon( helpers::getIconPath('g') ), "  Resign") };
 
         save_button->setStyleSheet(flat_style);
         load_button->setStyleSheet(flat_style);
         start_button->setStyleSheet(flat_style);
+        resign_button->setStyleSheet(flat_style);
 
-        save_button->setFixedSize(200, 50);
-        load_button->setFixedSize(200, 50);
+        save_button->setFixedSize(180, 50);
+        load_button->setFixedSize(180, 50);
+        resign_button->setFixedSize(150, 50);
 
         save_button->setIconSize(QSize(SAVE_BUTTON_SIZE, SAVE_BUTTON_SIZE));
         load_button->setIconSize(QSize(SAVE_BUTTON_SIZE, SAVE_BUTTON_SIZE));
         start_button->setIconSize(QSize(SAVE_BUTTON_SIZE, SAVE_BUTTON_SIZE));
+        resign_button->setIconSize(QSize(SAVE_BUTTON_SIZE, SAVE_BUTTON_SIZE));
 
         QObject::connect(load_button, &QPushButton::clicked, [=]()
                 {
@@ -264,6 +268,7 @@ namespace Chess
         layout->addWidget(save_button, 0, Qt::AlignCenter);
         layout->addWidget(load_button, 0, Qt::AlignCenter);
         layout->addWidget(start_button, 0, Qt::AlignCenter);
+        layout->addWidget(resign_button, 0, Qt::AlignCenter);
 
         layout->addStretch(1);
     }

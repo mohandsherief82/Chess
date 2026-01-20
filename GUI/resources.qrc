@@ -18,5 +18,6 @@
     <file>icons/save.svg</file>
     <file>icons/load.svg</file>
     <file>icons/start.svg</file>
+    <file>icons/resign.svg</file>
   </qresource>
 </RCC>
