@@ -182,17 +182,35 @@ namespace Chess
     void GInterface::start_game() 
     {
         char ***board_ptr = this->game_board->get_board_ptr();
-        *board_ptr = initializeBoard();
+
+        if (*board_ptr != nullptr) *board_ptr = initializeBoard(); 
 
         Player *ply1 = this->game_board->get_player(PLAYER1);
         Player *ply2 = this->game_board->get_player(PLAYER2);
 
-        std::string game_path { loadPath }
-                , time { helpers::get_formatted_time() }
-                , redo_path { redoPath };
+        Captured *ply1_captures = this->game_board->get_player_captures(PLAYER1);
+        Captured *ply2_captures = this->game_board->get_player_captures(PLAYER2);
+
+        int *whiteEP = this->game_board->get_player_EP(PLAYER1);
+        int *blackEP = this->game_board->get_player_EP(PLAYER2);
+
+        resetPlayer(ply1, COLOR_WHITE);
+        resetPlayer(ply2, COLOR_BLACK);
+
+        *ply1_captures = initializeCapture(COLOR_WHITE);
+        *ply2_captures = initializeCapture(COLOR_BLACK);
+
+        *whiteEP = -1;
+        *blackEP = -1;
+
+        this->game_board->update_turn(PLAYER1);
+
+        std::string game_path { loadPath }, 
+                    time { helpers::get_formatted_time() }, 
+                    redo_path { redoPath };
         
-        game_path.append( time );
-        redo_path.append( time );
+        game_path.append(time);
+        redo_path.append(time);
 
         { 
             std::ofstream game_file(game_path, std::ios::binary); 
@@ -202,10 +220,8 @@ namespace Chess
         this->game_board->udpate_game_path(game_path);
         this->game_board->udpate_redo_path(redo_path);
 
-        // Sync board state using the data stored in the map
         updateBoard(*board_ptr, ply1, ply2);
 
-        // Render the board
         this->update();
 
         return;
