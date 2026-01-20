@@ -27,5 +27,6 @@ Player createPlayer(PieceColor color);
 bool isValidSymbol(char symbol);
 void freePlayer(Player *player);
 Move getMove();
+void resetPlayer(Player* player, PieceColor color);
 
 #endif

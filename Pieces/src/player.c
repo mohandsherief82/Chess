@@ -96,3 +96,11 @@ void freePlayer(Player *player)
 
     return;
 }
+
+
+void resetPlayer(Player* player, PieceColor color)
+{
+    if (player == NULL) return;
+    freePlayer(player);
+    *player = createPlayer(color);
+}

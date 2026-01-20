@@ -44,22 +44,20 @@ int loadGame(char*** boardPtr, Player* player1, Player* player2, Captured* ply1C
 
     if (*boardPtr == NULL) exit(1);
 
-    for (int i = 0; i < BOARD_SIZE; i++) 
-        for (int j = 0; j < BOARD_SIZE; j++) boardPtr[0][i][j] = EMPTY_SQUARE;
-    
-    if (player1 != NULL) freePlayer(player1);
-    if (player2 != NULL) freePlayer(player2);
+    FILE* fptr = fopen(game_path, "rb");
+    if (fptr == NULL) return -1;
 
-    *player1 = createPlayer(COLOR_WHITE);
-    *player2 = createPlayer(COLOR_BLACK);
+    for (int i = 0; i < BOARD_SIZE; i++) 
+        for (int j = 0; j < BOARD_SIZE; j++) (*boardPtr)[i][j] = EMPTY_SQUARE;
+    
+    resetPlayer(player1, COLOR_WHITE);
+    resetPlayer(player2, COLOR_BLACK);
 
     *whiteEnPassantCol = -1;
     *blackEnPassantCol = -1;
 
     *ply1Captures = initializeCapture(COLOR_WHITE);
     *ply2Captures = initializeCapture(COLOR_BLACK);
-
-    FILE* fptr = fopen(game_path, "rb");
 
     Move move[2];
     int readData;
@@ -68,7 +66,11 @@ int loadGame(char*** boardPtr, Player* player1, Player* player2, Captured* ply1C
     while ((readData = fread(move, sizeof(Move), 2, fptr)) > 0) 
     {
         loadPlayerTurn(*boardPtr, player1, move[0], ply1Captures, whiteEnPassantCol, blackEnPassantCol);
-        if (ply1Captures->newCapture) capturePiece(player2, ply1Captures);
+        if (ply1Captures->newCapture) 
+        {
+            capturePiece(player2, ply1Captures);
+            ply1Captures->newCapture = false;
+        }
 
         totalMovesRead++;
         updateBoard(*boardPtr, player1, player2);
@@ -76,7 +78,11 @@ int loadGame(char*** boardPtr, Player* player1, Player* player2, Captured* ply1C
         if (readData == 2) 
         {
             loadPlayerTurn(*boardPtr, player2, move[1], ply2Captures, blackEnPassantCol, whiteEnPassantCol);
-            if (ply2Captures->newCapture) capturePiece(player1, ply2Captures);
+            if (ply2Captures->newCapture) 
+            {
+                capturePiece(player1, ply2Captures);
+                ply2Captures->newCapture = false;
+            }
 
             totalMovesRead++;
             updateBoard(*boardPtr, player1, player2);
@@ -88,7 +94,7 @@ int loadGame(char*** boardPtr, Player* player1, Player* player2, Captured* ply1C
     isChecked(*boardPtr, player1, true);
     isChecked(*boardPtr, player2, true);
     
-    return (totalMovesRead % 2 == 0) ? 1 : 2;
+    return (totalMovesRead % 2 == 0) ? 2 : 1;
 }
 
 

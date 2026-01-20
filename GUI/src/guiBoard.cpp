@@ -166,10 +166,14 @@ namespace Chess
         int player_turn = loadGame(board_ptr, ply1, ply2, ply1_captures, 
                 ply2_captures, whiteEP, blackEP, game_path.c_str());
 
-        this->game_board->update_board();
-        this->game_board->udpate_game_path(game_path);
-        
-        this->update();
+        if (player_turn != -1) 
+        {
+            this->game_board->update_turn(player_turn);
+            this->game_board->update_board();
+
+            this->game_board->udpate_game_path(game_path);
+            this->update();
+        }
 
         return;
     }
