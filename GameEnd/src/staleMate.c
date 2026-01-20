@@ -72,9 +72,8 @@ void freeCopy(Player cpyPlayer, char** cpyBoard)
 
 bool legalMove(char** board, Player* player)
 {
-    bool legalCheck = true;
     Move testMove;
-    Captured tempCapture = {0};
+    
     int plyEpCol = -1, oppEpCol = -1;
     
     for (int rPrev = 0; rPrev < BOARD_SIZE; rPrev++)
@@ -94,20 +93,20 @@ bool legalMove(char** board, Player* player)
 
                     char** cpyB = copyBoard(board);
                     Player cpyP = copyPlayer(player);
+                    Captured tempCapture = {0};
                     
                     testMove.rowNext = rNext;
                     testMove.colNext = cNext;
 
                     bool moveSuccessful = false;
-                    char pieceType = board[rPrev][cPrev];
-                    tolower(pieceType);
+                    char pieceType = (char)tolower(board[rPrev][cPrev]);
                     
-                    if (pieceType == 'p') moveSuccessful = movePawn(cpyB, &cpyP, testMove, &tempCapture, &plyEpCol, &oppEpCol, legalCheck, false);
-                    else if (pieceType == 'r') moveSuccessful = moveRook(cpyB, &cpyP, testMove, &tempCapture, legalCheck);
-                    else if (pieceType == 'n') moveSuccessful = moveKnight(cpyB, &cpyP, testMove, &tempCapture, legalCheck);
-                    else if (pieceType == 'b') moveSuccessful = moveBishop(cpyB, &cpyP, testMove, &tempCapture, legalCheck);
-                    else if (pieceType == 'q') moveSuccessful = moveQueen(cpyB, &cpyP, testMove, &tempCapture, legalCheck);
-                    else if (pieceType == 'k') moveSuccessful = moveKing(cpyB, &cpyP, testMove, &tempCapture, legalCheck);
+                    if (pieceType == 'p') moveSuccessful = movePawn(cpyB, &cpyP, testMove, &tempCapture, &plyEpCol, &oppEpCol, true, false);
+                    else if (pieceType == 'r') moveSuccessful = moveRook(cpyB, &cpyP, testMove, &tempCapture, true);
+                    else if (pieceType == 'n') moveSuccessful = moveKnight(cpyB, &cpyP, testMove, &tempCapture, true);
+                    else if (pieceType == 'b') moveSuccessful = moveBishop(cpyB, &cpyP, testMove, &tempCapture, true);
+                    else if (pieceType == 'q') moveSuccessful = moveQueen(cpyB, &cpyP, testMove, &tempCapture, true);
+                    else if (pieceType == 'k') moveSuccessful = moveKing(cpyB, &cpyP, testMove, &tempCapture, true);
 
                     if (moveSuccessful && !isChecked(cpyB, &cpyP, true))
                     {
@@ -116,8 +115,6 @@ bool legalMove(char** board, Player* player)
                     } 
                     
                     freeCopy(cpyP, cpyB);
-                    plyEpCol = -1;
-                    oppEpCol = -1;
                 }
             }
         }
@@ -128,38 +125,26 @@ bool legalMove(char** board, Player* player)
 
 bool inSufficientMaterial(Player player1, Player player2)
 {
-    int p1Minor = 0, p2Minor = 0;
-
     if (player1.queen->isActive || player2.queen->isActive) return false;
     
-    for (int i = 0; i < 2; i++) 
-    {
-        if (player1.rooks[i].isActive || player2.rooks[i].isActive) return false;
-    }
-
     for (int i = 0; i < 8; i++) 
     {
+        if (i < 2 && (player1.rooks[i].isActive || player2.rooks[i].isActive)) return false;
         if (player1.pawns[i].isActive || player2.pawns[i].isActive) return false;
     }
 
-    for (int i = 0; i < 2; i++) {
-        if (player1.bishops[i].isActive) p1Minor++;
-        if (player1.knights[i].isActive) p1Minor++;
-        
-        if (player2.bishops[i].isActive) p2Minor++;
-        if (player2.knights[i].isActive) p2Minor++;
+    int p1Minor = 0, p2Minor = 0;
+    for (int i = 0; i < 2; i++) 
+    {
+        p1Minor += (player1.bishops[i].isActive + player1.knights[i].isActive);
+        p2Minor += (player2.bishops[i].isActive + player2.knights[i].isActive);
     }
 
-    if (p1Minor == 0 && p2Minor == 0) return true;
-    if ((p1Minor == 1 && p2Minor == 0) || (p1Minor == 0 && p2Minor == 1)) return true;
-    if (p1Minor == 1 && p2Minor == 1) return true; 
-
-    return false;
+    return (p1Minor + p2Minor <= 1) || (p1Minor == 1 && p2Minor == 1);
 }
 
 
 bool checkStalemate(char** board, Player* player)
 {
-    if(!legalMove(board, player) && !isChecked(board, player, true)) return true;
-    else return false;
+    return !legalMove(board, player) && !isChecked(board, player, true);
 }
