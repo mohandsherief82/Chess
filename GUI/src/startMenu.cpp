@@ -22,72 +22,6 @@ extern "C"
     #include "GameEnd/include/saveGame.h"
 }
 
-namespace fs = std::filesystem;
-
-
-void load_game(std::unique_ptr<Chess::GInterface> &main_window, std::shared_ptr<Chess::Board> &game_board)
-{
-    std::string game_path = helpers::load_menu(main_window.get(), loadPath);
-
-    if (game_path.empty()) return;
-
-    char ***board_ptr = game_board->get_board_ptr();
-
-    Player *ply1 = game_board->get_player(PLAYER1);
-    Player *ply2 = game_board->get_player(PLAYER2);
-
-    Captured *ply1_captures = game_board->get_player_captures(PLAYER1);
-    Captured *ply2_captures = game_board->get_player_captures(PLAYER2);
-
-    int *whiteEP = game_board->get_player_EP(PLAYER1);
-    int *blackEP = game_board->get_player_EP(PLAYER2);
-
-    if (*board_ptr == nullptr) *board_ptr = initializeBoard();
-
-    int player_turn = loadGame(board_ptr, ply1, ply2, ply1_captures, 
-            ply2_captures, whiteEP, blackEP, game_path.c_str());
-
-    game_board->update_board();
-    game_board->udpate_game_path(game_path);
-    
-    main_window->update();
-
-    return;
-}
-
-
-void start_game(std::unique_ptr<Chess::GInterface> &main_window, std::shared_ptr<Chess::Board> &game_board) 
-{
-    char ***board_ptr = game_board->get_board_ptr();
-    *board_ptr = initializeBoard();
-
-    Player *ply1 = game_board->get_player(PLAYER1);
-    Player *ply2 = game_board->get_player(PLAYER2);
-
-    std::string game_path { loadPath }
-            , time { helpers::get_formatted_time() }
-            , redo_path { redoPath };
-    
-    game_path.append( time );
-    redo_path.append( time );
-
-    { 
-        std::ofstream game_file(game_path, std::ios::binary); 
-        std::ofstream redo_file(redo_path, std::ios::binary); 
-    }
-
-    game_board->udpate_game_path(game_path);
-    game_board->udpate_redo_path(redo_path);
-
-    // Sync board state using the data stored in the map
-    updateBoard(*board_ptr, ply1, ply2);
-
-    // Render the board
-    main_window->update();
-
-    return;
-}
-
 
 void display_start_window(std::unique_ptr<Chess::GInterface> &main_window, std::shared_ptr<Chess::Board> &game_board)
 {
@@ -132,13 +66,13 @@ void display_start_window(std::unique_ptr<Chess::GInterface> &main_window, std::
 
     QObject::connect(start_button, &QPushButton::clicked, [&]() 
             {
-                start_game(main_window, game_board);
+                main_window->start_game();
             }
     );
 
     QObject::connect(load_button, &QPushButton::clicked, [&]() 
             {
-                load_game(main_window, game_board);
+                main_window->load_game();
             }
     );
 

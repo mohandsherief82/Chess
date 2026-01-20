@@ -175,6 +175,39 @@ namespace Chess
     }
 
 
+    void GInterface::start_game() 
+    {
+        char ***board_ptr = this->game_board->get_board_ptr();
+        *board_ptr = initializeBoard();
+
+        Player *ply1 = this->game_board->get_player(PLAYER1);
+        Player *ply2 = this->game_board->get_player(PLAYER2);
+
+        std::string game_path { loadPath }
+                , time { helpers::get_formatted_time() }
+                , redo_path { redoPath };
+        
+        game_path.append( time );
+        redo_path.append( time );
+
+        { 
+            std::ofstream game_file(game_path, std::ios::binary); 
+            std::ofstream redo_file(redo_path, std::ios::binary); 
+        }
+
+        this->game_board->udpate_game_path(game_path);
+        this->game_board->udpate_redo_path(redo_path);
+
+        // Sync board state using the data stored in the map
+        updateBoard(*board_ptr, ply1, ply2);
+
+        // Render the board
+        this->update();
+
+        return;
+    }
+
+
     void GInterface::add_left_menu(QWidget *container)
     {
         QVBoxLayout *layout { new QVBoxLayout(container) };

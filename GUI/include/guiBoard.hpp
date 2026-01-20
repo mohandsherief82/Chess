@@ -50,10 +50,11 @@ namespace Chess
             void add_redo_undo(QHBoxLayout *box);
             void add_left_menu(QWidget *container);
             void add_moves_view();
-            void load_game();
         public:
             GInterface(std::shared_ptr<Board> game_board);
             void update() override;
+            void load_game();
+            void start_game();
         protected:
             void keyPressEvent(QKeyEvent *event) override;
     };
