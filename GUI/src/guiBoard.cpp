@@ -191,6 +191,7 @@ namespace Chess
             try 
             {
                 std::string filename = text.toStdString();
+                
                 if (filename.length() < 4 || filename.substr(filename.length() - 4) != ".bin") 
                     filename += ".bin";
 
@@ -213,21 +214,37 @@ namespace Chess
                     this->game_board->udpate_redo_path(r_new.string());
                 }
 
-                QMessageBox msgBox(this);
+                PersistentDialog diag(this);
 
-                msgBox.setWindowTitle("Game Saved");
-                msgBox.setText(tr("Game successfully saved as %1").arg(QString::fromStdString(filename)));
-
-                msgBox.setInformativeText("What would you like to do next?");
-
-                QPushButton *continueBtn = msgBox.addButton(tr("Start New Game"), QMessageBox::AcceptRole);
-                QPushButton *menuBtn = msgBox.addButton(tr("Exit Game"), QMessageBox::DestructiveRole);
+                diag.setWindowTitle("Game Saved");
                 
-                msgBox.setIcon(QMessageBox::Information);
-                msgBox.exec();
+                QVBoxLayout *layout = new QVBoxLayout(&diag);
 
-                if (msgBox.clickedButton() == menuBtn) this->close();
-                else if (msgBox.clickedButton() == continueBtn) this->start_game();
+                QLabel *msgLabel = new QLabel(tr("Game successfully saved as %1\nWhat would you like to do next?").arg(QString::fromStdString(filename)));
+                msgLabel->setStyleSheet("color: #f8e7bb; font-size: 16px; font-weight: bold;");
+                msgLabel->setAlignment(Qt::AlignCenter);
+                
+                layout->addWidget(msgLabel);
+
+                QPushButton *continueBtn = new QPushButton(tr("Start New Game"), &diag);
+                QPushButton *menuBtn = new QPushButton(tr("Exit Game"), &diag);
+                
+                QString btn_style = "QPushButton { color: #f8e7bb; background-color: #1c2b3a; border: 1px solid #f8e7bb; padding: 10px; font-size: 14px; }"
+                                  "QPushButton:hover { background-color: #2a3f55; }";
+
+                continueBtn->setStyleSheet(btn_style);
+                menuBtn->setStyleSheet(btn_style);
+
+                layout->addWidget(continueBtn);
+                layout->addWidget(menuBtn);
+
+                QObject::connect(continueBtn, &QPushButton::clicked, &diag, &QDialog::accept);
+                QObject::connect(menuBtn, &QPushButton::clicked, &diag, &QDialog::reject);
+
+                int result = diag.exec();
+
+                if (result == QDialog::Rejected) this->close();
+                else if (result == QDialog::Accepted) this->start_game();
             } 
             catch (const fs::filesystem_error& e) 
             {
@@ -330,7 +347,6 @@ namespace Chess
         resign_button->setIconSize(QSize(SAVE_BUTTON_SIZE, SAVE_BUTTON_SIZE));
         exit_button->setIconSize(QSize(SAVE_BUTTON_SIZE, SAVE_BUTTON_SIZE));
 
-        // Connect the save button to the new dialog function
         QObject::connect(save_button, &QPushButton::clicked, [=](){
             this->save_game_as();
         });

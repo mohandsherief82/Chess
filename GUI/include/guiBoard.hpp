@@ -15,9 +15,10 @@
 #include <QIcon>
 
 #include "interfaces.hpp"
-#include "helpers.hpp"
 #include "piecesIcon.hpp"
 #include "boardCell.hpp"
+#include "helpers.hpp"
+#include "dialog.hpp"
 
 #include <filesystem>
 #include <iostream>
