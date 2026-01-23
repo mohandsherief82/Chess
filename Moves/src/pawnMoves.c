@@ -169,7 +169,7 @@ MoveValidation movePawn(char** board, Player* player, Move move, Captured* playe
                 if (pawn->promoted) return PROMOTION;
             }
             
-            return ENEMY_CAPTURE;
+            return VALID_MOVE;
         }
 
         if (move.colNext == *oppEnPassantCol)
@@ -199,7 +199,7 @@ MoveValidation movePawn(char** board, Player* player, Move move, Captured* playe
                     if (pawn->firstMove) pawn->firstMove = false;
                 }
 
-                return ENEMY_CAPTURE;
+                return VALID_MOVE;
             }
         }
     }

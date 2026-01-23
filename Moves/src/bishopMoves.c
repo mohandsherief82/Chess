@@ -51,7 +51,7 @@ MoveValidation moveBishop(char** board, Player* player, Move move, Captured* pla
     // Handle Capture logic
     if (!isEmpty(board, move.rowNext, move.colNext))
     {
-        if (pieceColorAt(board, move.rowNext, move.colNext) == bishop->color) return FRIENDLY_CAPTURE;
+        if (pieceColorAt(board, move.rowNext, move.colNext) == bishop->color) return INVALID_MOVE;
 
         if (!legalCheck)
         {
@@ -62,13 +62,6 @@ MoveValidation moveBishop(char** board, Player* player, Move move, Captured* pla
             
             playerCaptures->captureCount++;
             playerCaptures->newCapture = true;
-
-            board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
-            board[move.rowNext][move.colNext] = bishop->symbol;
-            bishop->rowPosition = move.rowNext;
-            bishop->colPosition = move.colNext;
-
-            return ENEMY_CAPTURE;
         }
     }
 

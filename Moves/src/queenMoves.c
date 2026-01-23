@@ -46,7 +46,7 @@ MoveValidation moveQueen(char** board, Player* player, Move move, Captured* play
 
     if (!isEmpty(board, move.rowNext, move.colNext))
     {
-        if (pieceColorAt(board, move.rowNext, move.colNext) == queen->color) return FRIENDLY_CAPTURE;
+        if (pieceColorAt(board, move.rowNext, move.colNext) == queen->color) return INVALID_MOVE;
         
         if (!legalCheck)
         {
@@ -58,13 +58,6 @@ MoveValidation moveQueen(char** board, Player* player, Move move, Captured* play
             
             playerCaptures->captureCount++;
             playerCaptures->newCapture = true;
-
-            board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
-            board[move.rowNext][move.colNext] = queen->symbol;
-            queen->rowPosition = move.rowNext;
-            queen->colPosition = move.colNext;
-
-            return ENEMY_CAPTURE;
         }
     }
 
@@ -73,5 +66,5 @@ MoveValidation moveQueen(char** board, Player* player, Move move, Captured* play
     queen->rowPosition = move.rowNext;
     queen->colPosition = move.colNext;
     
-    return true;
+    return VALID_MOVE;
 }

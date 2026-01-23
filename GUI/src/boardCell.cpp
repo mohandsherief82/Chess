@@ -92,20 +92,10 @@ void BoardCell::dropEvent(QDropEvent *event)
             saveMove(move, (this->game_board->get_game_path()).c_str());
             clearRedo((this->game_board->get_redo_path()).c_str());
 
+            if (ply_captures->newCapture) 
+                capturePiece(game_board->get_player((player_turn == PLAYER1) ? PLAYER2: PLAYER1), ply_captures);
+            
             this->game_board->update_board();
         }
-        else if (move_state == ENEMY_CAPTURE)
-        {
-            capturePiece(game_board->get_player((player_turn == PLAYER1) ? PLAYER2: PLAYER1), ply_captures);
-
-            piece->hide(); 
-            event->acceptProposedAction();
-
-            saveMove(move, (this->game_board->get_game_path()).c_str());
-            clearRedo((this->game_board->get_redo_path()).c_str());
-
-            this->game_board->update_board();
-        }
-        else {}
     }
 }

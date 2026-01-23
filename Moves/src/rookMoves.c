@@ -45,7 +45,7 @@ MoveValidation moveRook(char** board ,Player* player, Move move, Captured* playe
 
     if (!isEmpty(board, move.rowNext, move.colNext))
     {
-        if (pieceColorAt(board, move.rowNext, move.colNext) == rock->color) return FRIENDLY_CAPTURE;
+        if (pieceColorAt(board, move.rowNext, move.colNext) == rock->color) return INVALID_MOVE;
 
         if (!legalCheck)
         {
@@ -56,14 +56,6 @@ MoveValidation moveRook(char** board ,Player* player, Move move, Captured* playe
             playerCaptures->capturedPiece.symbol = board[move.rowNext][move.colNext];
             playerCaptures->captureCount++;
             playerCaptures->newCapture = true;
-
-            board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
-            board[move.rowNext][move.colNext] = rock->symbol;
-            rock->rowPosition = move.rowNext;
-            rock->colPosition = move.colNext;
-            rock->firstMove = false;
-
-            return ENEMY_CAPTURE;
         }
     }
 
