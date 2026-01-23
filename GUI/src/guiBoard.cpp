@@ -311,6 +311,47 @@ namespace Chess
     }
 
 
+    void GInterface::resign()
+    {
+        PersistentDialog dialog(this);
+
+        dialog.setWindowTitle("Resigning");
+
+        QString btn_style = "QPushButton { color: #f8e7bb; background-color: #1c2b3a; border: 1px solid #f8e7bb; padding: 10px; font-size: 14px; }"
+                                    "QPushButton:hover { background-color: #2a3f55; }";
+        
+        QVBoxLayout *layout = new QVBoxLayout(&dialog);
+
+        std::string player_resigned { (this->game_board->get_player_turn() == 1) ? "Player 1 Lost" : "Player 2 Lost" };
+
+        QLabel *msg_label = new QLabel(tr("Game Ended: %1").arg(QString::fromStdString(player_resigned)));
+
+        msg_label->setStyleSheet("color: #f8e7bb; font-size: 16px; font-weight: bold;");
+        msg_label->setAlignment(Qt::AlignCenter);
+        
+        layout->addWidget(msg_label);
+
+        QPushButton *continue_btn = new QPushButton(tr("Start New Game"), &dialog);
+        QPushButton *menu_btn = new QPushButton(tr("Exit Game"), &dialog);
+
+        continue_btn->setStyleSheet(btn_style);
+        menu_btn->setStyleSheet(btn_style);
+
+        layout->addWidget(continue_btn);
+        layout->addWidget(menu_btn);
+
+        QObject::connect(continue_btn, &QPushButton::clicked, &dialog, &QDialog::accept);
+        QObject::connect(menu_btn, &QPushButton::clicked, &dialog, &QDialog::reject);
+
+        int result { dialog.exec() };
+
+        this->delete_files();
+
+        if (result == QDialog::Rejected) this->close();
+        else if (result == QDialog::Accepted) this->start_game();
+    }
+
+
     void GInterface::add_left_menu(QWidget *container)
     {
         QVBoxLayout *layout { new QVBoxLayout(container) };
@@ -370,6 +411,10 @@ namespace Chess
         QObject::connect(exit_button, &QPushButton::clicked, [=](){
             this->delete_files();
             this->close();
+        });
+
+        QObject::connect(resign_button, &QPushButton::clicked, [=](){
+            this->resign();
         });
 
         layout->setSpacing(20);

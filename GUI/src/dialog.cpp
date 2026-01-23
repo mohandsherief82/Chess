@@ -4,6 +4,8 @@ PersistentDialog::PersistentDialog(QWidget *parent) : QDialog(parent)
 {
     setWindowFlags(windowFlags() | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
     setWindowFlags(windowFlags() & ~Qt::WindowCloseButtonHint);
+
+    this->setMinimumSize(500, 250);
     
     setModal(true);
 }

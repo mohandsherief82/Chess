@@ -54,6 +54,7 @@ namespace Chess
             void add_moves_view();
             void save_game_as();
             void delete_files();
+            void resign();
         public:
             GInterface(std::shared_ptr<Board> game_board);
             void update() override;
