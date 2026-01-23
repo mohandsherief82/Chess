@@ -72,7 +72,7 @@ void display_start_window(std::unique_ptr<Chess::GInterface> &main_window, std::
 
     QObject::connect(load_button, &QPushButton::clicked, [&]() 
             {
-                main_window->load_game();
+                main_window->load_game("");
             }
     );
 

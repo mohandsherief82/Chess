@@ -57,7 +57,7 @@ namespace Chess
         public:
             GInterface(std::shared_ptr<Board> game_board);
             void update() override;
-            void load_game();
+            void load_game(const std::string file_path);
             void start_game();
         protected:
             void keyPressEvent(QKeyEvent *event) override;

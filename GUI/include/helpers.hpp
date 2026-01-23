@@ -52,5 +52,7 @@ namespace helpers
     void add_piece_to_cell(BoardCell *cell, char pieceChar, int row, int col);
     std::string get_formatted_time();
 
-    std::string load_menu(QWidget* parent, const std::string& folderPath);
+    std::string load_menu(QWidget* parent, const std::string& folder_path
+                , const std::string& exclude_name_no_ext);
+    std::string get_filename_without_ext(const std::string& full_path);
 }

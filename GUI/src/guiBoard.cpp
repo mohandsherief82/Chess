@@ -144,9 +144,9 @@ namespace Chess
     }
 
 
-    void GInterface::load_game()
+    void GInterface::load_game(const std::string file_path)
     {
-        std::string game_path { helpers::load_menu(this, loadPath) };
+        std::string game_path { helpers::load_menu(this, loadPath, file_path) };
 
         if (game_path.empty()) return;
 
@@ -191,12 +191,20 @@ namespace Chess
             try 
             {
                 std::string filename = text.toStdString();
-                
+            
                 if (filename.length() < 4 || filename.substr(filename.length() - 4) != ".bin") 
                     filename += ".bin";
 
                 fs::path g_new = fs::path(loadPath) / filename;
                 fs::path r_new = fs::path(redoPath) / filename;
+
+                if (fs::exists(g_new))
+                {
+                    QMessageBox::warning(this, tr("Duplicate Name"), 
+                        tr("A file named %1 already exists. Please choose a different name.").arg(QString::fromStdString(filename)));
+                    this->save_game_as();
+                    return;
+                }
 
                 std::string current_game_path = this->game_board->get_game_path();
 
@@ -220,26 +228,26 @@ namespace Chess
                 
                 QVBoxLayout *layout = new QVBoxLayout(&diag);
 
-                QLabel *msgLabel = new QLabel(tr("Game successfully saved as %1\nWhat would you like to do next?").arg(QString::fromStdString(filename)));
-                msgLabel->setStyleSheet("color: #f8e7bb; font-size: 16px; font-weight: bold;");
-                msgLabel->setAlignment(Qt::AlignCenter);
+                QLabel *msg_label = new QLabel(tr("Game successfully saved as %1\nWhat would you like to do next?").arg(QString::fromStdString(filename)));
+                msg_label->setStyleSheet("color: #f8e7bb; font-size: 16px; font-weight: bold;");
+                msg_label->setAlignment(Qt::AlignCenter);
                 
-                layout->addWidget(msgLabel);
+                layout->addWidget(msg_label);
 
-                QPushButton *continueBtn = new QPushButton(tr("Start New Game"), &diag);
-                QPushButton *menuBtn = new QPushButton(tr("Exit Game"), &diag);
+                QPushButton *continue_btn = new QPushButton(tr("Start New Game"), &diag);
+                QPushButton *menu_btn = new QPushButton(tr("Exit Game"), &diag);
                 
                 QString btn_style = "QPushButton { color: #f8e7bb; background-color: #1c2b3a; border: 1px solid #f8e7bb; padding: 10px; font-size: 14px; }"
-                                  "QPushButton:hover { background-color: #2a3f55; }";
+                                    "QPushButton:hover { background-color: #2a3f55; }";
 
-                continueBtn->setStyleSheet(btn_style);
-                menuBtn->setStyleSheet(btn_style);
+                continue_btn->setStyleSheet(btn_style);
+                menu_btn->setStyleSheet(btn_style);
 
-                layout->addWidget(continueBtn);
-                layout->addWidget(menuBtn);
+                layout->addWidget(continue_btn);
+                layout->addWidget(menu_btn);
 
-                QObject::connect(continueBtn, &QPushButton::clicked, &diag, &QDialog::accept);
-                QObject::connect(menuBtn, &QPushButton::clicked, &diag, &QDialog::reject);
+                QObject::connect(continue_btn, &QPushButton::clicked, &diag, &QDialog::accept);
+                QObject::connect(menu_btn, &QPushButton::clicked, &diag, &QDialog::reject);
 
                 int result = diag.exec();
 
@@ -352,7 +360,7 @@ namespace Chess
         });
 
         QObject::connect(load_button, &QPushButton::clicked, [=](){
-            this->load_game();
+            this->load_game( helpers::get_filename_without_ext( this->game_board->get_game_path() ) );
         });
 
         QObject::connect(start_button, &QPushButton::clicked, [=](){

@@ -1,9 +1,13 @@
-
 #include "helpers.hpp"
 
 namespace helpers
 {
-    std::string load_menu(QWidget* parent, const std::string& folderPath) 
+    std::string get_filename_without_ext(const std::string& full_path)
+    {
+        return fs::path(full_path).stem().string();
+    }
+
+    std::string load_menu(QWidget* parent, const std::string& folder_path, const std::string& exclude_name_no_ext) 
     {
         QDialog dialog(parent);
 
@@ -13,15 +17,30 @@ namespace helpers
         QVBoxLayout* layout = new QVBoxLayout(&dialog);
         layout->addWidget(new QLabel("Select a save file to load:"));
 
-        QListWidget* listWidget = new QListWidget(&dialog);
+        QListWidget* list_widget = new QListWidget(&dialog);
         
         try 
         {
-            if (fs::exists(folderPath) && fs::is_directory(folderPath)) 
+            if (fs::exists(folder_path) && fs::is_directory(folder_path)) 
             {
-                for (const auto& entry : fs::directory_iterator(folderPath)) 
+                for (const auto& entry : fs::directory_iterator(folder_path)) 
+                {
                     if (entry.is_regular_file() && entry.path().extension() == ".bin") 
-                        listWidget->addItem(QString::fromStdString(entry.path().filename().string()));
+                    {
+                        std::string current_file_name = entry.path().stem().string();
+                        
+                        if (current_file_name != exclude_name_no_ext)
+                        {
+                            list_widget->addItem(
+                                QString::fromStdString(
+                                        get_filename_without_ext(
+                                            entry.path().filename()
+                                        )
+                                    )
+                            );
+                        }
+                    }
+                }
             }
         } 
         catch (const fs::filesystem_error& e) 
@@ -29,42 +48,42 @@ namespace helpers
             layout->addWidget(new QLabel("Error accessing folder!")); 
         }
 
-        bool hasFiles = listWidget->count() > 0;
+        bool has_files = list_widget->count() > 0;
 
-        if (!hasFiles) 
+        if (!has_files) 
         {
-            listWidget->addItem("No .bin files found in folder.");
+            list_widget->addItem("No other .bin files found.");
         }
         else
         {
-            listWidget->sortItems(Qt::AscendingOrder);
-            listWidget->setCurrentRow(0);
+            list_widget->sortItems(Qt::AscendingOrder);
+            list_widget->setCurrentRow(0);
         }
 
-        layout->addWidget(listWidget);
+        layout->addWidget(list_widget);
 
-        QPushButton* loadBtn = new QPushButton("Load Selection", &dialog);
-        loadBtn->setEnabled(hasFiles);
-        layout->addWidget(loadBtn);
+        QPushButton* load_btn = new QPushButton("Load Selection", &dialog);
+        load_btn->setEnabled(has_files);
+        layout->addWidget(load_btn);
 
-        std::string finalPath = "";
+        std::string final_path = "";
         
-        auto onConfirm = [&]() 
+        auto on_confirm = [&]() 
         {
-            if (listWidget->currentItem() && hasFiles) 
+            if (list_widget->currentItem() && has_files) 
             {
-                QString filename = listWidget->currentItem()->text();
-                fs::path p = fs::path(folderPath) / filename.toStdString();
+                QString filename = list_widget->currentItem()->text();
+                fs::path p = fs::path(folder_path) / filename.toStdString();
 
-                finalPath = p.string();
+                final_path = p.string();
                 dialog.accept();
             }
         };
 
-        QObject::connect(loadBtn, &QPushButton::clicked, onConfirm);
-        QObject::connect(listWidget, &QListWidget::itemDoubleClicked, onConfirm);
+        QObject::connect(load_btn, &QPushButton::clicked, on_confirm);
+        QObject::connect(list_widget, &QListWidget::itemDoubleClicked, on_confirm);
 
-        if (dialog.exec() == QDialog::Accepted) return finalPath;
+        if (dialog.exec() == QDialog::Accepted) return final_path;
 
         return ""; 
     }
