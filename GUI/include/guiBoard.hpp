@@ -52,6 +52,7 @@ namespace Chess
             void add_left_menu(QWidget *container);
             void add_moves_view();
             void save_game_as();
+            void delete_files();
         public:
             GInterface(std::shared_ptr<Board> game_board);
             void update() override;

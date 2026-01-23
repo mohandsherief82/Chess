@@ -194,27 +194,40 @@ namespace Chess
                 if (filename.length() < 4 || filename.substr(filename.length() - 4) != ".bin") 
                     filename += ".bin";
 
-                std::string current_game_path = this->game_board->get_game_path();
-                fs::path g_old(current_game_path);
-                fs::path g_new = g_old.parent_path() / filename;
+                fs::path g_new = fs::path(loadPath) / filename;
+                fs::path r_new = fs::path(redoPath) / filename;
 
-                if (fs::exists(g_old)) 
+                std::string current_game_path = this->game_board->get_game_path();
+
+                if (fs::exists(current_game_path)) 
                 {
-                    fs::rename(g_old, g_new);
+                    fs::rename(current_game_path, g_new);
                     this->game_board->udpate_game_path(g_new.string());
                 }
 
                 std::string current_redo_path = this->game_board->get_redo_path();
-                fs::path r_old(current_redo_path);
-                fs::path r_new = r_old.parent_path() / filename;
 
-                if (fs::exists(r_old)) 
+                if (fs::exists(current_redo_path)) 
                 {
-                    fs::rename(r_old, r_new);
+                    fs::rename(current_redo_path, r_new);
                     this->game_board->udpate_redo_path(r_new.string());
                 }
+
+                QMessageBox msgBox(this);
+
+                msgBox.setWindowTitle("Game Saved");
+                msgBox.setText(tr("Game successfully saved as %1").arg(QString::fromStdString(filename)));
+
+                msgBox.setInformativeText("What would you like to do next?");
+
+                QPushButton *continueBtn = msgBox.addButton(tr("Start New Game"), QMessageBox::AcceptRole);
+                QPushButton *menuBtn = msgBox.addButton(tr("Exit Game"), QMessageBox::DestructiveRole);
                 
-                QMessageBox::information(this, "Success", "Game and Redo history saved as: " + QString::fromStdString(filename));
+                msgBox.setIcon(QMessageBox::Information);
+                msgBox.exec();
+
+                if (msgBox.clickedButton() == menuBtn) this->close();
+                else if (msgBox.clickedButton() == continueBtn) this->start_game();
             } 
             catch (const fs::filesystem_error& e) 
             {
@@ -298,20 +311,24 @@ namespace Chess
         QPushButton *load_button { new QPushButton( QIcon( helpers::getIconPath('l') ), "  Load Game") };
         QPushButton *start_button { new QPushButton( QIcon( helpers::getIconPath('a') ), "  Start New Game") };
         QPushButton *resign_button { new QPushButton( QIcon( helpers::getIconPath('g') ), "  Resign") };
+        QPushButton *exit_button { new QPushButton( QIcon( helpers::getIconPath('x') ), "  Exit") };
 
         save_button->setStyleSheet(flat_style);
         load_button->setStyleSheet(flat_style);
         start_button->setStyleSheet(flat_style);
         resign_button->setStyleSheet(flat_style);
+        exit_button->setStyleSheet(flat_style);
 
         save_button->setFixedSize(180, 50);
         load_button->setFixedSize(180, 50);
         resign_button->setFixedSize(150, 50);
+        exit_button->setFixedSize(150, 50);
 
         save_button->setIconSize(QSize(SAVE_BUTTON_SIZE, SAVE_BUTTON_SIZE));
         load_button->setIconSize(QSize(SAVE_BUTTON_SIZE, SAVE_BUTTON_SIZE));
         start_button->setIconSize(QSize(SAVE_BUTTON_SIZE, SAVE_BUTTON_SIZE));
         resign_button->setIconSize(QSize(SAVE_BUTTON_SIZE, SAVE_BUTTON_SIZE));
+        exit_button->setIconSize(QSize(SAVE_BUTTON_SIZE, SAVE_BUTTON_SIZE));
 
         // Connect the save button to the new dialog function
         QObject::connect(save_button, &QPushButton::clicked, [=](){
@@ -326,6 +343,11 @@ namespace Chess
             this->start_game();
         });
 
+        QObject::connect(exit_button, &QPushButton::clicked, [=](){
+            this->delete_files();
+            this->close();
+        });
+
         layout->setSpacing(20);
         layout->setContentsMargins(0, 0, 0, 0);
 
@@ -335,6 +357,7 @@ namespace Chess
         layout->addWidget(load_button, 0, Qt::AlignCenter);
         layout->addWidget(start_button, 0, Qt::AlignCenter);
         layout->addWidget(resign_button, 0, Qt::AlignCenter);
+        layout->addWidget(exit_button, 0, Qt::AlignCenter);
 
         layout->addStretch(1);
     }
@@ -578,8 +601,29 @@ namespace Chess
     }
 
 
+    void GInterface::delete_files()
+    {
+            std::string game_path = this->game_board->get_game_path();
+            std::string redo_path = this->game_board->get_redo_path();
+
+            std::error_code ec;
+
+            fs::remove(game_path, ec);
+            fs::remove(redo_path, ec);
+
+            return;
+    }
+
+
     void GInterface::keyPressEvent(QKeyEvent *event) 
     {
-        if (event->matches(QKeySequence::Quit) || event->matches(QKeySequence::Close)) this->close();
+        if (event->matches(QKeySequence::Quit) || 
+                event->matches(QKeySequence::Close) || 
+                    event->key() == Qt::Key_Escape)
+        {
+            this->delete_files();
+
+            this->close();
+        }
     }
 }
