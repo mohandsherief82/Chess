@@ -128,9 +128,6 @@ namespace Chess
         Player *ply { this->get_player((this->player_turn == PLAYER1) ? PLAYER2 : PLAYER1) };
         char **board { this->get_board_array() };
         
-        if (checkMate(board, ply)) { std::cout << "Checkmate" << std::endl; }
-        else if (checkStalemate(board, ply)) { std::cout << "Stalemate" << std::endl; }
-
         this->update_turn((this->player_turn == PLAYER1) ? PLAYER2 : PLAYER1);
  
         this->notifyObservers();

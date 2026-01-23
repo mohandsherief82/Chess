@@ -311,11 +311,11 @@ namespace Chess
     }
 
 
-    void GInterface::resign()
+    void GInterface::game_end(std::string end_state)
     {
         PersistentDialog dialog(this);
 
-        dialog.setWindowTitle("Resigning");
+        dialog.setWindowTitle(QString::fromStdString(end_state));
 
         QString btn_style = "QPushButton { color: #f8e7bb; background-color: #1c2b3a; border: 1px solid #f8e7bb; padding: 10px; font-size: 14px; }"
                                     "QPushButton:hover { background-color: #2a3f55; }";
@@ -324,7 +324,12 @@ namespace Chess
 
         std::string player_resigned { (this->game_board->get_player_turn() == 1) ? "Player 1 Lost" : "Player 2 Lost" };
 
-        QLabel *msg_label = new QLabel(tr("Game Ended: %1").arg(QString::fromStdString(player_resigned)));
+        QString final_msg;
+
+        if (end_state == "Stalemate") final_msg = tr("Game Ended: Stalemate!!!");
+        else final_msg = tr("Game Ended: %1!!!").arg(QString::fromStdString(player_resigned));
+
+        QLabel *msg_label = new QLabel(final_msg);
 
         msg_label->setStyleSheet("color: #f8e7bb; font-size: 16px; font-weight: bold;");
         msg_label->setAlignment(Qt::AlignCenter);
@@ -375,25 +380,32 @@ namespace Chess
 
         QPushButton *save_button { new QPushButton( QIcon( helpers::getIconPath('s') ), "  Save Game") };
         QPushButton *load_button { new QPushButton( QIcon( helpers::getIconPath('l') ), "  Load Game") };
+        
         QPushButton *start_button { new QPushButton( QIcon( helpers::getIconPath('a') ), "  Start New Game") };
         QPushButton *resign_button { new QPushButton( QIcon( helpers::getIconPath('g') ), "  Resign") };
+        
         QPushButton *exit_button { new QPushButton( QIcon( helpers::getIconPath('x') ), "  Exit") };
 
         save_button->setStyleSheet(flat_style);
         load_button->setStyleSheet(flat_style);
+        
         start_button->setStyleSheet(flat_style);
         resign_button->setStyleSheet(flat_style);
+        
         exit_button->setStyleSheet(flat_style);
 
         save_button->setFixedSize(180, 50);
         load_button->setFixedSize(180, 50);
+        
         resign_button->setFixedSize(150, 50);
         exit_button->setFixedSize(150, 50);
 
         save_button->setIconSize(QSize(SAVE_BUTTON_SIZE, SAVE_BUTTON_SIZE));
         load_button->setIconSize(QSize(SAVE_BUTTON_SIZE, SAVE_BUTTON_SIZE));
+        
         start_button->setIconSize(QSize(SAVE_BUTTON_SIZE, SAVE_BUTTON_SIZE));
         resign_button->setIconSize(QSize(SAVE_BUTTON_SIZE, SAVE_BUTTON_SIZE));
+        
         exit_button->setIconSize(QSize(SAVE_BUTTON_SIZE, SAVE_BUTTON_SIZE));
 
         QObject::connect(save_button, &QPushButton::clicked, [=](){
@@ -414,7 +426,7 @@ namespace Chess
         });
 
         QObject::connect(resign_button, &QPushButton::clicked, [=](){
-            this->resign();
+            this->game_end("Resigning");
         });
 
         layout->setSpacing(20);
@@ -424,8 +436,10 @@ namespace Chess
 
         layout->addWidget(save_button, 0, Qt::AlignCenter);
         layout->addWidget(load_button, 0, Qt::AlignCenter);
+        
         layout->addWidget(start_button, 0, Qt::AlignCenter);
         layout->addWidget(resign_button, 0, Qt::AlignCenter);
+        
         layout->addWidget(exit_button, 0, Qt::AlignCenter);
 
         layout->addStretch(1);
@@ -665,6 +679,9 @@ namespace Chess
         
         this->add_moves_view();
         master_layout->addStretch(1);
+
+        if (checkMate(*board_ptr, this->game_board->get_player(player_turn))) this->game_end("Checkmate");
+        else if (checkStalemate(*board_ptr, this->game_board->get_player(player_turn))) this->game_end("Stalemate");
 
         return;
     }
