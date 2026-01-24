@@ -24,8 +24,17 @@ bool loadPlayerTurn(char** board, Player* player, Move move, Captured* capture, 
     bool state = false;
     char sym = tolower(move.symbol);
 
-    if (sym == 'p') state = movePawn(board, player, move, capture, whiteEnPassantCol,
-                                         blackEnPassantCol, false, true);
+    if (sym == 'p') 
+    {
+        MoveValidation mv = movePawn(board, player, move, capture, whiteEnPassantCol, blackEnPassantCol, false, true);
+        state = (mv != INVALID_MOVE);
+        
+        if (move.promotedPawn != 0) 
+        {
+            promotePawn(move, player, move.promotedPawn);
+            board[move.rowNext][move.colNext] = move.promotedPawn;
+        }
+    }
     else if (sym == 'r') state = moveRook(board, player, move, capture, false);
     else if (sym == 'n') state = moveKnight(board, player, move, capture, false);
     else if (sym == 'b') state = moveBishop(board, player, move, capture, false);

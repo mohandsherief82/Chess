@@ -23,6 +23,7 @@
 
 #include "boardCell.hpp"
 #include "piecesIcon.hpp"
+#include "dialog.hpp"
 
 namespace fs = std::filesystem;
 
@@ -41,6 +42,13 @@ extern "C"
     extern char *loadPath;
 }
 
+
+struct PromoOption 
+{ 
+    char symbol; 
+    QString name; 
+};
+
 namespace helpers
 {
     QString getIconPath(char piece);
@@ -55,4 +63,6 @@ namespace helpers
     std::string load_menu(QWidget* parent, const std::string& folder_path
                 , const std::string& exclude_name_no_ext);
     std::string get_filename_without_ext(const std::string& full_path);
+
+    char promotion_menu(QWidget* parent, PieceColor player_color);
 }

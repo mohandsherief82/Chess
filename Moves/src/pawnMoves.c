@@ -26,6 +26,30 @@ Piece* checkPromotedPawn(Player* player, Move move)
 }
 
 
+void promotePawn(Move move, Player* ply, char promoSymbol)
+{
+    Pawn* pawn = NULL;
+
+    for (int i = 0; i < NUM_PAWNS; i++)
+    {
+        if (move.colNext == ply->pawns[i].colPosition && move.rowNext == ply->pawns[i].rowPosition 
+                    && ply->pawns[i].isActive) 
+        {
+            pawn = &ply->pawns[i];
+            break;
+        }
+    }
+
+    if (pawn)
+    {
+        pawn->symbol = promoSymbol;
+        pawn->promoted = true;
+    }
+
+    return;
+}
+
+
 MoveValidation movePawn(char** board, Player* player, Move move, Captured* playerCaptures
     , int *plyEnPassantCol, int *oppEnPassantCol, bool legalCheck, bool load)
 {

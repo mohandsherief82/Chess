@@ -234,4 +234,72 @@ namespace helpers
 
         return ss.str();
     }
+
+    char promotion_menu(QWidget* parent, PieceColor player_color)
+    {
+        PersistentDialog dialog(parent);
+        
+        dialog.setWindowTitle("Pawn Promotion");
+        dialog.setStyleSheet("background-color: #0A1118; border: 2px solid #f8e7bb;");
+
+        QVBoxLayout* layout = new QVBoxLayout(&dialog);
+
+        QLabel *title = new QLabel("Select your promotion piece:");
+        title->setAlignment(Qt::AlignCenter);
+        title->setStyleSheet("color: #f8e7bb; font-weight: bold; font-size: 18px; margin-top: 10px; border: none;");
+        layout->addWidget(title);
+
+        QListWidget* list_widget = new QListWidget(&dialog);
+        
+        QString list_style = "QListWidget { background-color: #111c28; border: 1px solid #f8e7bb; color: #f8e7bb; font-size: 16px; outline: none; }"
+                             "QListWidget::item { padding: 15px; border-bottom: 1px solid #2a3f55; }"
+                             "QListWidget::item:selected { background-color: #1c2b3a; color: #ffffff; }";
+        
+        list_widget->setStyleSheet(list_style);
+        list_widget->setIconSize(QSize(40, 40));
+        
+        std::vector<PromoOption> options = {
+            { (player_color == COLOR_WHITE) ? 'q' : 'Q', "  Queen" },
+            { (player_color == COLOR_WHITE) ? 'r' : 'R', "  Rook" },
+            { (player_color == COLOR_WHITE) ? 'b' : 'B', "  Bishop" },
+            { (player_color == COLOR_WHITE) ? 'n' : 'N', "  Knight" }
+        };
+
+        for (const auto& opt : options)
+        {
+            QListWidgetItem* item = new QListWidgetItem(QIcon(getIconPath(opt.symbol)), opt.name);
+            item->setData(Qt::UserRole, QVariant(opt.symbol));
+            list_widget->addItem(item);
+        }
+
+        list_widget->setCurrentRow(0);
+        layout->addWidget(list_widget);
+
+        QPushButton* select_btn = new QPushButton("Confirm Promotion", &dialog);
+
+        QString btn_style = "QPushButton { color: #f8e7bb; background-color: #1c2b3a; border: 1px solid #f8e7bb; padding: 12px; font-size: 14px; font-weight: bold; }"
+                            "QPushButton:hover { background-color: #2a3f55; }"
+                            "QPushButton:pressed { background-color: #0A1118; }";
+
+        select_btn->setStyleSheet(btn_style);
+        layout->addWidget(select_btn);
+
+        char selected_symbol = (player_color == COLOR_WHITE) ? 'q' : 'Q';
+
+        auto on_confirm = [&]() 
+        {
+            if (list_widget->currentItem()) 
+            {
+                selected_symbol = (char)list_widget->currentItem()->data(Qt::UserRole).toInt();
+                dialog.accept();
+            }
+        };
+
+        QObject::connect(select_btn, &QPushButton::clicked, on_confirm);
+        QObject::connect(list_widget, &QListWidget::itemDoubleClicked, on_confirm);
+
+        dialog.exec();
+
+        return selected_symbol;
+    }
 }
