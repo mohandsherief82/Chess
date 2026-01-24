@@ -97,5 +97,6 @@ void BoardCell::dropEvent(QDropEvent *event)
             
             this->game_board->update_board();
         }
+        else if (move_state == PROMOTION) { std::cout << "PROMOTE" << std::endl; }
     }
 }

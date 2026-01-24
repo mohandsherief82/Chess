@@ -26,44 +26,6 @@ Piece* checkPromotedPawn(Player* player, Move move)
 }
 
 
-void promotePawn(Pawn* pawn, Move move, bool load)
-{
-    if ((pawn->rowPosition == 0 && pawn->color == COLOR_WHITE) || 
-        (pawn->rowPosition == 7 && pawn->color == COLOR_BLACK))
-    {
-        char newSymbol;
-        pawn->promoted = true;
-
-        if (isValidSymbol(tolower(move.promotedPawn)) && load) newSymbol = tolower(move.promotedPawn);
-        else if (!load)
-        {
-            while (true)
-            {
-                char c;
-                printf("What do you want to promote the pawn to (r, n, b, q): ");
-                
-                if (scanf(" %c", &newSymbol) != 1)
-                {
-                    while ((c = getchar()) != '\n' && c != EOF); 
-                    printf("Invalid input. Try again.\n");
-                    continue;
-                }
-
-                while ((c = getchar()) != '\n' && c != EOF);
-                newSymbol = tolower(newSymbol); 
-                
-                if (newSymbol == 'r' || newSymbol == 'n' || newSymbol == 'b' || newSymbol == 'q') break; 
-                
-                printf("Invalid Piece Symbol, Try Again! (Must be r, n, b, or q)\n");
-            }
-        }
-
-        if (!load) move.promotedPawn = newSymbol;
-        pawn->symbol = (pawn->color == COLOR_BLACK) ? toupper(newSymbol) : newSymbol;
-    }
-}
-
-
 MoveValidation movePawn(char** board, Player* player, Move move, Captured* playerCaptures
     , int *plyEnPassantCol, int *oppEnPassantCol, bool legalCheck, bool load)
 {
@@ -98,12 +60,11 @@ MoveValidation movePawn(char** board, Player* player, Move move, Captured* playe
                 pawn->colPosition = move.colNext;
 
                 if (pawn->firstMove) pawn->firstMove = false;
-
-                promotePawn(pawn, move, load);
                       
                 board[move.rowNext][move.colNext] = pawn->symbol;
                 
-                if (pawn->promoted) return PROMOTION;
+                if ((pawn->rowPosition == 7 && pawn->color == COLOR_BLACK) 
+                        || (pawn->rowPosition == 0 && pawn->color == COLOR_WHITE)) return PROMOTION;
             }
             
             return VALID_MOVE;
@@ -161,12 +122,11 @@ MoveValidation movePawn(char** board, Player* player, Move move, Captured* playe
                 pawn->colPosition = move.colNext;
                 
                 if (pawn->firstMove) pawn->firstMove = false;
-
-                promotePawn(pawn, move, load);
                 
                 board[move.rowNext][move.colNext] = pawn->symbol;
 
-                if (pawn->promoted) return PROMOTION;
+                if ((pawn->rowPosition == 7 && pawn->color == COLOR_BLACK) 
+                        || (pawn->rowPosition == 0 && pawn->color == COLOR_WHITE)) return PROMOTION;
             }
             
             return VALID_MOVE;
