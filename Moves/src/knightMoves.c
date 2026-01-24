@@ -25,6 +25,8 @@ MoveValidation moveKnight(char** board ,Player* player, Move move, Captured* pla
         }
     }
 
+    if (knight == NULL) return INVALID_MOVE;
+
     dispX = abs(move.rowNext - move.rowPrev);
     dispY = abs(move.colNext - move.colPrev);
 

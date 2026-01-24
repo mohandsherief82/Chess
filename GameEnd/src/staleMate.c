@@ -98,17 +98,17 @@ bool legalMove(char** board, Player* player)
                     testMove.rowNext = rNext;
                     testMove.colNext = cNext;
 
-                    bool moveSuccessful = false;
+                    MoveValidation moveState;
                     char pieceType = (char)tolower(board[rPrev][cPrev]);
                     
-                    if (pieceType == 'p') moveSuccessful = movePawn(cpyB, &cpyP, testMove, &tempCapture, &plyEpCol, &oppEpCol, true, false);
-                    else if (pieceType == 'r') moveSuccessful = moveRook(cpyB, &cpyP, testMove, &tempCapture, true);
-                    else if (pieceType == 'n') moveSuccessful = moveKnight(cpyB, &cpyP, testMove, &tempCapture, true);
-                    else if (pieceType == 'b') moveSuccessful = moveBishop(cpyB, &cpyP, testMove, &tempCapture, true);
-                    else if (pieceType == 'q') moveSuccessful = moveQueen(cpyB, &cpyP, testMove, &tempCapture, true);
-                    else if (pieceType == 'k') moveSuccessful = moveKing(cpyB, &cpyP, testMove, &tempCapture, true);
+                    if (pieceType == 'p') moveState = movePawn(cpyB, &cpyP, testMove, &tempCapture, &plyEpCol, &oppEpCol, true, false);
+                    else if (pieceType == 'r') moveState = moveRook(cpyB, &cpyP, testMove, &tempCapture, true);
+                    else if (pieceType == 'n') moveState = moveKnight(cpyB, &cpyP, testMove, &tempCapture, true);
+                    else if (pieceType == 'b') moveState = moveBishop(cpyB, &cpyP, testMove, &tempCapture, true);
+                    else if (pieceType == 'q') moveState = moveQueen(cpyB, &cpyP, testMove, &tempCapture, true);
+                    else if (pieceType == 'k') moveState = moveKing(cpyB, &cpyP, testMove, &tempCapture, true);
 
-                    if (moveSuccessful && !isChecked(cpyB, &cpyP, true))
+                    if (moveState != INVALID_MOVE  && !isChecked(cpyB, &cpyP, true))
                     {
                         freeCopy(cpyP, cpyB);
                         return true;

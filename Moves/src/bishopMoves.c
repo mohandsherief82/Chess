@@ -65,6 +65,8 @@ MoveValidation moveBishop(char** board, Player* player, Move move, Captured* pla
         }
     }
 
+    if (bishop == NULL) return INVALID_MOVE;
+
     board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
     board[move.rowNext][move.colNext] = bishop->symbol;
     bishop->rowPosition = move.rowNext;

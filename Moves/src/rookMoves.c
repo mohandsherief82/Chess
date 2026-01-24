@@ -10,19 +10,21 @@
 MoveValidation moveRook(char** board ,Player* player, Move move, Captured* playerCaptures, bool legalCheck)
 {
     int diffrow, diffcol, rowstep = 0, colstep = 0, r, c;
-    Rook* rock = (Rook*)checkPromotedPawn(player, move);
+    Rook* rook = (Rook*)checkPromotedPawn(player, move);
 
-    if (rock == NULL)
+    if (rook == NULL)
     {
         for (int i = 0; i < NUM_PIECES; i++)
         {
             if (player->rooks[i].colPosition == move.colPrev && player->rooks[i].rowPosition == move.rowPrev && player->rooks[i].isActive)
             {
-                rock = &player->rooks[i];
+                rook = &player->rooks[i];
                 break;
             }
         }
     }
+
+    if (rook == NULL) return INVALID_MOVE;
 
     diffrow = move.rowNext - move.rowPrev;
     diffcol = move.colNext - move.colPrev;
@@ -45,7 +47,7 @@ MoveValidation moveRook(char** board ,Player* player, Move move, Captured* playe
 
     if (!isEmpty(board, move.rowNext, move.colNext))
     {
-        if (pieceColorAt(board, move.rowNext, move.colNext) == rock->color) return INVALID_MOVE;
+        if (pieceColorAt(board, move.rowNext, move.colNext) == rook->color) return INVALID_MOVE;
 
         if (!legalCheck)
         {
@@ -60,10 +62,10 @@ MoveValidation moveRook(char** board ,Player* player, Move move, Captured* playe
     }
 
     board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
-    board[move.rowNext][move.colNext] = rock->symbol;
-    rock->rowPosition = move.rowNext;
-    rock->colPosition = move.colNext;
-    rock->firstMove = false;
+    board[move.rowNext][move.colNext] = rook->symbol;
+    rook->rowPosition = move.rowNext;
+    rook->colPosition = move.colNext;
+    rook->firstMove = false;
 
     return VALID_MOVE;
 }

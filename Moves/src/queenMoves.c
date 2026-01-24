@@ -22,6 +22,8 @@ MoveValidation moveQueen(char** board, Player* player, Move move, Captured* play
         }
     }
 
+    if (queen == NULL) return INVALID_MOVE;
+
     dispX = move.rowNext - move.rowPrev;
     dispY = move.colNext - move.colPrev;
 
