@@ -166,14 +166,11 @@ namespace Chess
         int player_turn = loadGame(board_ptr, ply1, ply2, ply1_captures, 
                 ply2_captures, whiteEP, blackEP, game_path.c_str());
 
-        if (player_turn != -1) 
-        {
-            this->game_board->update_turn(player_turn);
-            this->game_board->update_board();
-
-            this->game_board->udpate_game_path(game_path);
-            this->update();
-        }
+        this->game_board->update_turn(player_turn);
+        this->game_board->udpate_game_path(game_path);
+        this->game_board->udpate_redo_path(std::string(redoPath) + helpers::get_filename_without_ext(game_path) + ".bin");
+        
+        this->game_board->update_board();
 
         return;
     }

@@ -27,17 +27,12 @@ namespace helpers
                 {
                     if (entry.is_regular_file() && entry.path().extension() == ".bin") 
                     {
-                        std::string current_file_name = entry.path().stem().string();
-                        
-                        if (current_file_name != exclude_name_no_ext)
+                        std::string stem = entry.path().stem().string();
+                        if (stem != exclude_name_no_ext)
                         {
-                            list_widget->addItem(
-                                QString::fromStdString(
-                                        get_filename_without_ext(
-                                            entry.path().filename()
-                                        )
-                                    )
-                            );
+                            QListWidgetItem* item = new QListWidgetItem(QString::fromStdString(stem));
+                            item->setData(Qt::UserRole, QString::fromStdString(entry.path().filename().string()));
+                            list_widget->addItem(item);
                         }
                     }
                 }
@@ -49,11 +44,8 @@ namespace helpers
         }
 
         bool has_files = list_widget->count() > 0;
-
-        if (!has_files) 
-        {
-            list_widget->addItem("No other .bin files found.");
-        }
+        
+        if (!has_files) list_widget->addItem("No other .bin files found.");
         else
         {
             list_widget->sortItems(Qt::AscendingOrder);
@@ -72,9 +64,9 @@ namespace helpers
         {
             if (list_widget->currentItem() && has_files) 
             {
-                QString filename = list_widget->currentItem()->text();
-                fs::path p = fs::path(folder_path) / filename.toStdString();
-
+                QString actual_filename = list_widget->currentItem()->data(Qt::UserRole).toString();
+                fs::path p = fs::path(folder_path) / actual_filename.toStdString();
+                
                 final_path = p.string();
                 dialog.accept();
             }
@@ -161,9 +153,9 @@ namespace helpers
     {
         QString iconPath = getIconPath(pieceChar);
         if (iconPath.isEmpty()) return;
-
-        QVBoxLayout *layout = static_cast<QVBoxLayout*>(cell->layout());
-
+    
+        QVBoxLayout *layout = qobject_cast<QVBoxLayout*>(cell->layout());
+    
         if (!layout)
         {
             layout = new QVBoxLayout(cell);
@@ -190,9 +182,9 @@ namespace helpers
     {
         QString iconPath = getIconPath(pieceChar);
         if (iconPath.isEmpty()) return;
-
-        QVBoxLayout *layout = static_cast<QVBoxLayout*>(cell->layout());
-
+    
+        QVBoxLayout *layout = qobject_cast<QVBoxLayout*>(cell->layout());
+    
         if (!layout)
         {
             layout = new QVBoxLayout(cell);
