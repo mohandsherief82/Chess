@@ -1,13 +1,4 @@
 #include "guiBoard.hpp"
-#include "piecesIcon.hpp"
-#include "boardCell.hpp"
-
-#include <iostream>
-#include <array>
-#include <fstream>
-
-#include <QLabel>
-#include <QScrollArea>
 
 
 namespace Chess
@@ -40,7 +31,7 @@ namespace Chess
             
             if (QHBoxLayout *hLayout = qobject_cast<QHBoxLayout*>(central->layout())) 
             {
-                hLayout->addSpacing(95); 
+                hLayout->addSpacing(50); 
                 hLayout->addWidget(sidebar, 0, Qt::AlignVCenter);
             }
             
@@ -153,9 +144,396 @@ namespace Chess
     }
 
 
-    void GInterface::add_captures(QVBoxLayout *ply_data, QLabel *ply_msg, Captured *ply_captures)
+    void GInterface::load_game(const std::string file_path)
     {
-        ply_data->addWidget(ply_msg);
+        std::string game_path { helpers::load_menu(this, loadPath, file_path) };
+
+        if (game_path.empty()) return;
+
+        char ***board_ptr = this->game_board->get_board_ptr();
+
+        Player *ply1 = this->game_board->get_player(PLAYER1);
+        Player *ply2 = this->game_board->get_player(PLAYER2);
+
+        Captured *ply1_captures = this->game_board->get_player_captures(PLAYER1);
+        Captured *ply2_captures = this->game_board->get_player_captures(PLAYER2);
+
+        int *whiteEP = this->game_board->get_player_EP(PLAYER1);
+        int *blackEP = this->game_board->get_player_EP(PLAYER2);
+
+        if (*board_ptr == nullptr) *board_ptr = initializeBoard();
+
+        int player_turn = loadGame(board_ptr, ply1, ply2, ply1_captures, 
+                ply2_captures, whiteEP, blackEP, game_path.c_str());
+
+        this->game_board->update_turn(player_turn);
+        this->game_board->udpate_game_path(game_path);
+        this->game_board->udpate_redo_path(std::string(redoPath) + helpers::get_filename_without_ext(game_path) + ".bin");
+        
+        this->game_board->update_board();
+
+        return;
+    }
+
+
+    void GInterface::save_game_as()
+    {
+        bool ok;
+        QString text = QInputDialog::getText(this, tr("Save Game"),
+                                            tr("Enter save file name:"), QLineEdit::Normal,
+                                            tr("MyChessGame"), &ok);
+        
+        if (ok && !text.isEmpty())
+        {
+            try 
+            {
+                std::string filename = text.toStdString();
+            
+                if (filename.length() < 4 || filename.substr(filename.length() - 4) != ".bin") 
+                    filename += ".bin";
+
+                fs::path g_new = fs::path(loadPath) / filename;
+                fs::path r_new = fs::path(redoPath) / filename;
+
+                if (fs::exists(g_new))
+                {
+                    QMessageBox::warning(this, tr("Duplicate Name"), 
+                        tr("A file named %1 already exists. Please choose a different name.").arg(QString::fromStdString(filename)));
+                    this->save_game_as();
+                    return;
+                }
+
+                std::string current_game_path = this->game_board->get_game_path();
+
+                if (fs::exists(current_game_path)) 
+                {
+                    fs::rename(current_game_path, g_new);
+                    this->game_board->udpate_game_path(g_new.string());
+                }
+
+                std::string current_redo_path = this->game_board->get_redo_path();
+
+                if (fs::exists(current_redo_path)) 
+                {
+                    fs::rename(current_redo_path, r_new);
+                    this->game_board->udpate_redo_path(r_new.string());
+                }
+
+                PersistentDialog diag(this);
+
+                diag.setWindowTitle("Game Saved");
+                
+                QVBoxLayout *layout = new QVBoxLayout(&diag);
+
+                QLabel *msg_label = new QLabel(tr("Game successfully saved as %1\nWhat would you like to do next?").arg(QString::fromStdString(filename)));
+                msg_label->setStyleSheet("color: #f8e7bb; font-size: 16px; font-weight: bold;");
+                msg_label->setAlignment(Qt::AlignCenter);
+                
+                layout->addWidget(msg_label);
+
+                QPushButton *continue_btn = new QPushButton(tr("Start New Game"), &diag);
+                QPushButton *menu_btn = new QPushButton(tr("Exit Game"), &diag);
+                
+                QString btn_style = "QPushButton { color: #f8e7bb; background-color: #1c2b3a; border: 1px solid #f8e7bb; padding: 10px; font-size: 14px; }"
+                                    "QPushButton:hover { background-color: #2a3f55; }";
+
+                continue_btn->setStyleSheet(btn_style);
+                menu_btn->setStyleSheet(btn_style);
+
+                layout->addWidget(continue_btn);
+                layout->addWidget(menu_btn);
+
+                QObject::connect(continue_btn, &QPushButton::clicked, &diag, &QDialog::accept);
+                QObject::connect(menu_btn, &QPushButton::clicked, &diag, &QDialog::reject);
+
+                int result = diag.exec();
+
+                if (result == QDialog::Rejected) this->close();
+                else if (result == QDialog::Accepted) this->start_game();
+            } 
+            catch (const fs::filesystem_error& e) 
+            {
+                QMessageBox::critical(this, "File Error", "Could not rename files: " + QString::fromStdString(e.what()));
+            }
+        }
+    }
+
+
+    void GInterface::start_game() 
+    {
+        char ***board_ptr = this->game_board->get_board_ptr();
+
+        if (*board_ptr != nullptr) *board_ptr = initializeBoard(); 
+
+        Player *ply1 = this->game_board->get_player(PLAYER1);
+        Player *ply2 = this->game_board->get_player(PLAYER2);
+
+        Captured *ply1_captures = this->game_board->get_player_captures(PLAYER1);
+        Captured *ply2_captures = this->game_board->get_player_captures(PLAYER2);
+
+        int *whiteEP = this->game_board->get_player_EP(PLAYER1);
+        int *blackEP = this->game_board->get_player_EP(PLAYER2);
+
+        resetPlayer(ply1, COLOR_WHITE);
+        resetPlayer(ply2, COLOR_BLACK);
+
+        *ply1_captures = initializeCapture(COLOR_WHITE);
+        *ply2_captures = initializeCapture(COLOR_BLACK);
+
+        *whiteEP = -1;
+        *blackEP = -1;
+
+        this->game_board->update_turn(PLAYER1);
+
+        std::string game_path { loadPath }, 
+                    time { helpers::get_formatted_time() }, 
+                    redo_path { redoPath };
+        
+        game_path.append(time);
+        redo_path.append(time);
+
+        { 
+            std::ofstream game_file(game_path, std::ios::binary); 
+            std::ofstream redo_file(redo_path, std::ios::binary); 
+        }
+
+        this->game_board->udpate_game_path(game_path);
+        this->game_board->udpate_redo_path(redo_path);
+
+        updateBoard(*board_ptr, ply1, ply2);
+
+        this->update();
+
+        return;
+    }
+
+
+    void GInterface::game_end(std::string end_state)
+    {
+        PersistentDialog dialog(this);
+
+        dialog.setWindowTitle(QString::fromStdString(end_state));
+
+        QString btn_style = "QPushButton { color: #f8e7bb; background-color: #1c2b3a; border: 1px solid #f8e7bb; padding: 10px; font-size: 14px; }"
+                                    "QPushButton:hover { background-color: #2a3f55; }";
+        
+        QVBoxLayout *layout = new QVBoxLayout(&dialog);
+
+        std::string player_resigned { (this->game_board->get_player_turn() == 1) ? "Player 1 Lost" : "Player 2 Lost" };
+
+        QString final_msg;
+
+        if (end_state == "Stalemate") final_msg = tr("Game Ended: Stalemate!!!");
+        else final_msg = tr("Game Ended: %1!!!").arg(QString::fromStdString(player_resigned));
+
+        QLabel *msg_label = new QLabel(final_msg);
+
+        msg_label->setStyleSheet("color: #f8e7bb; font-size: 16px; font-weight: bold;");
+        msg_label->setAlignment(Qt::AlignCenter);
+        
+        layout->addWidget(msg_label);
+
+        QPushButton *continue_btn = new QPushButton(tr("Start New Game"), &dialog);
+        QPushButton *menu_btn = new QPushButton(tr("Exit Game"), &dialog);
+
+        continue_btn->setStyleSheet(btn_style);
+        menu_btn->setStyleSheet(btn_style);
+
+        layout->addWidget(continue_btn);
+        layout->addWidget(menu_btn);
+
+        QObject::connect(continue_btn, &QPushButton::clicked, &dialog, &QDialog::accept);
+        QObject::connect(menu_btn, &QPushButton::clicked, &dialog, &QDialog::reject);
+
+        int result { dialog.exec() };
+
+        this->delete_files();
+
+        if (result == QDialog::Rejected) this->close();
+        else if (result == QDialog::Accepted) this->start_game();
+    }
+
+
+    void GInterface::add_left_menu(QWidget *container)
+    {
+        QVBoxLayout *layout { new QVBoxLayout(container) };
+
+        container->setFixedSize(250, 500); 
+        container->setStyleSheet("background-color: #111c28; border-radius: 10px;");
+
+        QString flat_style =
+                    "QPushButton {"
+                    "   color: #f8e7bb; "
+                    "   border: 2px solid transparent;" 
+                    "   background: transparent;"
+                    "   font-size: 22px;" 
+                    "   padding: 10px;" 
+                    "   text-align: left;"
+                    "}"
+                    "QPushButton:hover {"
+                    "   background-color: #1c2b3a;"
+                    "   border-radius: 5px;"
+                    "}";
+
+        QPushButton *save_button { new QPushButton( QIcon( helpers::getIconPath('s') ), "  Save Game") };
+        QPushButton *load_button { new QPushButton( QIcon( helpers::getIconPath('l') ), "  Load Game") };
+        
+        QPushButton *start_button { new QPushButton( QIcon( helpers::getIconPath('a') ), "  Start New Game") };
+        QPushButton *resign_button { new QPushButton( QIcon( helpers::getIconPath('g') ), "  Resign") };
+        
+        QPushButton *exit_button { new QPushButton( QIcon( helpers::getIconPath('x') ), "  Exit") };
+
+        save_button->setStyleSheet(flat_style);
+        load_button->setStyleSheet(flat_style);
+        
+        start_button->setStyleSheet(flat_style);
+        resign_button->setStyleSheet(flat_style);
+        
+        exit_button->setStyleSheet(flat_style);
+
+        save_button->setFixedSize(180, 50);
+        load_button->setFixedSize(180, 50);
+        
+        resign_button->setFixedSize(150, 50);
+        exit_button->setFixedSize(150, 50);
+
+        save_button->setIconSize(QSize(SAVE_BUTTON_SIZE, SAVE_BUTTON_SIZE));
+        load_button->setIconSize(QSize(SAVE_BUTTON_SIZE, SAVE_BUTTON_SIZE));
+        
+        start_button->setIconSize(QSize(SAVE_BUTTON_SIZE, SAVE_BUTTON_SIZE));
+        resign_button->setIconSize(QSize(SAVE_BUTTON_SIZE, SAVE_BUTTON_SIZE));
+        
+        exit_button->setIconSize(QSize(SAVE_BUTTON_SIZE, SAVE_BUTTON_SIZE));
+
+        QObject::connect(save_button, &QPushButton::clicked, [=](){
+            this->save_game_as();
+        });
+
+        QObject::connect(load_button, &QPushButton::clicked, [=](){
+            this->load_game( helpers::get_filename_without_ext( this->game_board->get_game_path() ) );
+        });
+
+        QObject::connect(start_button, &QPushButton::clicked, [=](){
+            this->start_game();
+        });
+
+        QObject::connect(exit_button, &QPushButton::clicked, [=](){
+            this->delete_files();
+            this->close();
+        });
+
+        QObject::connect(resign_button, &QPushButton::clicked, [=](){
+            this->game_end("Resigning");
+        });
+
+        layout->setSpacing(20);
+        layout->setContentsMargins(0, 0, 0, 0);
+
+        layout->addStretch(1);
+
+        layout->addWidget(save_button, 0, Qt::AlignCenter);
+        layout->addWidget(load_button, 0, Qt::AlignCenter);
+        
+        layout->addWidget(start_button, 0, Qt::AlignCenter);
+        layout->addWidget(resign_button, 0, Qt::AlignCenter);
+        
+        layout->addWidget(exit_button, 0, Qt::AlignCenter);
+
+        layout->addStretch(1);
+    }
+
+
+    void GInterface::add_redo_undo(QHBoxLayout *box)
+    {
+        QString redo_icon_path { helpers::getIconPath('d') };   
+        QString undo_icon_path { helpers::getIconPath('u') };
+
+        QPushButton *undo_button = new QPushButton(QIcon(undo_icon_path), "Undo");
+        QPushButton *redo_button = new QPushButton(QIcon(redo_icon_path), "Redo");
+
+        QString flat_style = 
+                    "QPushButton {"
+                    "   color: #f8e7bb; "
+                    "   border: none;" 
+                    "   background: transparent;"
+                    "   font-size: 20px;" 
+                    "   padding: 0px;" 
+                    "   text-align: left;"
+                    "}"
+                    "QPushButton:hover {"
+                    "   background-color: #1c2b3a;"
+                    "   border-radius: 5px;"
+                    "}";
+
+        undo_button->setStyleSheet(flat_style);
+        redo_button->setStyleSheet(flat_style);
+
+        undo_button->setFixedSize(REDO_BUTTON_SIZE * 3, REDO_BUTTON_SIZE);
+        redo_button->setFixedSize(REDO_BUTTON_SIZE * 3, REDO_BUTTON_SIZE);
+
+        undo_button->setIconSize(QSize(REDO_BUTTON_SIZE, REDO_BUTTON_SIZE));
+        redo_button->setIconSize(QSize(REDO_BUTTON_SIZE, REDO_BUTTON_SIZE));
+        
+        QObject::connect(undo_button, &QPushButton::clicked, [=]()
+            {
+                undoLastMove(
+                        this->game_board->get_board_ptr(),
+                        this->game_board->get_player(PLAYER1),
+                        this->game_board->get_player(PLAYER2),
+                        this->game_board->get_player_captures(PLAYER1),
+                        this->game_board->get_player_captures(PLAYER2),
+                        this->game_board->get_player_EP(PLAYER1),
+                        this->game_board->get_player_EP(PLAYER2),
+                        (this->game_board->get_game_path()).c_str(),
+                        (this->game_board->get_redo_path()).c_str()
+                    );
+
+                this->game_board->update_board();
+            }
+        );
+
+        QObject::connect(redo_button, &QPushButton::clicked, [=]()
+            {
+                redoLastMove(
+                        this->game_board->get_board_ptr(),
+                        this->game_board->get_player(PLAYER1),
+                        this->game_board->get_player(PLAYER2),
+                        this->game_board->get_player_captures(PLAYER1),
+                        this->game_board->get_player_captures(PLAYER2),
+                        this->game_board->get_player_EP(PLAYER1),
+                        this->game_board->get_player_EP(PLAYER2),
+                        (this->game_board->get_game_path()).c_str(),
+                        (this->game_board->get_redo_path()).c_str()
+                    );
+
+                this->game_board->update_board();
+            }
+        );
+
+        box->setSpacing(0);
+        box->setContentsMargins(0, 0, 0, 0);
+        
+        box->addStretch(1);
+
+        box->addWidget(undo_button);
+        box->addWidget(redo_button);
+
+        undo_button->setVisible( fs::exists(this->game_board->get_game_path()) && fs::file_size(this->game_board->get_game_path()) > 0 );
+        redo_button->setVisible( fs::exists(this->game_board->get_redo_path()) && fs::file_size(this->game_board->get_redo_path()) > 0 );
+
+        box->addSpacing(10);
+    }
+
+
+    void GInterface::add_captures(QVBoxLayout *ply_data, QLabel *ply_msg, Captured *ply_captures, bool redo_flag)
+    {
+        QHBoxLayout *msg_box { new QHBoxLayout() };
+
+        msg_box->addWidget(ply_msg);
+
+        if (redo_flag) this->add_redo_undo(msg_box);
+        
+        ply_data->addLayout(msg_box);
 
         QGridLayout *gl = new QGridLayout();
 
@@ -184,15 +562,16 @@ namespace Chess
     void GInterface::update()
     {
         QWidget *master_container { new QWidget() };
+
         QWidget *container_central { new QWidget() };
+        QWidget *container_left { new QWidget() };
 
         QHBoxLayout *master_layout { new QHBoxLayout(master_container) };
         
         QGridLayout *gl { new QGridLayout(container_central) };
 
-        QString label_style = "font-weight: bold; color: #f8e7bb;"
-                    " font-size: 20px; margin-bottom: 5px;"
-                    " padding-bottom: 2px;";
+        QString label_style = "font-weight: bold; color: #f8e7bb; font-size: 20px; margin-bottom: 5px; padding-bottom: 2px;";
+        QString edge_label_style = "color: #f8e7bb; font-weight: bold; font-size: 14px; min-width: 25px; min-height: 25px;";
 
         QLabel *player2_msg { new QLabel("Player 2 (Black)") };
         QLabel *player1_msg { new QLabel("Player 1 (White)") };
@@ -204,57 +583,83 @@ namespace Chess
         QVBoxLayout *ply1_data { new QVBoxLayout() };
 
         gl->setSpacing(0);
-        gl->setContentsMargins(0, 0, 0, 0);
+        gl->setContentsMargins(10, 10, 10, 10);
 
         int player_turn = this->game_board->get_player_turn();
 
         char ***board_ptr = this->game_board->get_board_ptr();
 
-        Player *ply = this->game_board->get_player(player_turn);
-
-        Captured *captures = NULL;
-
-        this->add_captures(ply1_data, player1_msg, this->game_board->get_player_captures(PLAYER1));
-        this->add_captures(ply2_data, player2_msg, this->game_board->get_player_captures(PLAYER2));
-
         this->setCentralWidget(master_container);
 
         if (player_turn == PLAYER1)
         {
-            captures = this->game_board->get_player_captures(1);
-            gl->addLayout(ply2_data, 0, 0, 1, 8, Qt::AlignLeft);
-            gl->addLayout(ply1_data, 9, 0, 1, 8, Qt::AlignLeft);
+            gl->addLayout(ply2_data, 0, 1, 1, 8, Qt::AlignLeft);
+            gl->addLayout(ply1_data, 11, 1, 1, 8, Qt::AlignLeft);
+
+            this->add_captures(ply1_data, player1_msg, this->game_board->get_player_captures(PLAYER1), true);
+            this->add_captures(ply2_data, player2_msg, this->game_board->get_player_captures(PLAYER2), false);
         }
         else
         {
-            captures = this->game_board->get_player_captures(2);
-            gl->addLayout(ply1_data, 0, 0, 1, 8, Qt::AlignLeft);
-            gl->addLayout(ply2_data, 9, 0, 1, 8, Qt::AlignLeft);
+            gl->addLayout(ply1_data, 0, 1, 1, 8, Qt::AlignLeft);
+            gl->addLayout(ply2_data, 11, 1, 1, 8, Qt::AlignLeft);
+
+            this->add_captures(ply2_data, player2_msg, this->game_board->get_player_captures(PLAYER2), true);
+            this->add_captures(ply1_data, player1_msg, this->game_board->get_player_captures(PLAYER1), false);
         }
 
         for (int i = 0; i < 8; i++)
         {
+            int actual_row = (player_turn == PLAYER1) ? i : (7 - i);
+            int rank_num = (player_turn == PLAYER1) ? (8 - i) : (i + 1);
+
+            QLabel *left_rank { new QLabel(QString::number(rank_num)) };
+            QLabel *right_rank { new QLabel(QString::number(rank_num)) };
+
+            left_rank->setStyleSheet(edge_label_style);
+            right_rank->setStyleSheet(edge_label_style);
+
+            left_rank->setAlignment(Qt::AlignCenter);
+            right_rank->setAlignment(Qt::AlignCenter);
+
+            gl->addWidget(left_rank, i + 2, 0);
+            gl->addWidget(right_rank, i + 2, 9);
+
             for (int j = 0; j < 8; j++)
             {
-                BoardCell *cell = new BoardCell(i, j, this->game_board);
+                int actual_col = (player_turn == PLAYER1) ? j : (7 - j);
 
-                QString color = ((i + j) % 2 == 0) ? "#f8e7bb" : "#004474";
-                cell->setStyleSheet(QString(
-                    "background-color: %1; border: none; margin: 0px;"
-                ).arg(color));
-
-                bool isCurrentPlayerPiece = (player_turn == PLAYER1) ?
-                                            std::islower((*board_ptr)[i][j]) :
-                                            std::isupper((*board_ptr)[i][j]);
-
-                if (!isEmpty(*board_ptr, i, j))
+                if (i == 0)
                 {
-                    if (isCurrentPlayerPiece) helpers::add_piece_to_cell(cell, (*board_ptr)[i][j], i, j);
-                    else helpers::add_piece_to_cell(cell, (*board_ptr)[i][j]);
+                    char fileChar = (player_turn == PLAYER1) ? ('a' + j) : ('h' - j);
+                    QLabel *top_file { new QLabel(QString(fileChar)) };
+                    QLabel *bottom_file { new QLabel(QString(fileChar)) };
+                    
+                    top_file->setStyleSheet(edge_label_style);
+                    bottom_file->setStyleSheet(edge_label_style);
+                    top_file->setAlignment(Qt::AlignCenter);
+                    bottom_file->setAlignment(Qt::AlignCenter);
+
+                    gl->addWidget(top_file, 1, j + 1);
+                    gl->addWidget(bottom_file, 10, j + 1);
                 }
 
-                int displayRow = (player_turn == PLAYER1) ? (i + 1) : ((7 - i) + 1);
-                gl->addWidget(cell, displayRow, j);
+                BoardCell *cell = new BoardCell(actual_row, actual_col, this->game_board);
+
+                QString color = ((actual_row + actual_col) % 2 == 0) ? "#f8e7bb" : "#004474";
+                cell->setStyleSheet(QString("background-color: %1; border: none; margin: 0px;").arg(color));
+
+                bool isCurrentPlayerPiece = (player_turn == PLAYER1) ?
+                                            std::islower((*board_ptr)[actual_row][actual_col]) :
+                                            std::isupper((*board_ptr)[actual_row][actual_col]);
+
+                if (!isEmpty(*board_ptr, actual_row, actual_col))
+                {
+                    if (isCurrentPlayerPiece) helpers::add_piece_to_cell(cell, (*board_ptr)[actual_row][actual_col], actual_row, actual_col);
+                    else helpers::add_piece_to_cell(cell, (*board_ptr)[actual_row][actual_col]);
+                }
+
+                gl->addWidget(cell, i + 2, j + 1);
             }
         }
 
@@ -262,17 +667,46 @@ namespace Chess
         master_layout->setSpacing(0);
 
         master_layout->addStretch(1);
+
+        this->add_left_menu(container_left);
+        master_layout->addWidget(container_left, 0, Qt::AlignLeft);
+
+        master_layout->addStretch(1);
         master_layout->addWidget(container_central, 0, Qt::AlignCenter);
         
         this->add_moves_view();
         master_layout->addStretch(1);
 
+        if (checkMate(*board_ptr, this->game_board->get_player(player_turn))) this->game_end("Checkmate");
+        else if (checkStalemate(*board_ptr, this->game_board->get_player(player_turn))) this->game_end("Stalemate");
+
         return;
+    }
+
+
+    void GInterface::delete_files()
+    {
+            std::string game_path = this->game_board->get_game_path();
+            std::string redo_path = this->game_board->get_redo_path();
+
+            std::error_code ec;
+
+            fs::remove(game_path, ec);
+            fs::remove(redo_path, ec);
+
+            return;
     }
 
 
     void GInterface::keyPressEvent(QKeyEvent *event) 
     {
-        if (event->matches(QKeySequence::Quit) || event->matches(QKeySequence::Close)) this->close();
+        if (event->matches(QKeySequence::Quit) || 
+                event->matches(QKeySequence::Close) || 
+                    event->key() == Qt::Key_Escape)
+        {
+            this->delete_files();
+
+            this->close();
+        }
     }
 }

@@ -135,23 +135,24 @@ Used Classes:
 
     namespace Chess
     {
-        class GInterface: Concrete::Observer
-        {
-            public:
-                void update();
-        };
+        class Board;
 
-        class Board: Concrete::Subject
+        class GInterface: public Concrete::Observer, public QMainWindow
         {
             private:
-                char board[8][8];
-                std::string board_str;
-                std::vector<Concrete::Observer> observers_data;
+                std::shared_ptr<Board> game_board = nullptr;
+
+                void add_captures(QVBoxLayout *ply_data, QLabel *ply_msg, Captured *ply_captures, bool redo_flag);
+                void add_redo_undo(QHBoxLayout *box);
+                void add_left_menu(QWidget *container);
+                void add_moves_view();
             public:
-                void addObserver(Concrete::Observer observer);
-                void removeObserver(Concrete::Observer observer);
-                void notifyObservers();
-                void updateBoard();
+                GInterface(std::shared_ptr<Board> game_board);
+                void update() override;
+                void load_game();
+                void start_game();
+            protected:
+                void keyPressEvent(QKeyEvent *event) override;
         };
     }
 
@@ -210,21 +211,14 @@ The queen's move is very similar to the bishop and the rook moves, so the implem
 To ensure games can be resumed, validated moves are appended to a binary file for space efficiency.
 
 *   **Save**: Commits the `Move` struct to disk immediately after a successful turn.
-*   **Load**: Reads history sequentially and reconstructs the game state by replaying moves.
+*   **Load**: Reads history sequentially and reconstructs the game state by replaying moves and supports multiple game loading.
 *   **Undo**: Implemented by truncating the last `sizeof(Move)` bytes from the binary file and triggering a reload to revert state and storing the data of the undone move in a separate file for redoing.
 *   **Redo**: It checks if the redo file isn't empty and then read the last move from the file and then reload the game with the redone move again.
 
 8\. User Manual
 ---------------
 
-*   **Start**: Enter `p` for a new game or `l` to load a game.
-*   **Movement**: Enter moves as `[Piece][Source][Destination]` (e.g., `pe2e4`).
-*   **Undo**: Type `u` to revert the last turn.
-*   **Redo**: Type `d` to redo the last undone move
-*   **Save**: Type `s` to save progress and exit the application.
-*   **Resign**: Type `r` to resign and exit the application.
-*   **Promotion**: You will be prompted to enter `q`, `r`, `b`, or `n`.
-
+<!-- Needs Updates -->
 
 9\. Snapshots of the Game
 -------------------------

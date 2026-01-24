@@ -11,9 +11,9 @@ void saveMove(Move move, const char *game_path);
 int loadGame(char*** board, Player* player1, Player* player2, Captured* ply1Captures, 
     Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol, const char *game_path);
 bool undoLastMove(char*** boardPtr, Player* player1, Player* player2, Captured* ply1Captures,
-     Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol, const char *game_path);
+     Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol, const char *game_path, const char *redo_path);
 bool redoLastMove(char*** boardPtr, Player* player1, Player* player2, Captured* ply1Captures
     , Captured* ply2Captures, int *whiteEnPassantCol, int *blackEnPassantCol, const char *game_path, const char *redo_path);
-void clearRedo();
+void clearRedo(const char *redo_path);
 
 #endif

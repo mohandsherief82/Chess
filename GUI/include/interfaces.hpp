@@ -6,9 +6,11 @@
 
 extern "C"
 {
-    #include "Board/include/board.h"
-    #include "Pieces/include/player.h"
-    #include "Pieces/include/captures.h"
+    #include "board.h"
+    #include "staleMate.h"
+    #include "checkMate.h"
+    #include "player.h"
+    #include "captures.h"
     #include "chessTypes.h"
 }
 
@@ -41,6 +43,8 @@ namespace Concrete
 
 namespace Chess
 {
+    class GInterface;
+
     class AIOpponent: public Concrete::Observer
     {
         public:

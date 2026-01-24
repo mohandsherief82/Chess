@@ -36,11 +36,15 @@ void BoardCell::dropEvent(QDropEvent *event)
     {
         Move move 
         {
+            .symbol = 0,
+
             .colPrev = piece->getCol(),
             .rowPrev = piece->getRow(),
 
             .colNext = this->getCol(),
-            .rowNext = this->getRow()
+            .rowNext = this->getRow(),
+ 
+            .promotedPawn = 0
         };
 
         MoveValidation move_state {};
@@ -50,11 +54,8 @@ void BoardCell::dropEvent(QDropEvent *event)
         Captured *ply_captures = this->game_board->get_player_captures(player_turn);
 
         char **board = this->game_board->get_board_array();
-
-        int player_turn = this->game_board->get_player_turn();
-
-        int *plyEP = this->game_board->get_player_EP(player_turn)
-            , *oppEP = this->game_board->get_player_EP( (player_turn == PLAYER1) ? PLAYER2: PLAYER1 );
+        int *plyEP = this->game_board->get_player_EP(player_turn), 
+            *oppEP = this->game_board->get_player_EP((player_turn == PLAYER1) ? PLAYER2 : PLAYER1);
 
         switch (piece->symbol)
         {
@@ -84,26 +85,28 @@ void BoardCell::dropEvent(QDropEvent *event)
                 break;
         }
 
-        if (move_state == VALID_MOVE) 
+        if (move_state != INVALID_MOVE) 
         {
+            if (move_state == PROMOTION)
+            {
+                char chosen_piece = helpers::promotion_menu(this, ply->color);
+                               
+                promotePawn(move, ply, chosen_piece);
+
+                move.promotedPawn = chosen_piece;
+                board[move.rowNext][move.colNext] = chosen_piece;
+            }
+
             piece->hide(); 
             event->acceptProposedAction();
 
             saveMove(move, (this->game_board->get_game_path()).c_str());
+            clearRedo((this->game_board->get_redo_path()).c_str());
 
+            if (ply_captures->newCapture) 
+                capturePiece(game_board->get_player((player_turn == PLAYER1) ? PLAYER2 : PLAYER1), ply_captures);
+            
             this->game_board->update_board();
         }
-        else if (move_state == ENEMY_CAPTURE)
-        {
-            capturePiece(game_board->get_player((player_turn == PLAYER1) ? PLAYER2: PLAYER1), ply_captures);
-
-            piece->hide(); 
-            event->acceptProposedAction();
-
-            saveMove(move, (this->game_board->get_game_path()).c_str());
-
-            this->game_board->update_board();
-        }
-        else {}
     }
 }

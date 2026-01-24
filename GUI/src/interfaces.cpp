@@ -125,8 +125,11 @@ namespace Chess
     {
         updateBoard(*this->board_ptr, this->ply1, this->ply2);
 
-        this->update_turn((this->player_turn == PLAYER1) ? PLAYER2 : PLAYER1);
+        Player *ply { this->get_player((this->player_turn == PLAYER1) ? PLAYER2 : PLAYER1) };
+        char **board { this->get_board_array() };
         
+        this->update_turn((this->player_turn == PLAYER1) ? PLAYER2 : PLAYER1);
+ 
         this->notifyObservers();
         return;
     }

@@ -1,43 +1,68 @@
 #pragma once
 
+#include <QVBoxLayout>
+#include <QPushButton>
+#include <QListWidget>
 #include <QString>
 #include <QLayout>
 #include <QWidget>
-#include <QVBoxLayout>
+#include <QDialog>
 #include <QLabel>
 #include <QIcon>
 #include <QPixmap>
 
-#include <array>
+#include <filesystem>
 #include <fstream>
+#include <sstream>
+#include <iomanip>
 #include <cctype>
 #include <chrono>
-#include <ctime>
-#include <iomanip>
-#include <sstream>
 #include <string>
+#include <ctime>
+#include <array>
 
 #include "boardCell.hpp"
 #include "piecesIcon.hpp"
+#include "dialog.hpp"
+
+namespace fs = std::filesystem;
 
 // GUI Constants
 #define CELL_SIZE 70
 #define PIECE_ICON_SIZE 60
 #define CAPTURE_CELL_SIZE 30
 #define MOVES_READ 32
+#define REDO_BUTTON_SIZE 32
+#define SAVE_BUTTON_SIZE 30
 
 // External variables used for file reading
 extern "C" 
 {
+    #include "saveGame.h"
     extern char *loadPath;
 }
+
+
+struct PromoOption 
+{ 
+    char symbol; 
+    QString name; 
+};
 
 namespace helpers
 {
     QString getIconPath(char piece);
     std::array<Move, MOVES_READ> read_moves(std::string path);
+
     void clear_items(QLayout *gl);
     void add_piece_to_cell(QWidget *cell, char pieceChar);
+
     void add_piece_to_cell(BoardCell *cell, char pieceChar, int row, int col);
     std::string get_formatted_time();
+
+    std::string load_menu(QWidget* parent, const std::string& folder_path
+                , const std::string& exclude_name_no_ext);
+    std::string get_filename_without_ext(const std::string& full_path);
+
+    char promotion_menu(QWidget* parent, PieceColor player_color);
 }

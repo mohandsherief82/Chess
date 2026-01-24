@@ -25,6 +25,8 @@ MoveValidation moveKnight(char** board ,Player* player, Move move, Captured* pla
         }
     }
 
+    if (knight == NULL) return INVALID_MOVE;
+
     dispX = abs(move.rowNext - move.rowPrev);
     dispY = abs(move.colNext - move.colPrev);
 
@@ -32,7 +34,7 @@ MoveValidation moveKnight(char** board ,Player* player, Move move, Captured* pla
 
     if (!isEmpty(board, move.rowNext, move.colNext))
     {      
-        if (pieceColorAt(board, move.rowNext, move.colNext) == knight->color) return FRIENDLY_CAPTURE;
+        if (pieceColorAt(board, move.rowNext, move.colNext) == knight->color) return INVALID_MOVE;
         
         if (!legalCheck)
         {
@@ -43,13 +45,6 @@ MoveValidation moveKnight(char** board ,Player* player, Move move, Captured* pla
             
             playerCaptures->captureCount++;
             playerCaptures->newCapture = true;
-
-            board[move.rowPrev][move.colPrev] = EMPTY_SQUARE;
-            board[move.rowNext][move.colNext] = knight->symbol;
-            knight->rowPosition = move.rowNext;
-            knight->colPosition = move.colNext;
-
-            return ENEMY_CAPTURE;
         }
     }
 

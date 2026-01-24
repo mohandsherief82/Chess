@@ -35,6 +35,7 @@ target_sources(
             include/boardCell.hpp
             include/interfaces.hpp
             include/helpers.hpp
+            include/dialog.hpp
     PRIVATE
         src/guiBoard.cpp
         src/startMenu.cpp
@@ -42,6 +43,7 @@ target_sources(
         src/boardCell.cpp
         src/interfaces.cpp
         src/helpers.cpp
+        src/dialog.cpp
 )
 
 # Ensure the compiler can find your headers
