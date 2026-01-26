@@ -8,6 +8,7 @@
 #include <QGridLayout>
 #include <QLabel>
 #include <QDebug>
+#include <QTimer>
 
 #include <memory>
 
