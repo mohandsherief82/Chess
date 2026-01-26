@@ -63,5 +63,6 @@ namespace Chess
             void start_game();
         protected:
             void keyPressEvent(QKeyEvent *event) override;
+            void closeEvent(QCloseEvent *event) override;
     };
 }
