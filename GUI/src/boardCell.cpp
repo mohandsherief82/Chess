@@ -106,7 +106,7 @@ void BoardCell::dropEvent(QDropEvent *event)
             if (ply_captures->newCapture) 
                 capturePiece(game_board->get_player((player_turn == PLAYER1) ? PLAYER2 : PLAYER1), ply_captures);
             
-            this->game_board->update_board();
+            QTimer::singleShot(0, [this](){ this->game_board->update_board(); });
         }
     }
 }

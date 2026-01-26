@@ -12,6 +12,7 @@
 #include <QWidget>
 #include <QString>
 #include <QLabel>
+#include <QTimer>
 #include <QIcon>
 
 #include "interfaces.hpp"

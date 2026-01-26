@@ -178,7 +178,7 @@ namespace Chess
 
     void GInterface::save_game_as()
     {
-        bool ok;
+        bool ok = false;
         QString text = QInputDialog::getText(this, tr("Save Game"),
                                             tr("Enter save file name:"), QLineEdit::Normal,
                                             tr("MyChessGame"), &ok);
@@ -349,8 +349,8 @@ namespace Chess
 
         this->delete_files();
 
-        if (result == QDialog::Rejected) this->close();
-        else if (result == QDialog::Accepted) this->start_game();
+        if (result == QDialog::Accepted) QTimer::singleShot(0, this, [this](){ this->start_game(); });
+        else this->close();
     }
 
 
@@ -677,8 +677,13 @@ namespace Chess
         this->add_moves_view();
         master_layout->addStretch(1);
 
-        if (checkMate(*board_ptr, this->game_board->get_player(player_turn))) this->game_end("Checkmate");
-        else if (checkStalemate(*board_ptr, this->game_board->get_player(player_turn))) this->game_end("Stalemate");
+        Player *current_ply = this->game_board->get_player(player_turn);
+
+        if (board_ptr && *board_ptr && current_ply)
+        {
+            if (checkMate(*board_ptr, current_ply)) this->game_end("Checkmate");
+            else if (checkStalemate(*board_ptr, current_ply)) this->game_end("Stalemate");
+        }
 
         return;
     }
@@ -686,15 +691,12 @@ namespace Chess
 
     void GInterface::delete_files()
     {
-            std::string game_path = this->game_board->get_game_path();
-            std::string redo_path = this->game_board->get_redo_path();
+        std::error_code ec;
+        
+        fs::remove(this->game_board->get_game_path(), ec);
+        fs::remove(this->game_board->get_redo_path(), ec);
 
-            std::error_code ec;
-
-            fs::remove(game_path, ec);
-            fs::remove(redo_path, ec);
-
-            return;
+        return;
     }
 
 
