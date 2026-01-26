@@ -11,11 +11,6 @@
 #include "startMenu.hpp"
 #include "interfaces.hpp"
 
-extern "C" 
-{
-    #include "Board/include/board.h"
-}
-
 
 int main(int argc, char **argv)
 {
