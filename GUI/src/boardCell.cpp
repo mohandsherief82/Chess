@@ -85,7 +85,7 @@ void BoardCell::dropEvent(QDropEvent *event)
                 break;
         }
 
-        if (move_state != INVALID_MOVE) 
+        if (move_state != INVALID_MOVE && !isChecked(board, ply, true)) 
         {
             if (move_state == PROMOTION)
             {
