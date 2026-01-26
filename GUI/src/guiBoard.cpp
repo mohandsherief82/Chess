@@ -386,9 +386,12 @@ namespace Chess
 
         int result { dialog.exec() };
 
-        this->delete_files();
+        if (result == QDialog::Accepted) 
+        {
+            this->delete_files();
 
-        if (result == QDialog::Accepted) QTimer::singleShot(0, this, [this](){ this->start_game(); });
+            QTimer::singleShot(0, this, [this](){ this->start_game(); });
+        }
         else if (result == QDialog::Rejected) 
         {
             this->delete_files();
@@ -754,5 +757,13 @@ namespace Chess
 
             this->close();
         }
+    }
+
+
+    void GInterface::closeEvent(QCloseEvent *event)
+    {
+        this->delete_files();
+        
+        event->accept();
     }
 }

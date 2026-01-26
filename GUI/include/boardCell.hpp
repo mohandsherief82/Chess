@@ -20,6 +20,7 @@ extern "C"
     #include "bishopMoves.h"
     #include "queenMoves.h"
     #include "kingMoves.h"
+    #include "check.h"
     #include "saveGame.h"
     
     extern char *loadPath;
