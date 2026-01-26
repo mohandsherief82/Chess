@@ -314,7 +314,7 @@ namespace Chess
 
         dialog.setWindowTitle(QString::fromStdString(end_state));
 
-        QString btn_style = "QPushButton { color: #f8e7bb; background-color: #1c2b3a; border: 1px solid #f8e7bb; padding: 10px; font-size: 14px; }"
+        QString btn_style = "QPushButton { color: #f8e7bb; background-color: #1c2b3a; border:none; padding: 10px; font-size: 14px; }"
                                     "QPushButton:hover { background-color: #2a3f55; }";
         
         QVBoxLayout *layout = new QVBoxLayout(&dialog);
@@ -334,13 +334,52 @@ namespace Chess
         layout->addWidget(msg_label);
 
         QPushButton *continue_btn = new QPushButton(tr("Start New Game"), &dialog);
+        QPushButton *undo_btn = new QPushButton(tr("Undo Last Move"), &dialog);
         QPushButton *menu_btn = new QPushButton(tr("Exit Game"), &dialog);
 
         continue_btn->setStyleSheet(btn_style);
+        undo_btn->setStyleSheet(btn_style);
         menu_btn->setStyleSheet(btn_style);
 
         layout->addWidget(continue_btn);
+        if (end_state == "Checkmate" || end_state == "Stalemate") layout->addWidget(undo_btn);
         layout->addWidget(menu_btn);
+
+        QObject::connect(undo_btn, &QPushButton::clicked, [&]()
+            {
+                undoLastMove(
+                        this->game_board->get_board_ptr(),
+                        this->game_board->get_player(PLAYER1),
+                        this->game_board->get_player(PLAYER2),
+                        this->game_board->get_player_captures(PLAYER1),
+                        this->game_board->get_player_captures(PLAYER2),
+                        this->game_board->get_player_EP(PLAYER1),
+                        this->game_board->get_player_EP(PLAYER2),
+                        (this->game_board->get_game_path()).c_str(),
+                        (this->game_board->get_redo_path()).c_str()
+                );
+
+                undoLastMove(
+                        this->game_board->get_board_ptr(),
+                        this->game_board->get_player(PLAYER1),
+                        this->game_board->get_player(PLAYER2),
+                        this->game_board->get_player_captures(PLAYER1),
+                        this->game_board->get_player_captures(PLAYER2),
+                        this->game_board->get_player_EP(PLAYER1),
+                        this->game_board->get_player_EP(PLAYER2),
+                        (this->game_board->get_game_path()).c_str(),
+                        (this->game_board->get_redo_path()).c_str()
+                );
+
+                int player_turn { this->game_board->get_player_turn() };
+
+                if (player_turn == PLAYER1) this->game_board->update_turn(PLAYER2);
+                else this->game_board->update_turn(PLAYER1);
+
+                this->game_board->update_board();
+                dialog.done(2);
+            }
+        );
 
         QObject::connect(continue_btn, &QPushButton::clicked, &dialog, &QDialog::accept);
         QObject::connect(menu_btn, &QPushButton::clicked, &dialog, &QDialog::reject);
@@ -350,7 +389,12 @@ namespace Chess
         this->delete_files();
 
         if (result == QDialog::Accepted) QTimer::singleShot(0, this, [this](){ this->start_game(); });
-        else this->close();
+        else if (result == QDialog::Rejected) 
+        {
+            this->delete_files();
+
+            this->close();
+        }
     }
 
 
