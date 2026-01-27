@@ -350,8 +350,10 @@ namespace Chess
         menu_btn->setStyleSheet(btn_style);
 
         layout->addWidget(continue_btn);
-        if (end_state == "Checkmate" || end_state == "Stalemate") layout->addWidget(undo_btn);
+        layout->addWidget(undo_btn);
         layout->addWidget(menu_btn);
+
+        if (end_state != "Checkmate" && end_state != "Stalemate")  undo_btn->hide();
 
         QObject::connect(undo_btn, &QPushButton::clicked, [&]()
             {
