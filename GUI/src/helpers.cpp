@@ -110,29 +110,56 @@ namespace helpers
     }
 
 
-    std::array<Move, MOVES_READ> read_moves(std::string path) 
+    std::vector<Move> read_moves(std::string path)
     {
-        std::array<Move, MOVES_READ> lastMoves = {};
+        std::vector<Move> last_moves(MOVES_READ);
+
+        for (int i = 0; i < MOVES_READ; i++)
+        {
+            last_moves[i].rowPrev = -1;
+            last_moves[i].colPrev = -1;
+
+            last_moves[i].rowNext = -1;
+            last_moves[i].colNext = -1;
+            
+            last_moves[i].symbol = 0;
+        }
 
         std::ifstream file(path, std::ios::binary | std::ios::ate);
 
-        if (!file.is_open()) return lastMoves;
-
-        std::streamsize fileSize = file.tellg();
-
-        int totalMoves = fileSize / sizeof(Move);
-        int countToRead = (totalMoves < MOVES_READ) ? totalMoves : MOVES_READ;
-
-        if (countToRead > 0) 
+        if (!file.is_open())
         {
-            file.seekg(-(static_cast<std::streamoff>(countToRead) * sizeof(Move)), std::ios::end);
-            
-            file.read(reinterpret_cast<char*>(lastMoves.data()), countToRead * sizeof(Move));
+            std::ofstream create_file(path, std::ios::binary);
+            return last_moves;
+        }
+
+        std::streamsize file_size = file.tellg();
+        int total_moves = static_cast<int>(file_size / sizeof(Move));
+
+        int count_to_read = (total_moves < MOVES_READ) ? total_moves : MOVES_READ;
+
+        if (count_to_read > 0)
+        {
+            file.seekg(-(static_cast<std::streamoff>(count_to_read) * sizeof(Move)), std::ios::end);
+            file.read(reinterpret_cast<char*>(last_moves.data()), count_to_read * sizeof(Move));
         }
 
         file.close();
 
-        return lastMoves;
+        if (total_moves % 2 != 0 && count_to_read != 0 && total_moves > MOVES_READ)
+        {
+            last_moves.erase(last_moves.begin());
+
+            last_moves[count_to_read - 1].rowPrev = -1;
+            last_moves[count_to_read - 1].colPrev = -1;
+
+            last_moves[count_to_read - 1].rowNext = -1;
+            last_moves[count_to_read - 1].colNext = -1;
+            
+            last_moves[count_to_read - 1].symbol = 0;
+        }
+
+        return last_moves;
     }
 
 
@@ -234,6 +261,7 @@ namespace helpers
 
         return ss.str();
     }
+
 
     char promotion_menu(QWidget* parent, PieceColor player_color)
     {

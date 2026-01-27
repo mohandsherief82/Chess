@@ -52,7 +52,7 @@ struct PromoOption
 namespace helpers
 {
     QString getIconPath(char piece);
-    std::array<Move, MOVES_READ> read_moves(std::string path);
+    std::vector<Move> read_moves(std::string path);
 
     void clear_items(QLayout *gl);
     void add_piece_to_cell(QWidget *cell, char pieceChar);

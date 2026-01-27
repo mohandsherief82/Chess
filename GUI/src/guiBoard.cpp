@@ -14,9 +14,10 @@ namespace Chess
     void GInterface::add_moves_view()
     {
         std::string path { this->game_board->get_game_path() };
-        std::array<Move, MOVES_READ> moves { helpers::read_moves(path) };
+        std::vector<Move> moves { helpers::read_moves(path) };
 
         QWidget *central = this->centralWidget();
+
         if (!central || !central->layout()) return;
 
         QWidget *sidebar = central->findChild<QWidget*>("moveHistorySidebar");
@@ -25,7 +26,7 @@ namespace Chess
         {
             sidebar = new QWidget();
             sidebar->setObjectName("moveHistorySidebar");
-            
+
             sidebar->setFixedWidth(380);
             sidebar->setFixedHeight(650);
             
@@ -62,12 +63,9 @@ namespace Chess
             side_layout->addWidget(scroll);
         }
 
-        QString label_style = "font-weight: bold; color: #f8e7bb;"
-                            " font-size: 20px; margin-bottom: 5px;"
-                            " padding-bottom: 2px;";
-
+        QString label_style = "font-weight: bold; color: #f8e7bb; font-size: 20px; margin-bottom: 5px; padding-bottom: 2px;";
         QLabel *title = sidebar->findChild<QLabel*>("sidebarTitle");
-
+        
         if (title) title->setStyleSheet(label_style + "font-size: 22px;");
 
         QWidget *table_container = sidebar->findChild<QWidget*>("tableContainer");
@@ -77,7 +75,7 @@ namespace Chess
 
         grid_view->setSpacing(2);
         grid_view->setContentsMargins(0, 0, 0, 0);
-
+        
         grid_view->setColumnStretch(0, 1);
         grid_view->setColumnStretch(1, 1);
 
@@ -95,49 +93,59 @@ namespace Chess
         grid_view->addWidget(whiteHeader, 0, 0);
         grid_view->addWidget(blackHeader, 0, 1);
 
-        for (int i = 0; i < MOVES_READ; i++)
+        for (int i = 0; i < MOVES_READ; i += 2)
         {
-            int row = (i / 2) + 1; 
-            int col = i % 2;
+            int row = (i / 2) + 1;
             QString rowBg = (row % 2 == 0) ? "#0D1721" : "#121C26";
 
-            QWidget *cell = new QWidget();
-            cell->setStyleSheet(QString("background-color: %1;").arg(rowBg));
-
-            QHBoxLayout *cell_layout = new QHBoxLayout(cell);
-            cell_layout->setContentsMargins(10, 2, 10, 2);
-
-            cell_layout->setSpacing(6);
-            cell_layout->setAlignment(Qt::AlignLeft);
-
-            if (moves[i].symbol != 0)
+            for (int col = 0; col < 2; col++)
             {
-                QLabel *iconLabel = new QLabel();
-                QPixmap pix = QIcon(helpers::getIconPath(moves[i].symbol)).pixmap(24, 24);
-
-                iconLabel->setPixmap(pix);
-                cell_layout->addWidget(iconLabel);
-
-                QString move_text = QString("%1%2 -> %3%4")
-                    .arg((char)(moves[i].colPrev + 'A')).arg(8 - moves[i].rowPrev)
-                    .arg((char)(moves[i].colNext + 'A')).arg(8 - moves[i].rowNext);
+                int move_idx = i + col;
                 
-                QLabel *textLabel = new QLabel(move_text);
+                QWidget *cell = new QWidget();
+                
+                cell->setStyleSheet(QString("background-color: %1;").arg(rowBg));
 
-                textLabel->setStyleSheet(label_style + "font-size: 14px; background: transparent; padding: 0; margin: 0;");
-                cell_layout->addWidget(textLabel);
+                QHBoxLayout *cell_layout = new QHBoxLayout(cell);
+                
+                cell_layout->setContentsMargins(10, 2, 10, 2);
+                cell_layout->setSpacing(6);
+                
+                cell_layout->setAlignment(Qt::AlignLeft);
 
-                cell_layout->addStretch();
+                if (move_idx < MOVES_READ && moves[move_idx].rowPrev != -1)
+                {
+                    char display_symbol = (col == 0) ? moves[move_idx].symbol : toupper(moves[move_idx].symbol);
+                    
+                    QLabel *iconLabel = new QLabel();
+                    QPixmap pix = QIcon(helpers::getIconPath(moves[move_idx].symbol)).pixmap(24, 24);
+                    
+                    iconLabel->setPixmap(pix);
+                    cell_layout->addWidget(iconLabel);
+
+                    QString move_text = QString(" %1%2 -> %3%4")
+                        .arg((char)(moves[move_idx].colPrev + 'A')).arg(8 - moves[move_idx].rowPrev)
+                        .arg((char)(moves[move_idx].colNext + 'A')).arg(8 - moves[move_idx].rowNext);
+                    
+                    QLabel *textLabel = new QLabel(move_text);
+                    
+                    textLabel->setStyleSheet(label_style + "font-size: 14px; background: transparent; padding: 0; margin: 0;");
+                    
+                    cell_layout->addWidget(textLabel);
+                    cell_layout->addStretch();
+                }
+                else
+                {
+                    bool is_trailing_half_move = (col == 1 && i < MOVES_READ && moves[i].rowPrev != -1);
+                    
+                    QLabel *emptyLabel = new QLabel(is_trailing_half_move ? "..." : "");
+                    
+                    emptyLabel->setStyleSheet(label_style + "font-size: 14px; background: transparent; color: #555555;");
+                    cell_layout->addWidget(emptyLabel);
+                }
+
+                grid_view->addWidget(cell, row, col);
             }
-            else
-            {
-                QLabel *emptyLabel = new QLabel("");
-
-                emptyLabel->setStyleSheet(label_style + "font-size: 14px; background: transparent;");
-                cell_layout->addWidget(emptyLabel);
-            }
-
-            grid_view->addWidget(cell, row, col);
         }
 
         return;
