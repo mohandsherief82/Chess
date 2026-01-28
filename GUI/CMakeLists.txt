@@ -6,20 +6,10 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON) 
 
-find_package(Qt6 REQUIRED COMPONENTS Widgets Svg)
+find_package(Qt6 REQUIRED COMPONENTS Widgets Svg Network)
 
 # Define the executable
 add_library(Gui SHARED resources.qrc)
-
-# Link the required libraries
-target_link_libraries(
-    Gui 
-    PRIVATE 
-        Qt6::Widgets 
-        Qt6::Svg 
-    PUBLIC
-        GameEnd
-)
 
 # Manage sources and headers
 target_sources(
@@ -50,3 +40,14 @@ target_sources(
 
 # Ensure the compiler can find your headers
 target_include_directories(Gui PRIVATE include ..)
+
+# Link the required libraries
+target_link_libraries(
+    Gui 
+    PRIVATE 
+        Qt6::Widgets 
+        Qt6::Svg 
+        Qt6::Network 
+    PUBLIC
+        GameEnd
+)

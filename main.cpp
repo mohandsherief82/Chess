@@ -20,7 +20,6 @@ int main(int argc, char **argv)
     std::shared_ptr<Chess::Board> game_board = std::make_shared<Chess::Board>();
     
     std::unique_ptr<Chess::GInterface> main_window = std::make_unique<Chess::GInterface>(game_board);
-    std::unique_ptr<Chess::AIOpponent> opponent = std::make_unique<Chess::AIOpponent>();
     
     game_board->addObserver(main_window.get());
 

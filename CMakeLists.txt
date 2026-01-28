@@ -20,7 +20,7 @@ set(CMAKE_C_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 
 # Find the required Qt6 components
-find_package(Qt6 REQUIRED COMPONENTS Widgets Svg)
+find_package(Qt6 REQUIRED COMPONENTS Widgets Svg Network)
 
 # Looks in this folder (the root) for headers
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
@@ -46,6 +46,7 @@ target_link_libraries(
         Gui
         Qt6::Widgets
         Qt6::Svg
+        Qt6::Network
 )
 
 # Add game binary directories to the build
