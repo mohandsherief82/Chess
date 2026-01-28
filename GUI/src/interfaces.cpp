@@ -133,10 +133,4 @@ namespace Chess
         this->notifyObservers();
         return;
     }
-
-
-    void AIOpponent::update()
-    {
-        // Implementation
-    }
 }

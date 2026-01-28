@@ -29,21 +29,23 @@ target_sources(
         TYPE HEADERS
         BASE_DIRS include
         FILES
-            include/guiBoard.hpp
-            include/startMenu.hpp
             include/piecesIcon.hpp
-            include/boardCell.hpp
             include/interfaces.hpp
+            include/startMenu.hpp
+            include/boardCell.hpp
+            include/guiBoard.hpp
             include/helpers.hpp
             include/dialog.hpp
+            include/server.hpp
     PRIVATE
-        src/guiBoard.cpp
-        src/startMenu.cpp
         src/piecesIcon.cpp
-        src/boardCell.cpp
         src/interfaces.cpp
+        src/startMenu.cpp
+        src/boardCell.cpp
+        src/guiBoard.cpp
         src/helpers.cpp
         src/dialog.cpp
+        src/server.cpp
 )
 
 # Ensure the compiler can find your headers

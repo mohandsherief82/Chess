@@ -44,12 +44,7 @@ namespace Concrete
 namespace Chess
 {
     class GInterface;
-
-    class AIOpponent: public Concrete::Observer
-    {
-        public:
-            void update() override;
-    };
+    class AIOpponent;
 
     class Board: public Concrete::Subject, public std::enable_shared_from_this<Board>
     {
@@ -88,6 +83,7 @@ namespace Chess
 
             void update_turn(int turn) { this->player_turn = turn; }
             void udpate_game_path(std::string path) { this->game_path = path; }
+            
             void udpate_redo_path(std::string path) { this->redo_path = path; }
     };
 }
