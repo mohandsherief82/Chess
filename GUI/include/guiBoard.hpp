@@ -48,13 +48,17 @@ namespace Chess
     {
         private:
             std::shared_ptr<Board> game_board = nullptr;
+            GameMode mode = TwoPlayer;
 
             void add_captures(QVBoxLayout *ply_data, QLabel *ply_msg, Captured *ply_captures, bool redo_flag);
             void add_redo_undo(QHBoxLayout *box);
+            
             void add_left_menu(QWidget *container);
             void add_moves_view();
+            
             void save_game_as();
             void delete_files();
+            
             void game_end(std::string end_state);
         public:
             GInterface(std::shared_ptr<Board> game_board);

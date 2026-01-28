@@ -7,6 +7,7 @@ namespace helpers
         return fs::path(full_path).stem().string();
     }
 
+
     std::string load_menu(QWidget* parent, const std::string& folder_path, const std::string& exclude_name_no_ext) 
     {
         QDialog dialog(parent);
@@ -81,7 +82,7 @@ namespace helpers
     }
 
 
-    QString getIconPath(char piece)
+    QString get_icon_path(char piece)
     {
         QString colorStr = (std::islower(piece)) ? "white" : "black";
         QString type_str;
@@ -90,23 +91,31 @@ namespace helpers
         {
             case 'p': type_str = "pawn"; break;
             case 'r': type_str = "rook"; break;
+            
             case 'n': type_str = "knight"; break;
             case 'b': type_str = "bishop"; break;
+            
             case 'q': type_str = "queen"; break;
             case 'k': type_str = "king"; break;
 
-            case 'd': return QString(":/icons/redo.svg");
-            case 'u': return QString(":/icons/undo.svg");
-            case 's': return QString(":/icons/save.svg");
-            case 'l': return QString(":/icons/load.svg");
-            case 'a': return QString(":/icons/start.svg");
-            case 'g': return QString(":/icons/resign.svg");
-            case 'x': return QString(":/icons/exit.svg");
+            case 'd': return QString(":/buttons/icons/redo.svg");
+            case 'u': return QString(":/buttons/icons/undo.svg");
+
+            case 's': return QString(":/buttons/icons/save.svg");
+            case 'l': return QString(":/buttons/icons/load.svg");
+
+            case 'a': return QString(":/buttons/icons/start.svg");
+            case 'g': return QString(":/buttons/icons/resign.svg");
+
+            case 'x': return QString(":/buttons/icons/exit.svg");
+
+            case 'o': return QString(":/buttons/icons/one_player.svg");
+            case 't': return QString(":/buttons/icons/two_player.svg");
 
             default: return QString("");
         }
 
-        return QString(":/icons/%1_%2.svg").arg(colorStr).arg(type_str);
+        return QString(":/pieces/icons/%1_%2.svg").arg(colorStr).arg(type_str);
     }
 
 
@@ -178,7 +187,7 @@ namespace helpers
 
     void add_piece_to_cell(QWidget *cell, char pieceChar)
     {
-        QString iconPath = getIconPath(pieceChar);
+        QString iconPath = get_icon_path(pieceChar);
         if (iconPath.isEmpty()) return;
     
         QVBoxLayout *layout = qobject_cast<QVBoxLayout*>(cell->layout());
@@ -207,7 +216,7 @@ namespace helpers
 
     void add_piece_to_cell(BoardCell *cell, char pieceChar, int row, int col)
     {
-        QString iconPath = getIconPath(pieceChar);
+        QString iconPath = get_icon_path(pieceChar);
         if (iconPath.isEmpty()) return;
     
         QVBoxLayout *layout = qobject_cast<QVBoxLayout*>(cell->layout());
@@ -268,13 +277,15 @@ namespace helpers
         PersistentDialog dialog(parent);
         
         dialog.setWindowTitle("Pawn Promotion");
-        dialog.setStyleSheet("background-color: #0A1118; border: 2px solid #f8e7bb;");
+        dialog.setStyleSheet("background-color: #0A1118; border: none;");
 
         QVBoxLayout* layout = new QVBoxLayout(&dialog);
 
         QLabel *title = new QLabel("Select your promotion piece:");
+        
         title->setAlignment(Qt::AlignCenter);
         title->setStyleSheet("color: #f8e7bb; font-weight: bold; font-size: 18px; margin-top: 10px; border: none;");
+        
         layout->addWidget(title);
 
         QListWidget* list_widget = new QListWidget(&dialog);
@@ -295,7 +306,7 @@ namespace helpers
 
         for (const auto& opt : options)
         {
-            QListWidgetItem* item = new QListWidgetItem(QIcon(getIconPath(opt.symbol)), opt.name);
+            QListWidgetItem* item = new QListWidgetItem(QIcon(get_icon_path(opt.symbol)), opt.name);
             item->setData(Qt::UserRole, QVariant(opt.symbol));
             list_widget->addItem(item);
         }

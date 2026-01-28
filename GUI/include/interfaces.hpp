@@ -17,6 +17,11 @@ extern "C"
 #define PLAYER1 1
 #define PLAYER2 2
 
+enum GameMode
+{
+    TwoPlayer, OnePlayer
+};
+
 namespace Concrete
 {
     class Subject;
@@ -43,9 +48,6 @@ namespace Concrete
 
 namespace Chess
 {
-    class GInterface;
-    class AIOpponent;
-
     class Board: public Concrete::Subject, public std::enable_shared_from_this<Board>
     {
         private:
