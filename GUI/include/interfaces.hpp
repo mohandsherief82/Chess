@@ -24,8 +24,6 @@ enum GameMode
 
 namespace Concrete
 {
-    class Subject;
-
     class Observer
     {
         public:
@@ -38,6 +36,7 @@ namespace Concrete
         public:
             virtual ~Subject() = default;
             virtual void addObserver(Observer* observer);
+            
             virtual void removeObserver(Observer* observer);
             virtual void notifyObservers();
         protected:
@@ -53,13 +52,17 @@ namespace Chess
         private:
             char ***board_ptr = nullptr;
             std::string board_str = "";
+            
             Player *ply1 = nullptr, *ply2 = nullptr;
             Captured *ply1_captures = nullptr, *ply2_captures = nullptr;
+            
             int *ply1EP = new int(-1), *ply2EP = new int(-1);
             int player_turn = 1;
+            
             std::string game_path {}, redo_path {};
         public:
             Board();
+            
             Board(char ***board_ptr, int player_turn);
             ~Board();
             

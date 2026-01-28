@@ -1,10 +1,2 @@
 
-#include "server.hpp"
-
-namespace Chess
-{
-    void AIOpponent::update()
-    {
-        // Implementation
-    }
-}
+#include "guiBoard.hpp"

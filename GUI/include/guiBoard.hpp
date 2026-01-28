@@ -42,8 +42,6 @@ namespace fs = std::filesystem;
 
 namespace Chess
 {
-    class Board;
-
 	class GInterface: public Concrete::Observer, public QMainWindow
     {
         private:
@@ -62,8 +60,10 @@ namespace Chess
             void game_end(std::string end_state);
         public:
             GInterface(std::shared_ptr<Board> game_board);
+            
             void update() override;
             void load_game(const std::string file_path);
+            
             void start_game();
         protected:
             void keyPressEvent(QKeyEvent *event) override;
