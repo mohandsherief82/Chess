@@ -6,7 +6,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON) 
 
-find_package(Qt6 REQUIRED COMPONENTS Widgets Svg Network)
+find_package(Qt6 REQUIRED COMPONENTS Widgets Svg)
 
 # Define the executable
 add_library(Gui SHARED resources.qrc)
@@ -26,7 +26,6 @@ target_sources(
             include/guiBoard.hpp
             include/helpers.hpp
             include/dialog.hpp
-            include/server.hpp
     PRIVATE
         src/piecesIcon.cpp
         src/interfaces.cpp
@@ -35,7 +34,6 @@ target_sources(
         src/guiBoard.cpp
         src/helpers.cpp
         src/dialog.cpp
-        src/server.cpp
 )
 
 # Ensure the compiler can find your headers
@@ -46,8 +44,7 @@ target_link_libraries(
     Gui 
     PRIVATE 
         Qt6::Widgets 
-        Qt6::Svg 
-        Qt6::Network 
+        Qt6::Svg
     PUBLIC
         GameEnd
 )

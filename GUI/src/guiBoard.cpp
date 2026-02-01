@@ -8,6 +8,8 @@ namespace Chess
     {
         this->setStyleSheet("background-color: #0A1118;");
         this->setFixedSize(QGuiApplication::primaryScreen()->availableGeometry().size());
+
+        this->server = new QTcpServer(this);
     }
 
 
@@ -267,6 +269,10 @@ namespace Chess
     }
 
 
+    // void GInterface::choose_mode()
+    // {}
+
+
     void GInterface::start_game() 
     {
         char ***board_ptr = this->game_board->get_board_ptr();
@@ -326,8 +332,16 @@ namespace Chess
 
         layout->addLayout(hlayout);
 
-        QObject::connect(one_player_mode_btn, &QPushButton::clicked, []() { std::cout << "Hello" << std::endl; });
-        QObject::connect(two_player_mode_btn, &QPushButton::clicked, []() { std::cout << "Hello" << std::endl; });
+        QObject::connect(one_player_mode_btn, &QPushButton::clicked, [&]() 
+                { 
+                    this->mode = OnePlayer;
+                }
+            );
+        QObject::connect(two_player_mode_btn, &QPushButton::clicked, [&]() 
+                { 
+                    this->mode = TwoPlayer; 
+                }
+            );
 
         dialog.exec();
 

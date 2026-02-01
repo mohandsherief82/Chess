@@ -245,3 +245,18 @@ To ensure games can be resumed, validated moves are appended to a binary file fo
 *   **Design Patterns:** [W3Schools](https://www.geeksforgeeks.org/system-design/-pattern-set-1-introduction/)
 *   **C++ File I/O (Binary):** [GeeksforGeeks](https://www.w3schools.com/cpp/cpp_files.asp)
 *   **C File I/O (Binary):** [Programiz](https://www.programiz.com/c-programming/c-file-input-output)
+*   **Pybind11:** [Pybind11 Documentation](https://pybind11.readthedocs.io/en/stable/advanced/embedding.html)
+
+
+
+
+
+
+
+Embedding Python in C++:
+* The idea of the embedding is that we connect python to the Python-C API Embedding which allows as to also embed python in C.
+* It starts by telling where exactly python exists, then it starts to map C++ data types to python data types and vise verca.
+* As python doesn't have similar variable scope like C/C++, so python uses a reference counter to know when to delete objects and free, it works by counting how many things are counting to a specific memory address and it deletes it when it finds that nothing is pointing to that address.
+* All of this steps can be done by Pybind or Shiboken(already used to bridge the Qt library into python)
+* For this project, we are going to use pybind, as we only need python to create a Minimax algorithm for the opponent.
+* Pybind can't handle complex paths in cpp so to add the correct files for importing in C++ using sys.path to add the files to the path where the python will search for the files.
