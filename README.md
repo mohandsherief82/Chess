@@ -11,15 +11,17 @@ Table of Contents
 *   [4\. System Design](#Design)
 *   [5\. Movement Logic](#movement)
 *   [6\. Game End States](#endstates)
-*   [7\. Persistence](#persistence)
-*   [8\. User Manual](#manual)
-*   [9\. Snapshots](#snapshots)
-*   [10\. References](#references)
+*   [7\. Minimax Algorithm](#minimax)
+*   [8\. Embedding Python in C++](#embedding)
+*   [9\. Persistence](#persistence)
+*   [10\. User Manual](#manual)
+*   [11\. Snapshots](#snapshots)
+*   [12\. References](#references)
 
 1\. Overview
 ------------
 
-The **Terminal Chess Engine** is a comprehensive board game application implemented in C. It translates the high-level complexity of Chess into a modular, command-line interface. The engine supports full rules, including specialized movements like castling, en passant, and pawn promotion.
+The **Terminal Chess Engine** is a comprehensive board game application implemented in C, C++ and Python. It translates the high-level complexity of Chess into a modular, command-line interface. The engine supports full rules, including specialized movements like castling, en passant, and pawn promotion.
 
 Key technical highlights include a recursive-style move validation system, binary file persistence for saving and loading game states, and a robust "Undo" feature that uses file truncation to safely revert moves back to the starting position.
 
@@ -205,7 +207,35 @@ The queen's move is very similar to the bishop and the rook moves, so the implem
 
 **Resignation:** when one of the players types 'r' in his turn, the game consider them resigned and the other player automatically wins.
 
-7\. Persistence: Save, Load, and Undo
+
+7\. Minimax Algorithm:
+---------------------------------
+
+* The ***Minimax Algorithm*** works as an opponent for users, as it works by calculating all future possible moves, which in most games will be computationaly inefficient to do.
+* It calculates all possible moves until reaching a terminal state and then decides the score of the state, where it gives zero if draw, positive value for itself winning and negative value if the user wins.
+* In our game of chess, games can last for over 50 moves, which will create a game tree that is extremely deep, having this much moves needs a significant amount of processing power which might not be ideal in most cases.
+* Also the use of the full tree will result in the computer talking a lot of time to choose a move. In order to overcome this, we can use either alpha-beta pruning or a max depth for the game tree with an evaluation function.
+* Alpha-beta pruning works by stoping the calculation when:
+    * In max($\alpha$) nodes: it finds a min subtree that has a score lower than alpha, and it disregards this subtree.
+    * In min($\beta$) nodes: if finds a max subtree that has a score higher than beta, and it disregards this subtree.
+* In max depth approach, the algorithm stops at a specific depth specified before the game starts and then uses an evaluation function to determine which is the best next move and choose it.
+* The evaluation function can be a simple piece counting function or a *Machine Learning* algorithm which we won't be diving into.
+* In our approach of this game of chess, we are going to use the max depth strategy to allow the game to be playable and computationaly more efficient and the evaluation function will be based on the score of the avaliable pieces on the board.
+* The algorithm will be implemented in Python and embedded into C++ using pybind11.
+
+
+8\. Embedding Python in C++:
+------------------------------------
+
+* The idea of the embedding is that we connect python to the Python-C API Embedding which allows as to also embed python in C.
+* It starts by telling where exactly python exists, then it starts to map C++ data types to python data types and vise verca.
+* As python doesn't have similar variable scope like C/C++, so python uses a reference counter to know when to delete objects and free, it works by counting how many things are counting to a specific memory address and it deletes it when it finds that nothing is pointing to that address.
+* All of this steps can be done by Pybind or Shiboken(already used to bridge the Qt library into python)
+* For this project, we are going to use pybind, as we only need python to create a Minimax algorithm for the opponent.
+* Pybind can't handle complex paths in cpp so to add the correct files for importing in C++ using sys.path to add the files to the path where the python will search for the files.
+
+
+9\. Persistence: Save, Load, and Undo
 -------------------------------------
 
 To ensure games can be resumed, validated moves are appended to a binary file for space efficiency.
@@ -215,29 +245,34 @@ To ensure games can be resumed, validated moves are appended to a binary file fo
 *   **Undo**: Implemented by truncating the last `sizeof(Move)` bytes from the binary file and triggering a reload to revert state and storing the data of the undone move in a separate file for redoing.
 *   **Redo**: It checks if the redo file isn't empty and then read the last move from the file and then reload the game with the redone move again.
 
-8\. User Manual
+10\. User Manual
 ---------------
 
-<!-- Needs Updates -->
+* Uses the mouse to move pieces like a normal chess gui.
+* In case of Promotions a list appears in a dialog box with all pieces that are avaliable for promotion.
+* Castling is done normally be moving the king to the respective position.
+* The UI maintains board integrity by only accepting validated moves from the engine.
+* The player with the current turn labels appears in the lower half of the screen with draggable piece, while the other player's labels is in the top half with undraggable pieces.
+* On the tright of the screen the list of moves appear with the last 32 player moves, 16 white and 16 black.
 
-9\. Snapshots of the Game
+11\. Snapshots of the Game
 -------------------------
 
 ![Main Menu](image.png)
 
-9.1 Main Menu Interface
+11.1 Main Menu Interface
 
 ![Gameplay UI](image-1.png)
 
-9.2 Active Board Rendering
+11.2 Active Board Rendering
 
 ![Checkmate](image-2.png)
 
-9.3 End of Game State
+11.3 End of Game State
 
 * * *
 
-10\. References
+12\. References
 --------------
 
 *   **C memcpy Documentation:** [GeeksforGeeks](https://www.geeksforgeeks.org/cpp/memcpy-in-cc/)
@@ -246,17 +281,3 @@ To ensure games can be resumed, validated moves are appended to a binary file fo
 *   **C++ File I/O (Binary):** [GeeksforGeeks](https://www.w3schools.com/cpp/cpp_files.asp)
 *   **C File I/O (Binary):** [Programiz](https://www.programiz.com/c-programming/c-file-input-output)
 *   **Pybind11:** [Pybind11 Documentation](https://pybind11.readthedocs.io/en/stable/advanced/embedding.html)
-
-
-
-
-
-
-
-Embedding Python in C++:
-* The idea of the embedding is that we connect python to the Python-C API Embedding which allows as to also embed python in C.
-* It starts by telling where exactly python exists, then it starts to map C++ data types to python data types and vise verca.
-* As python doesn't have similar variable scope like C/C++, so python uses a reference counter to know when to delete objects and free, it works by counting how many things are counting to a specific memory address and it deletes it when it finds that nothing is pointing to that address.
-* All of this steps can be done by Pybind or Shiboken(already used to bridge the Qt library into python)
-* For this project, we are going to use pybind, as we only need python to create a Minimax algorithm for the opponent.
-* Pybind can't handle complex paths in cpp so to add the correct files for importing in C++ using sys.path to add the files to the path where the python will search for the files.
