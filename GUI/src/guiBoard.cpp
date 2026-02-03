@@ -8,8 +8,6 @@ namespace Chess
     {
         this->setStyleSheet("background-color: #0A1118;");
         this->setFixedSize(QGuiApplication::primaryScreen()->availableGeometry().size());
-
-        this->server = new QTcpServer(this);
     }
 
 

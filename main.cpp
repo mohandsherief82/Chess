@@ -10,7 +10,6 @@
 #include "guiBoard.hpp"
 #include "startMenu.hpp"
 #include "interfaces.hpp"
-#include "server.hpp"
 
 
 int main(int argc, char **argv)

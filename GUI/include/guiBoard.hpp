@@ -46,7 +46,6 @@ namespace Chess
     {
         private:
             std::shared_ptr<Board> game_board = nullptr;
-            QTcpServer *server = nullptr;
             GameMode mode = TwoPlayer;
 
             void add_captures(QVBoxLayout *ply_data, QLabel *ply_msg, Captured *ply_captures, bool redo_flag);
