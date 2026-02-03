@@ -1,14 +1,21 @@
 cmake_minimum_required(VERSION 3.15)
-project(example )
+project(Minimax )
 
 find_package(pybind11 REQUIRED)
 
-add_executable(example)
+add_library(Minimax)
 
 target_sources(
-    example
+    Minimax
     PRIVATE
-        src/main.cpp
+        src/algorithm.cpp
+        src/move_wrappers.cpp
 )
 
-target_link_libraries(example PRIVATE pybind11::embed)
+target_link_libraries(
+    Minimax 
+    PRIVATE 
+        pybind11::embed
+    PUBLIC
+        GameEnd
+)
