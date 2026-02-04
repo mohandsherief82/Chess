@@ -68,10 +68,37 @@ bool move_piece(std::string board_string, std::string move_string)
 }
 
 
+bool check_mate(std::string board_string)
+{
+    char **board { board_parser(board_string) };
+
+    Player ply1 { player_parser(board, COLOR_WHITE) };
+    Player ply2 { player_parser(board, COLOR_BLACK) };
+
+    return checkMate(board, &ply1);
+}
+
+
+bool check_stalemate(std::string board_string)
+{
+    char **board { board_parser(board_string) };
+
+    Player ply1 { player_parser(board, COLOR_WHITE) };
+    Player ply2 { player_parser(board, COLOR_BLACK) };
+
+    return checkStalemate(board, &ply1);
+}
+
+
 PYBIND11_MODULE(move, m)
 {
     m.doc() = "Wrappers for all moving function implemented in C and moddified by C++";
 
     m.def("move_piece", &move_piece, "A Wrapper Function that wraps the pieces move functions all at once",
         "board_string"_a, "move_string"_a);
+
+    m.def("check_mate", &check_mate, "Checks whether the game reached a state of checkmate."
+        , "board_string"_a);
+    m.def("check_stalemate", &check_stalemate, "Checks whether the game reached a state of checkmate."
+        , "board_string"_a);
 }
