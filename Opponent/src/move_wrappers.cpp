@@ -75,7 +75,11 @@ bool check_mate(std::string board_string)
     Player ply1 { player_parser(board, COLOR_WHITE) };
     Player ply2 { player_parser(board, COLOR_BLACK) };
 
-    return checkMate(board, &ply1);
+    bool state = checkMate(board, &ply1);
+
+    freeBoard(&board, &ply1, &ply2);
+
+    return state;
 }
 
 
@@ -86,11 +90,15 @@ bool check_stalemate(std::string board_string)
     Player ply1 { player_parser(board, COLOR_WHITE) };
     Player ply2 { player_parser(board, COLOR_BLACK) };
 
-    return checkStalemate(board, &ply1);
+    bool state = checkStalemate(board, &ply1);
+
+    freeBoard(&board, &ply1, &ply2);
+
+    return state;
 }
 
 
-PYBIND11_MODULE(move, m)
+PYBIND11_MODULE(Move_Wrappers, m)
 {
     m.doc() = "Wrappers for all moving function implemented in C and moddified by C++";
 
