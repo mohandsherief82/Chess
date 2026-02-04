@@ -1,4 +1,13 @@
-import math
+import sys
+import os
+
+script_dir = os.path.dirname(os.path.abspath(__file__))
+build_path = os.path.join(script_dir, "../..", "build")
+
+if build_path not in sys.path:
+    sys.path.append(build_path)
+
+import Move_Wrappers
 
 class Minimax:
     __piece_value = {'k': 13, 'q': 9, 'r': 5, 'b': 3, 'n': 3, 'p': 1}
@@ -9,13 +18,18 @@ class Minimax:
     def __get_available_moves(self, current_state: str):
         pass
 
-    def __is_terminal(self, current_state: str):
-        pass
-
-    def minimax(self, current_state: str, is_maximizing_turn: bool, depth: int = 0):
+    def __is_terminal(self, current_state: str) -> bool:
         """
-            Recursive minimax function. 
-            Note: is_maximizing_turn toggles each layer.
+            Checks if the current state is a terminal state or not.
+        """
+        if Move_Wrappers.check_mate(current_state) or Move_Wrappers.check_stalemate(current_state):
+            return True
+        else:
+            return False
+
+    def minimax(self, current_state: str, is_maximizing_turn: bool, depth: int = 0) -> int:
+        """
+            Recursive minimax function.
         """
         best_score = 0
 
@@ -43,7 +57,7 @@ class Minimax:
             
         return best_score
 
-    def __evaluation_function(self, current_state: str):
+    def __evaluation_function(self, current_state: str) -> int:
         """
             Calculates score based on piece values. 
             Lowercase = Positive (AI), Uppercase = Negative (Opponent).
@@ -62,7 +76,7 @@ class Minimax:
 
         return score
 
-    def get_best_move(self, current_state: str):
+    def get_best_move(self, current_state: str) -> int:
         """
             Helper to find the best move string from the starting state 
         """

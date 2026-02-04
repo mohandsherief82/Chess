@@ -24,6 +24,8 @@ using namespace py::literals;
 
 bool move_piece(std::string board_string, std::string move_string)
 {
+    if (move_string.size() < 4) return false;
+
     char **board { board_parser(board_string) };
 
     Player ply1 { player_parser(board, COLOR_WHITE) };
