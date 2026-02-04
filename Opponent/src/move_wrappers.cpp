@@ -19,7 +19,7 @@ extern "C"
 }
 
 namespace py = pybind11;
-using namespace py::literals;, py::argarg()""move_string-_a_a
+using namespace py::literals;
 
 
 bool move_piece(std::string board_string, std::string move_string)
@@ -61,7 +61,7 @@ bool move_piece(std::string board_string, std::string move_string)
         default: return false;
     }
 
-    freeBoard(board, ply1, ply2);
+    freeBoard(&board, &ply1, &ply2);
 
     if (valid == INVALID_MOVE) return false;
     else return true;

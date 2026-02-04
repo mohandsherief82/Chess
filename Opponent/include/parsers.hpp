@@ -2,6 +2,8 @@
 #pragma once
 
 #include <string>
+#include <cctype>
+#include <functional>
 
 extern "C"
 {
