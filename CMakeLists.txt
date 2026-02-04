@@ -21,6 +21,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "-g")
 
 # Find the required Qt6 components
 find_package(Qt6 REQUIRED COMPONENTS Widgets Svg)
+find_package(pybind11 REQUIRED)
 
 # Looks in this folder (the root) for headers
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
@@ -44,7 +45,6 @@ target_link_libraries(
         Board 
         Moves 
         GameEnd
-        Minimax
         Gui
         Qt6::Widgets
         Qt6::Svg
