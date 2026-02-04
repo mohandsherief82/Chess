@@ -159,4 +159,19 @@ Captured captures_parser(char **board, Player ply)
 
 
 Move move_parser(std::string move_string)
-{}
+{
+    Move move;
+
+    move.symbol = move_string[0];
+
+    move.colPrev = move_string[1] - 'A';
+    move.rowPrev = move_string[2];
+
+    move.colNext = move_string[3] - 'A';
+    move.rowNext = move_string[4];
+
+    if (move_string.size() == 6) move.promotedPawn = move_string[5];
+    else move.promotedPawn = ' ';
+    
+    return move;
+}
