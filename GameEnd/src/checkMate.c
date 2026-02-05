@@ -7,10 +7,10 @@
 #include <stdio.h>
 #include <ctype.h>
 
-bool checkMate(char** board, Player* currentPlayer) 
+/**
+ * @brief Determines if the current state is Checkmate.
+ */
+bool checkMate(char** board, Player* player) 
 {
-    if (!isChecked(board, currentPlayer, true)) return false;
-    if (!legalMove(board, currentPlayer)) return true;
-
-    return false;
+    return !legalMove(board, player) && isChecked(board, player, true);
 }

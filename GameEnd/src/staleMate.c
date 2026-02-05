@@ -1,31 +1,40 @@
 #include "pawnMoves.h"
 #include "rookMoves.h"
+
 #include "knightMoves.h"
 #include "bishopMoves.h"
+
 #include "queenMoves.h"
 #include "kingMoves.h"
+
 #include "captures.h"
 #include "board.h"
+
 #include "chessTypes.h"
 #include "player.h"
+
 #include "check.h"
 
 #include <stdio.h>
 #include <stdbool.h>
+
 #include <ctype.h>
 #include <stdlib.h>
+
 #include <string.h>
 
 
 char** copyBoard(char** board)
 {
-    char** cpyBoard = malloc(sizeof(char*) * BOARD_SIZE);
+    char** cpy_board = malloc(sizeof(char*) * BOARD_SIZE);
+    
     for (int i = 0; i < BOARD_SIZE; i++)
     {
-        cpyBoard[i] = malloc(sizeof(char) * BOARD_SIZE);
-        memcpy(cpyBoard[i], board[i], BOARD_SIZE * sizeof(char)); 
+        cpy_board[i] = malloc(sizeof(char) * BOARD_SIZE);
+        memcpy(cpy_board[i], board[i], BOARD_SIZE * sizeof(char)); 
     }
-    return cpyBoard;
+    
+    return cpy_board;
 }
 
 
@@ -56,95 +65,130 @@ Player copyPlayer(Player* player)
 }
 
 
-void freeCopy(Player cpyPlayer, char** cpyBoard)
+void freeCopy(Player cpy_player, char** cpy_board)
 {
-    free(cpyPlayer.pawns);
-    free(cpyPlayer.rooks);
-    free(cpyPlayer.knights);
-    free(cpyPlayer.bishops);
-    free(cpyPlayer.queen);
-    free(cpyPlayer.king);
+    free(cpy_player.pawns);
+    free(cpy_player.rooks);
+
+    free(cpy_player.knights);
+    free(cpy_player.bishops);
+
+    free(cpy_player.queen);
+    free(cpy_player.king);
     
-    for (int i = 0; i < BOARD_SIZE; i++) free(cpyBoard[i]);
-    free(cpyBoard);
+    for (int i = 0; i < BOARD_SIZE; i++) 
+        free(cpy_board[i]);
+    
+    free(cpy_board);
+}
+
+
+static bool can_piece_move(char** board, Player* player, Piece* p, char type)
+{
+    if (!p->isActive) return false;
+
+    Move test_move;
+    
+    int ply_ep_col = -1, opp_ep_col = -1;
+
+    test_move.rowPrev = p->rowPosition;
+    test_move.colPrev = p->colPosition;
+
+    for (int r = 0; r < BOARD_SIZE; r++)
+    {
+        for (int c = 0; c < BOARD_SIZE; c++)
+        {
+            if (r == test_move.rowPrev && c == test_move.colPrev) continue;
+            
+            if (!isEmpty(board, r, c) && pieceColorAt(board, r, c) == player->color) continue;
+
+            test_move.rowNext = r;
+            test_move.colNext = c;
+
+            char** cpy_b = copyBoard(board);
+            
+            Player cpy_p = copyPlayer(player);
+            
+            Captured temp_cap = {0};
+            
+            MoveValidation state = INVALID_MOVE;
+
+            if (type == 'p') state = movePawn(cpy_b, &cpy_p, test_move, &temp_cap, &ply_ep_col, &opp_ep_col, true, false);
+            else if (type == 'r') state = moveRook(cpy_b, &cpy_p, test_move, &temp_cap, true);
+            else if (type == 'n') state = moveKnight(cpy_b, &cpy_p, test_move, &temp_cap, true);
+            else if (type == 'b') state = moveBishop(cpy_b, &cpy_p, test_move, &temp_cap, true);
+            else if (type == 'q') state = moveQueen(cpy_b, &cpy_p, test_move, &temp_cap, true);
+            else if (type == 'k') state = moveKing(cpy_b, &cpy_p, test_move, &temp_cap, true);
+
+            if (state != INVALID_MOVE && !isChecked(cpy_b, &cpy_p, true))
+            {
+                freeCopy(cpy_p, cpy_b);
+                return true;
+            }
+            
+            freeCopy(cpy_p, cpy_b);
+        }
+    }
+    
+    return false;
 }
 
 
 bool legalMove(char** board, Player* player)
 {
-    Move testMove;
-    
-    int plyEpCol = -1, oppEpCol = -1;
-    
-    for (int rPrev = 0; rPrev < BOARD_SIZE; rPrev++)
+    for (int i = 0; i < NUM_PAWNS; i++) 
+        if (can_piece_move(board, player, (Piece*)&player->pawns[i], 'p')) return true;
+
+    for (int i = 0; i < NUM_PIECES; i++) 
     {
-        for (int cPrev = 0; cPrev < BOARD_SIZE; cPrev++)
-        {
-            if (isEmpty(board, rPrev, cPrev) || pieceColorAt(board, rPrev, cPrev) != player->color) continue;
-
-            testMove.rowPrev = rPrev;
-            testMove.colPrev = cPrev;
-
-            for (int rNext = 0; rNext < BOARD_SIZE; rNext++)
-            {
-                for (int cNext = 0; cNext < BOARD_SIZE; cNext++)
-                {
-                    if (rNext == rPrev && cNext == cPrev) continue;
-
-                    char** cpyB = copyBoard(board);
-                    Player cpyP = copyPlayer(player);
-                    Captured tempCapture = {0};
-                    
-                    testMove.rowNext = rNext;
-                    testMove.colNext = cNext;
-
-                    MoveValidation moveState;
-                    char pieceType = (char)tolower(board[rPrev][cPrev]);
-                    
-                    if (pieceType == 'p') moveState = movePawn(cpyB, &cpyP, testMove, &tempCapture, &plyEpCol, &oppEpCol, true, false);
-                    else if (pieceType == 'r') moveState = moveRook(cpyB, &cpyP, testMove, &tempCapture, true);
-                    else if (pieceType == 'n') moveState = moveKnight(cpyB, &cpyP, testMove, &tempCapture, true);
-                    else if (pieceType == 'b') moveState = moveBishop(cpyB, &cpyP, testMove, &tempCapture, true);
-                    else if (pieceType == 'q') moveState = moveQueen(cpyB, &cpyP, testMove, &tempCapture, true);
-                    else if (pieceType == 'k') moveState = moveKing(cpyB, &cpyP, testMove, &tempCapture, true);
-
-                    if (moveState != INVALID_MOVE  && !isChecked(cpyB, &cpyP, true))
-                    {
-                        freeCopy(cpyP, cpyB);
-                        return true;
-                    } 
-                    
-                    freeCopy(cpyP, cpyB);
-                }
-            }
-        }
+        if (can_piece_move(board, player, (Piece*)&player->rooks[i], 'r')) return true;
+        if (can_piece_move(board, player, (Piece*)&player->knights[i], 'n')) return true;
+        if (can_piece_move(board, player, (Piece*)&player->bishops[i], 'b')) return true;
     }
+
+    if (can_piece_move(board, player, (Piece*)player->queen, 'q')) return true;
+    if (can_piece_move(board, player, (Piece*)player->king, 'k')) return true;
+
     return false;
 }
 
 
-bool inSufficientMaterial(Player player1, Player player2)
+bool inSufficientMaterial(Player* player1, Player* player2)
 {
-    if (player1.queen->isActive || player2.queen->isActive) return false;
+    if (player1->queen->isActive || player2->queen->isActive) return false;
     
-    for (int i = 0; i < 8; i++) 
+    for (int i = 0; i < NUM_PAWNS; i++) 
     {
-        if (i < 2 && (player1.rooks[i].isActive || player2.rooks[i].isActive)) return false;
-        if (player1.pawns[i].isActive || player2.pawns[i].isActive) return false;
+        if (player1->pawns[i].isActive || player2->pawns[i].isActive) return false;
     }
 
-    int p1Minor = 0, p2Minor = 0;
-    for (int i = 0; i < 2; i++) 
+    for (int i = 0; i < NUM_PIECES; i++) 
     {
-        p1Minor += (player1.bishops[i].isActive + player1.knights[i].isActive);
-        p2Minor += (player2.bishops[i].isActive + player2.knights[i].isActive);
+        if (player1->rooks[i].isActive || player2->rooks[i].isActive) return false;
     }
 
-    return (p1Minor + p2Minor <= 1) || (p1Minor == 1 && p2Minor == 1);
+    int p1_minor = 0;
+    int p2_minor = 0;
+
+    for (int i = 0; i < NUM_PIECES; i++) 
+    {
+        if (player1->bishops[i].isActive) p1_minor++;
+        if (player1->knights[i].isActive) p1_minor++;
+        if (player2->bishops[i].isActive) p2_minor++;
+        if (player2->knights[i].isActive) p2_minor++;
+    }
+
+    if (p1_minor == 0 && p2_minor == 0) return true;
+    if ((p1_minor == 1 && p2_minor == 0) || (p1_minor == 0 && p2_minor == 1)) return true;
+    if (p1_minor == 1 && p2_minor == 1) return true;
+
+    return false;
 }
 
 
-bool checkStalemate(char** board, Player* player)
+bool checkStalemate(char** board, Player* player, Player* opponent)
 {
+    if (inSufficientMaterial(player, opponent)) return true;
+    
     return !legalMove(board, player) && !isChecked(board, player, true);
 }

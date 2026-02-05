@@ -7,10 +7,13 @@ extern "C"
 {
     #include "pawnMoves.h"
     #include "rookMoves.h"
+    
     #include "knightMoves.h"
     #include "bishopMoves.h"
+    
     #include "queenMoves.h"
     #include "kingMoves.h"
+    
     #include "check.h"
     #include "saveGame.h"
 
@@ -68,9 +71,7 @@ std::string move_piece(std::string board_string, std::string move_string)
     for (int i = 0; i < BOARD_SIZE; i++)
     {
         for (int j = 0; j < BOARD_SIZE; j++)
-        {
             new_board_str.push_back(board[i][j]);
-        }
     }
 
     freeBoard(&board, &ply1, &ply2);
