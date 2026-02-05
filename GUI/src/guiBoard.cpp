@@ -805,11 +805,12 @@ namespace Chess
         master_layout->addStretch(1);
 
         Player *current_ply = this->game_board->get_player(player_turn);
+        Player *opponent_ply = this->game_board->get_player((player_turn == PLAYER1) ? PLAYER2: PLAYER1);
 
         if (board_ptr && *board_ptr && current_ply)
         {
             if (checkMate(*board_ptr, current_ply)) this->game_end("Checkmate");
-            else if (checkStalemate(*board_ptr, current_ply)) this->game_end("Stalemate");
+            else if (checkStalemate(*board_ptr, current_ply, opponent_ply)) this->game_end("Stalemate");
         }
 
         return;

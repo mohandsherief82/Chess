@@ -1,16 +1,24 @@
 
 #include "parsers.hpp"
 
+
+/**
+ * @brief Parses a string of the board into a 2D C style array.
+ */
 char** board_parser(std::string board_string) 
 {
-    char** board = new char*[BOARD_SIZE];
+    char** board = (char**)malloc(BOARD_SIZE * sizeof(char*));
+    if (board == NULL) exit(1);
 
     for (int i = 0; i < BOARD_SIZE; i++) 
     {
-        board[i] = new char[BOARD_SIZE];
+        board[i] = (char*)malloc(BOARD_SIZE * sizeof(char));
+        if (board[i] == NULL) exit(1);
         
         for (int j = 0; j < BOARD_SIZE; j++) 
+        {
             board[i][j] = board_string[i * BOARD_SIZE + j];
+        }
     }
 
     return board;
