@@ -224,11 +224,12 @@ The queen's move is very similar to the bishop and the rook moves, so the implem
     * In min($\beta$) nodes: if finds a max subtree that has a score higher than beta, and it disregards this subtree.
 * In max depth approach, the algorithm stops at a specific depth specified before the game starts and then uses an evaluation function to determine which is the best next move and choose it.
 * The evaluation function can be a simple piece counting function or a *Machine Learning* algorithm which we won't be diving into.
-* In our approach of this game of chess, we are going to use the max depth strategy to allow the game to be playable and computationally more efficient and the evaluation function will be based on the score of the available pieces on the board.
+* In our approach of this game of chess, we are going to use the max depth strategy with alpha-beta prunning to allow the game to be playable and computationally more efficient and the evaluation function will be based on the score of the available pieces on the board.
 * The algorithm will be implemented in Python and embedded into C++ using pybind11.
+* In order to achieve better performance, some of the important function are implemented in C/C++ for better performance and efficiency, note that some of the functions are just wrappers to already existing functions in the original engine.
 
 <a name="embedding"></a>
-8. Embedding Python in C++
+8. Embedding Python & C++
 ------------------------------------
 
 * The idea of the embedding is that we connect python to the Python-C API Embedding which allows us to also embed python in C.
