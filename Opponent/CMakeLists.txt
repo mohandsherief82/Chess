@@ -13,7 +13,6 @@ target_sources(
         FILES
             include/parsers.hpp
     PRIVATE
-        src/algorithm.cpp
         src/move_wrappers.cpp
         src/parsers.cpp
 )

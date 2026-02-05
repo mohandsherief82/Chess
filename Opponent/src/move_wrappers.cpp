@@ -22,23 +22,25 @@ namespace py = pybind11;
 using namespace py::literals;
 
 
-bool move_piece(std::string board_string, std::string move_string)
+std::string move_piece(std::string board_string, std::string move_string)
 {
-    if (move_string.size() < 4) return false;
+    if (move_string.size() < 5) return board_string;
 
     char **board { board_parser(board_string) };
 
     Player ply1 { player_parser(board, COLOR_WHITE) };
     Player ply2 { player_parser(board, COLOR_BLACK) };
 
-    Captured ply1_captures { captures_parser(board, ply1) };
-    Captured ply2_captures { captures_parser(board, ply2) };
-
+    Captured ply1_captures { captures_parser(board, &ply2, ply1.color) };
+    Captured ply2_captures { captures_parser(board, &ply1, ply2.color) };
     int ply1_EP { -1 }, ply2_EP { -1 };
 
     Move move { move_parser(move_string) };
 
     MoveValidation valid;
+
+    std::string new_board_str;
+    new_board_str.reserve(BOARD_SIZE * BOARD_SIZE);
 
     switch (std::tolower(move.symbol))
     {
@@ -60,13 +62,20 @@ bool move_piece(std::string board_string, std::string move_string)
         case 'k': 
             valid = moveKing(board, &ply1, move, &ply1_captures, false);
             break;
-        default: return false;
+        default: return board_string;
+    }
+
+    for (int i = 0; i < BOARD_SIZE; i++)
+    {
+        for (int j = 0; j < BOARD_SIZE; j++)
+        {
+            new_board_str.push_back(board[i][j]);
+        }
     }
 
     freeBoard(&board, &ply1, &ply2);
 
-    if (valid == INVALID_MOVE) return false;
-    else return true;
+    return new_board_str;
 }
 
 
