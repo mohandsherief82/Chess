@@ -48,9 +48,13 @@ Player player_parser(char **board, PieceColor color)
                         {
                             ply.pawns[pawn_idx].rowPosition = i;
                             ply.pawns[pawn_idx].colPosition = j;
-
+                
+                            ply.pawns[pawn_idx].symbol = current_char;
+                            ply.pawns[pawn_idx].isActive = true;
+                
                             ply.pawns[pawn_idx].promoted = false;
                             ply.pawns[pawn_idx].firstMove = false;
+                
                             pawn_idx++;
                         }
                         break;
@@ -60,18 +64,23 @@ Player player_parser(char **board, PieceColor color)
                         {
                             ply.rooks[rook_idx].rowPosition = i;
                             ply.rooks[rook_idx].colPosition = j;
-
+                
+                            ply.rooks[rook_idx].symbol = current_char;
+                            ply.rooks[rook_idx].isActive = true;
+                
                             rook_idx++;
                         }
                         else if (pawn_idx < NUM_PAWNS)
                         {
                             ply.pawns[pawn_idx].rowPosition = i;
                             ply.pawns[pawn_idx].colPosition = j;
-
+                
+                            ply.pawns[pawn_idx].symbol = current_char;
+                            ply.pawns[pawn_idx].isActive = true;
+                
                             ply.pawns[pawn_idx].promoted = true;
-                            ply.pawns[pawn_idx].symbol = current_char; 
-                         
                             ply.pawns[pawn_idx].firstMove = false;
+                
                             pawn_idx++;
                         }
                         break;
@@ -81,18 +90,23 @@ Player player_parser(char **board, PieceColor color)
                         {
                             ply.knights[knight_idx].rowPosition = i;
                             ply.knights[knight_idx].colPosition = j;
-
+                
+                            ply.knights[knight_idx].symbol = current_char;
+                            ply.knights[knight_idx].isActive = true;
+                
                             knight_idx++;
                         }
                         else if (pawn_idx < NUM_PAWNS)
                         {
                             ply.pawns[pawn_idx].rowPosition = i;
                             ply.pawns[pawn_idx].colPosition = j;
-
-                            ply.pawns[pawn_idx].promoted = true;
+                
                             ply.pawns[pawn_idx].symbol = current_char;
-                            
+                            ply.pawns[pawn_idx].isActive = true;
+                
+                            ply.pawns[pawn_idx].promoted = true;
                             ply.pawns[pawn_idx].firstMove = false;
+                
                             pawn_idx++;
                         }
                         break;
@@ -103,6 +117,9 @@ Player player_parser(char **board, PieceColor color)
                             ply.bishops[bishop_idx].rowPosition = i;
                             ply.bishops[bishop_idx].colPosition = j;
 
+                            ply.bishops[bishop_idx].symbol = current_char;
+                            ply.bishops[bishop_idx].isActive = true;
+
                             bishop_idx++;
                         }
                         else if (pawn_idx < NUM_PAWNS)
@@ -110,10 +127,12 @@ Player player_parser(char **board, PieceColor color)
                             ply.pawns[pawn_idx].rowPosition = i;
                             ply.pawns[pawn_idx].colPosition = j;
 
-                            ply.pawns[pawn_idx].promoted = true;
                             ply.pawns[pawn_idx].symbol = current_char;
+                            ply.pawns[pawn_idx].isActive = true;
 
+                            ply.pawns[pawn_idx].promoted = true;
                             ply.pawns[pawn_idx].firstMove = false;
+
                             pawn_idx++;
                         }
                         break;
@@ -124,6 +143,9 @@ Player player_parser(char **board, PieceColor color)
                             ply.queen[0].rowPosition = i;
                             ply.queen[0].colPosition = j;
 
+                            ply.queen[0].symbol = current_char;
+                            ply.queen[0].isActive = true;
+
                             queen_idx++;
                         }
                         else if (pawn_idx < NUM_PAWNS)
@@ -131,10 +153,12 @@ Player player_parser(char **board, PieceColor color)
                             ply.pawns[pawn_idx].rowPosition = i;
                             ply.pawns[pawn_idx].colPosition = j;
 
-                            ply.pawns[pawn_idx].promoted = true;
                             ply.pawns[pawn_idx].symbol = current_char;
+                            ply.pawns[pawn_idx].isActive = true;
 
+                            ply.pawns[pawn_idx].promoted = true;
                             ply.pawns[pawn_idx].firstMove = false;
+
                             pawn_idx++;
                         }
                         break;
@@ -143,6 +167,9 @@ Player player_parser(char **board, PieceColor color)
                         ply.king[0].rowPosition = i;
                         ply.king[0].colPosition = j;
 
+                        ply.king[0].symbol = current_char;
+                        ply.king[0].isActive = true;
+                        
                         ply.king->firstMove = false;
                         break;
                 }
@@ -154,10 +181,81 @@ Player player_parser(char **board, PieceColor color)
 }
 
 
-Captured captures_parser(char **board, Player ply)
-{}
+/**
+ * @brief Template to handle different piece types (Pawn, Rook, etc.) safely.
+*/
+template <typename T>
+void process_missing_generic(Player *ply, Captured *captures, int current_count, int max_count, T *piece_array, char symbol)
+{
+    if (current_count < max_count) 
+    {
+        for (int i = current_count; i < max_count; i++) 
+        {
+            if (piece_array[i].isActive) 
+            {
+                captures->newCapture = true;
+                captures->captureCount++;
+                
+                captures->capturedPiece.rowPosition = piece_array[i].rowPosition;
+                captures->capturedPiece.colPosition = piece_array[i].colPosition;
+                captures->capturedPiece.symbol = symbol;
+                
+                capturePiece(ply, captures);
+            }
+        }
+    }
+}
 
 
+/**
+ * @brief Parses the board to identify which pieces of the opponent have been captured.
+ */
+Captured captures_parser(char **board, Player *ply, PieceColor color)
+{
+    Captured captures { initializeCapture(color) }; 
+
+    int pawn_count = 0, rook_count = 0, knight_count = 0, bishop_count = 0, queen_count = 0;
+
+    auto is_player_piece = (ply->color == COLOR_WHITE) 
+        ? [](char c) { return std::islower(c); }
+        : [](char c) { return std::isupper(c); };
+    
+    for (int i = 0; i < BOARD_SIZE; i++) 
+    {
+        for (int j = 0; j < BOARD_SIZE; j++) 
+        {
+            if (is_player_piece(board[i][j])) 
+            {
+                switch (std::tolower(board[i][j])) 
+                {
+                    case 'p': pawn_count++;   break;
+                    case 'r': rook_count++;   break;
+                   
+                    case 'n': knight_count++; break;
+                    case 'b': bishop_count++; break;
+                   
+                    case 'q': queen_count++;  break;
+                }
+            }
+        }
+    }
+    
+    process_missing_generic(ply, &captures, queen_count, 1, ply->queen, 'q');
+    process_missing_generic(ply, &captures, bishop_count, NUM_PIECES, ply->bishops, 'b');
+
+    process_missing_generic(ply, &captures, knight_count, NUM_PIECES, ply->knights, 'n');
+    process_missing_generic(ply, &captures, rook_count, NUM_PIECES, ply->rooks, 'r');
+    
+    if (pawn_count < NUM_PAWNS) 
+        process_missing_generic(ply, &captures, pawn_count, NUM_PAWNS, ply->pawns, 'p');
+
+    return captures;
+}
+
+
+/**
+ * @brief Parses a move string into a Move structure.
+ */
 Move move_parser(std::string move_string)
 {
     Move move;

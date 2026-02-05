@@ -14,5 +14,5 @@ extern "C"
 
 char **board_parser(std::string board_string);
 Player player_parser(char **board, PieceColor color);
-Captured captures_parser(char **board, Player ply);
+Captured captures_parser(char **board, Player *ply, PieceColor color);
 Move move_parser(std::string move_string);
