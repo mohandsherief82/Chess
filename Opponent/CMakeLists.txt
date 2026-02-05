@@ -12,9 +12,11 @@ target_sources(
         BASE_DIRS include
         FILES
             include/parsers.hpp
+            include/move_wrappers.hpp
     PRIVATE
         src/move_wrappers.cpp
         src/parsers.cpp
+        src/pymodule_move.cpp
 )
 
 target_link_libraries(

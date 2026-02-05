@@ -7,7 +7,7 @@ build_path = os.path.join(script_dir, "../..", "build")
 if build_path not in sys.path:
     sys.path.append(build_path)
 
-import Move_Wrappers
+from Move_Wrappers import check_mate, check_stalemate
 
 class Minimax:
     __piece_value = {'k': 13, 'q': 9, 'r': 5, 'b': 3, 'n': 3, 'p': 1}
@@ -15,17 +15,17 @@ class Minimax:
     def __init__(self, max_depth: int = 5):
         self.max_depth = max_depth
 
+
     def __get_available_moves(self, current_state: str):
         pass
+
 
     def __is_terminal(self, current_state: str) -> bool:
         """
             Checks if the current state is a terminal state or not.
         """
-        if Move_Wrappers.check_mate(current_state) or Move_Wrappers.check_stalemate(current_state):
-            return True
-        else:
-            return False
+        return check_mate(current_state) or check_stalemate(current_state)
+
 
     def minimax(self, current_state: str, is_maximizing_turn: bool, depth: int = 0) -> int:
         """
@@ -57,6 +57,7 @@ class Minimax:
             
         return best_score
 
+
     def __evaluation_function(self, current_state: str) -> int:
         """
             Calculates score based on piece values. 
@@ -76,6 +77,7 @@ class Minimax:
 
         return score
 
+
     def get_best_move(self, current_state: str) -> int:
         """
             Helper to find the best move string from the starting state 
@@ -84,8 +86,8 @@ class Minimax:
         max_eval = -math.inf
         
         for move in self.__get_available_moves(current_state):
-            # Start recursion at depth 1, opponent's turn (False)
-            eval_score = self.minimax(move, 1, False)
+            eval_score = self.minimax(move, False, 1)
+            
             if eval_score > max_eval:
                 max_eval = eval_score
                 best_move = move

@@ -1,28 +1,5 @@
-#include <pybind11/pybind11.h>
-#include <cctype>
 
-#include "parsers.hpp"
-
-extern "C"
-{
-    #include "pawnMoves.h"
-    #include "rookMoves.h"
-    
-    #include "knightMoves.h"
-    #include "bishopMoves.h"
-    
-    #include "queenMoves.h"
-    #include "kingMoves.h"
-    
-    #include "check.h"
-    #include "saveGame.h"
-
-    #include "staleMate.h"
-    #include "checkMate.h"
-}
-
-namespace py = pybind11;
-using namespace py::literals;
+#include "move_wrappers.hpp"
 
 
 std::string move_piece(std::string board_string, std::string move_string)
@@ -48,22 +25,22 @@ std::string move_piece(std::string board_string, std::string move_string)
     switch (std::tolower(move.symbol))
     {
         case 'p': 
-            valid = movePawn(board, &ply1, move, &ply1_captures, &ply1_EP, &ply2_EP, false, false);
+            valid = movePawn(board, &ply2, move, &ply1_captures, &ply1_EP, &ply2_EP, false, false);
             break;
         case 'r': 
-            valid = moveRook(board, &ply1, move, &ply1_captures, false);
+            valid = moveRook(board, &ply2, move, &ply1_captures, false);
             break;
         case 'n': 
-            valid = moveKnight(board, &ply1, move, &ply1_captures, false);
+            valid = moveKnight(board, &ply2, move, &ply1_captures, false);
             break;
         case 'b': 
-            valid = moveBishop(board, &ply1, move, &ply1_captures, false);
+            valid = moveBishop(board, &ply2, move, &ply1_captures, false);
             break;
         case 'q': 
-            valid = moveQueen(board, &ply1, move, &ply1_captures, false);
+            valid = moveQueen(board, &ply2, move, &ply1_captures, false);
             break;
         case 'k': 
-            valid = moveKing(board, &ply1, move, &ply1_captures, false);
+            valid = moveKing(board, &ply2, move, &ply1_captures, false);
             break;
         default: return board_string;
     }
@@ -107,18 +84,4 @@ bool check_stalemate(std::string board_string)
     freeBoard(&board, &ply1, &ply2);
 
     return state;
-}
-
-
-PYBIND11_MODULE(Move_Wrappers, m)
-{
-    m.doc() = "Wrappers for all moving function implemented in C and moddified by C++";
-
-    m.def("move_piece", &move_piece, "A Wrapper Function that wraps the pieces move functions all at once",
-        "board_string"_a, "move_string"_a);
-
-    m.def("check_mate", &check_mate, "Checks whether the game reached a state of checkmate."
-        , "board_string"_a);
-    m.def("check_stalemate", &check_stalemate, "Checks whether the game reached a state of checkmate."
-        , "board_string"_a);
 }
