@@ -1,3 +1,4 @@
+
 import sys
 import os
 
@@ -7,62 +8,72 @@ build_path = os.path.join(script_dir, "../..", "build")
 if build_path not in sys.path:
     sys.path.append(build_path)
 
-from Move_Wrappers import check_mate, check_stalemate, move_piece
+
+import math
+from Move_Wrappers import get_available_moves, move_piece, check_mate, check_stalemate
+
 
 class Minimax:
-    __piece_value = {'k': 13, 'q': 9, 'r': 5, 'b': 3, 'n': 3, 'p': 1}
+    __piece_value = {'k': 1000, 'q': 90, 'r': 50, 'b': 30, 'n': 30, 'p': 10}
     
-    def __init__(self, max_depth: int = 5):
+    def __init__(self, max_depth: int = 3):
         self.max_depth = max_depth
 
-
-    def __get_available_moves(self, current_state: str) -> list:
-        pass
-
-
-    def __is_terminal(self, current_state: str) -> bool:
+    def __get_available_moves(self, current_state: str, color: int) -> list:
+        """ 
+            Fetches all legal moves for the current player color. 
         """
-            Checks if the current state is a terminal state or not.
-        """
-        return check_mate(current_state) or check_stalemate(current_state)
+        return get_available_moves(current_state, color)
 
-
-    def minimax(self, current_state: str, is_maximizing_turn: bool, depth: int = 0) -> int:
+    def __is_terminal(self, current_state: str, color: int) -> bool:
+        """ 
+            Checks if the current state is mate or stalemate for the player. 
         """
-            Recursive minimax function.
-        """
-        best_score = 0
+        return check_mate(current_state, color) or check_stalemate(current_state, color)
 
-        # Base case: Check terminal state or max depth
-        if depth == self.max_depth or self.__is_terminal(current_state):
+    def __minimax(self, current_state: str, is_maximizing_turn: bool, alpha: float, beta: float, depth: int = 0) -> int:
+        current_color = 1 if is_maximizing_turn else 0
+
+        if depth == self.max_depth or self.__is_terminal(current_state, current_color):
+            return self.__evaluation_function(current_state)
+
+        moves = self.__get_available_moves(current_state, current_color)
+        
+        if not moves:
             return self.__evaluation_function(current_state)
 
         if is_maximizing_turn:
-            best_score = -math.inf
-            
-            for move in self.__get_available_moves(current_state):
-                # Recurse: increment depth and flip turn to False
+            max_eval = -math.inf
+
+            for move in moves:
                 new_state = move_piece(current_state, move)
-                evaluation = self.minimax(new_state, False, depth + 1)
+                eval_score = self.__minimax(new_state, False, alpha, beta, depth + 1)
 
-                best_score = max(best_score, evaluation)
-            
+                max_eval = max(max_eval, eval_score)
+                alpha = max(alpha, eval_score)
+
+                if beta <= alpha:
+                    break
+
+            return max_eval
         else:
-            best_score = math.inf
-            
-            for move in self.__get_available_moves(current_state):
-                # Recurse: increment depth and flip turn to True
-                evaluation = self.minimax(move, True, depth + 1)
+            min_eval = math.inf
 
-                best_score = min(best_score, evaluation)
-            
-        return best_score
+            for move in moves:
+                new_state = move_piece(current_state, move)
+                eval_score = self.__minimax(new_state, True, alpha, beta, depth + 1)
+                
+                min_eval = min(min_eval, eval_score)
+                beta = min(beta, eval_score)
+                
+                if beta <= alpha:
+                    break
 
+            return min_eval
 
     def __evaluation_function(self, current_state: str) -> int:
-        """
-            Calculates score based on piece values. 
-            Lowercase = Positive (AI), Uppercase = Negative (Opponent).
+        """ 
+            Simple Material-based evaluation. 
         """
         score = 0
 
@@ -70,7 +81,6 @@ class Minimax:
             lower_char = char.lower()
         
             if lower_char in self.__piece_value:
-                # Add value for lowercase (AI pieces), subtract for uppercase (Opponent)
                 if char.islower():
                     score += self.__piece_value[lower_char]
                 else:
@@ -79,15 +89,18 @@ class Minimax:
         return score
 
 
-    def get_best_move(self, current_state: str) -> int:
-        """
-            Helper to find the best move string from the starting state 
+    def get_best_move(self, current_state: str) -> str:
+        """ 
+            Returns the best move string found by the AI. 
         """
         best_move = None
         max_eval = -math.inf
         
-        for move in self.__get_available_moves(current_state):
-            eval_score = self.minimax(move, False, 1)
+        moves = self.__get_available_moves(current_state, 1)
+        
+        for move in moves:
+            new_state = move_piece(current_state, move)
+            eval_score = self.__minimax(new_state, False, -math.inf, math.inf, 1)
             
             if eval_score > max_eval:
                 max_eval = eval_score
