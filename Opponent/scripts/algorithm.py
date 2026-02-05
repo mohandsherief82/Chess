@@ -7,7 +7,7 @@ build_path = os.path.join(script_dir, "../..", "build")
 if build_path not in sys.path:
     sys.path.append(build_path)
 
-from Move_Wrappers import check_mate, check_stalemate
+from Move_Wrappers import check_mate, check_stalemate, move_piece
 
 class Minimax:
     __piece_value = {'k': 13, 'q': 9, 'r': 5, 'b': 3, 'n': 3, 'p': 1}
@@ -16,7 +16,7 @@ class Minimax:
         self.max_depth = max_depth
 
 
-    def __get_available_moves(self, current_state: str):
+    def __get_available_moves(self, current_state: str) -> list:
         pass
 
 
@@ -42,7 +42,8 @@ class Minimax:
             
             for move in self.__get_available_moves(current_state):
                 # Recurse: increment depth and flip turn to False
-                evaluation = self.minimax(move, False, depth + 1)
+                new_state = move_piece(current_state, move)
+                evaluation = self.minimax(new_state, False, depth + 1)
 
                 best_score = max(best_score, evaluation)
             

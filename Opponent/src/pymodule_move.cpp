@@ -10,6 +10,7 @@ PYBIND11_MODULE(Move_Wrappers, m)
 
     m.def("check_mate", &check_mate, "Checks whether the game reached a state of checkmate."
         , "board_string"_a);
+ 
     m.def("check_stalemate", &check_stalemate, "Checks whether the game reached a state of checkmate."
         , "board_string"_a);
 }
