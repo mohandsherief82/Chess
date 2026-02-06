@@ -8,6 +8,15 @@
 #include "parsers.hpp"
 
 extern "C" {
+    #include "pawnMoves.h"
+    #include "rookMoves.h"
+
+    #include "knightMoves.h"
+    #include "bishopMoves.h"
+
+    #include "queenMoves.h"
+    #include "kingMoves.h"
+    
     #include "chessTypes.h"
     #include "board.h"
 

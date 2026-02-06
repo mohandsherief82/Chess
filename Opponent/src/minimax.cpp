@@ -10,6 +10,86 @@ Minimax::Minimax(int depth, PieceColor ai_color) : max_depth(depth), computer_co
 
 
 /**
+ * @brief Iterates through all pieces of a player and simulates every possible move to find legal ones.
+ * @param board The current board state.
+ * @param player Pointer to the player whose legal moves are being calculated.
+ * @return A vector of valid Move structures.
+ */
+std::vector<Move> Minimax::get_legal_moves(char** board, Player* player)
+{
+    std::vector<Move> move_list;
+    PieceColor color = player->color;
+
+    auto collect_for_piece = [&](Piece* p, char type) 
+    {
+        if (!p || !p->isActive) return;
+
+        Move test_move;
+
+        test_move.symbol = p->symbol;
+        test_move.rowPrev = p->rowPosition;
+
+        test_move.colPrev = p->colPosition;
+        test_move.promotedPawn = ' ';
+
+        for (int r = 0; r < BOARD_SIZE; r++)
+        {
+            for (int c = 0; c < BOARD_SIZE; c++)
+            {
+                if (r == p->rowPosition && c == p->colPosition) continue;
+                
+                if (!isEmpty(board, r, c))
+                {
+                    PieceColor target_color = (std::islower(board[r][c])) ? COLOR_WHITE : COLOR_BLACK;
+
+                    if (target_color == color) continue;
+                }
+
+                test_move.rowNext = r;
+                test_move.colNext = c;
+
+                char** cpy_b = copy_board(board);
+
+                Player cpy_p1 = copy_player(player); 
+                
+                Captured tmp_cap = initializeCapture(color);
+
+                int p_ep = -1, o_ep = -1;
+
+                MoveValidation valid = INVALID_MOVE;
+
+                if (type == 'p') valid = movePawn(cpy_b, &cpy_p1, test_move, &tmp_cap, &p_ep, &o_ep, true, false);
+                else if (type == 'r') valid = moveRook(cpy_b, &cpy_p1, test_move, &tmp_cap, true);
+                else if (type == 'n') valid = moveKnight(cpy_b, &cpy_p1, test_move, &tmp_cap, true);
+                else if (type == 'b') valid = moveBishop(cpy_b, &cpy_p1, test_move, &tmp_cap, true);
+                else if (type == 'q') valid = moveQueen(cpy_b, &cpy_p1, test_move, &tmp_cap, true);
+                else if (type == 'k') valid = moveKing(cpy_b, &cpy_p1, test_move, &tmp_cap, true);
+
+                if (valid != INVALID_MOVE && !isChecked(cpy_b, &cpy_p1, true))
+                    move_list.push_back(test_move);
+
+                freeBoard(&cpy_b, &cpy_p1, NULL);
+            }
+        }
+    };
+
+    for (int i = 0; i < 8; i++) collect_for_piece((Piece*)&player->pawns[i], 'p');
+    
+    for (int i = 0; i < 2; i++) 
+    {
+        collect_for_piece((Piece*)&player->rooks[i], 'r');
+        collect_for_piece((Piece*)&player->knights[i], 'n');
+        collect_for_piece((Piece*)&player->bishops[i], 'b');
+    }
+
+    collect_for_piece((Piece*)player->queen, 'q');
+    collect_for_piece((Piece*)player->king, 'k');
+
+    return move_list;
+}
+
+
+/**
  * @brief Evaluates the board material relative to the AI's color.
  * @param board The 2D array representing the chess board.
  * @return Integer score where positive favors the computer.
