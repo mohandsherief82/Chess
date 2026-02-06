@@ -12,11 +12,10 @@ target_sources(
         BASE_DIRS include
         FILES
             include/parsers.hpp
-            include/move_wrappers.hpp
+            include/minimax.hpp
     PRIVATE
-        src/move_wrappers.cpp
         src/parsers.cpp
-        src/pymodule_move.cpp
+        src/minimax.cpp
 )
 
 target_link_libraries(
