@@ -5,24 +5,23 @@ Chess Engine
 Table of Contents
 -----------------
 
-* [1. Overview](#1-overview)
-* [2. Technical Features & Data Structures](#2-technical-features--data-structures)
-* [3. The Build System](#3-the-build-system)
-* [4. System Design](#4-system-design)
-* [5. Movement Logic](#5-movement-logic)
-* [6. Game End States](#6-game-end-states)
-* [7. Minimax Algorithm](#7-minimax-algorithm)
-* [8. Embedding Python in C++](#8-embedding-python-in-c)
-* [9. Persistence: Save, Load, and Undo](#9-persistence-save-load-and-undo)
-* [10. User Manual](#10-user-manual)
-* [11. Snapshots of the Game](#11-snapshots-of-the-game)
-* [12. References](#12-references)
+* [1. Overview](#overview)
+* [2. Technical Features & Data Structures](#technical)
+* [3. The Build System](#the-build-system)
+* [4. System Design](#system-design)
+* [5. Movement Logic](#movement-logic)
+* [6. Game End States](#game-end-states)
+* [7. Minimax Algorithm](#minimax-algorithm)
+* [8. Persistence: Save, Load, and Undo](#persistence)
+* [9. User Manual](#user-manual)
+* [10. Snapshots of the Game](#snapshots)
+* [11. References](#references)
 
 <a name="overview"></a>
 1. Overview
 ------------
 
-The **Terminal Chess Engine** is a comprehensive board game application implemented in C, C++, and Python. It translates the high-level complexity of Chess into a modular, command-line interface. The engine supports full rules, including specialized movements like castling, en passant, and pawn promotion.
+The **Terminal Chess Engine** is a comprehensive board game application implemented in C and C++. It translates the high-level complexity of Chess into a modular, command-line interface. The engine supports full rules, including specialized movements like castling, en passant, and pawn promotion.
 
 Key technical highlights include a recursive-style move validation system, binary file persistence for saving and loading game states, and a robust "Undo" feature that uses file truncation to safely revert moves back to the starting position.
 
@@ -113,8 +112,6 @@ The general *CMakeLists.txt* file builds the entire system where the subdirector
 ------------------
 
 In order to get the board updates between the two users and the GUI, the observer behavioral pattern was used, which made the communication easier between the engine and the display.
-
-Also the use of this pattern helped with the communication between the python AI API and the game engine.
 
 Concrete Classes:
 
@@ -225,22 +222,10 @@ The queen's move is very similar to the bishop and the rook moves, so the implem
 * In max depth approach, the algorithm stops at a specific depth specified before the game starts and then uses an evaluation function to determine which is the best next move and choose it.
 * The evaluation function can be a simple piece counting function or a *Machine Learning* algorithm which we won't be diving into.
 * In our approach of this game of chess, we are going to use the max depth strategy with alpha-beta prunning to allow the game to be playable and computationally more efficient and the evaluation function will be based on the score of the available pieces on the board.
-* The algorithm will be implemented in Python and embedded into C++ using pybind11.
-* In order to achieve better performance, some of the important function are implemented in C/C++ for better performance and efficiency, note that some of the functions are just wrappers to already existing functions in the original engine.
-
-<a name="embedding"></a>
-8. Embedding Python & C++
-------------------------------------
-
-* The idea of the embedding is that we connect python to the Python-C API Embedding which allows us to also embed python in C.
-* It starts by telling where exactly python exists, then it starts to map C++ data types to python data types and vice versa.
-* As python doesn't have similar variable scope like C/C++, so python uses a reference counter to know when to delete objects and free, it works by counting how many things are pointing to a specific memory address and it deletes it when it finds that nothing is pointing to that address.
-* All of this steps can be done by Pybind or Shiboken (already used to bridge the Qt library into python).
-* For this project, we are going to use pybind, as we only need python to create a Minimax algorithm for the opponent.
-* Pybind can't handle complex paths in cpp so to add the correct files for importing in C++ using sys.path to add the files to the path where the python will search for the files.
+* The algorithm will be implemented in C++.
 
 <a name="persistence"></a>
-9. Persistence: Save, Load, and Undo
+8. Persistence: Save, Load, and Undo
 -------------------------------------
 
 To ensure games can be resumed, validated moves are appended to a binary file for space efficiency.
@@ -251,7 +236,7 @@ To ensure games can be resumed, validated moves are appended to a binary file fo
 * **Redo**: It checks if the redo file isn't empty and then read the last move from the file and then reload the game with the redone move again.
 
 <a name="manual"></a>
-10. User Manual
+9. User Manual
 ---------------
 
 * Uses the mouse to move pieces like a normal chess gui.
@@ -262,25 +247,25 @@ To ensure games can be resumed, validated moves are appended to a binary file fo
 * On the right of the screen the list of moves appear with the last 32 player moves, 16 white and 16 black.
 
 <a name="snapshots"></a>
-11. Snapshots of the Game
+10. Snapshots of the Game
 -------------------------
 
 ![Main Menu](image.png)
 
-11.1 Main Menu Interface
+10.1 Main Menu Interface
 
 ![Gameplay UI](image-1.png)
 
-11.2 Active Board Rendering
+10.2 Active Board Rendering
 
 ![Checkmate](image-2.png)
 
-11.3 End of Game State
+10.3 End of Game State
 
 * * *
 
 <a name="references"></a>
-12. References
+11. References
 --------------
 
 * **C memcpy Documentation:** [GeeksforGeeks](https://www.geeksforgeeks.org/cpp/memcpy-in-cc/)
@@ -288,4 +273,3 @@ To ensure games can be resumed, validated moves are appended to a binary file fo
 * **Design Patterns:** [W3Schools](https://www.geeksforgeeks.org/system-design/-pattern-set-1-introduction/)
 * **C++ File I/O (Binary):** [GeeksforGeeks](https://www.w3schools.com/cpp/cpp_files.asp)
 * **C File I/O (Binary):** [Programiz](https://www.programiz.com/c-programming/c-file-input-output)
-* **Pybind11:** [Pybind11 Documentation](https://pybind11.readthedocs.io/en/stable/advanced/embedding.html)
