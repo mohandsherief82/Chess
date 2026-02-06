@@ -103,8 +103,7 @@ void BoardCell::dropEvent(QDropEvent *event)
             
             piece->hide();
 
-            if (this->game_mode == TwoPlayer) 
-                saveMove(move, (this->game_board->get_game_path()).c_str());
+            saveMove(move, (this->game_board->get_game_path()).c_str());
             
             clearRedo((this->game_board->get_redo_path()).c_str());
 

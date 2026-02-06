@@ -734,6 +734,85 @@ namespace Chess
 
         this->setCentralWidget(master_container);
 
+        bool cpu_turn { ((this->cpu_opponent.get_color() == COLOR_BLACK && player_turn == PLAYER2) || (this->cpu_opponent.get_color() == COLOR_WHITE && player_turn == PLAYER1)) };
+
+        if (this->game_mode == OnePlayer && cpu_turn)
+        {
+            int cpu_num { (this->cpu_opponent.get_color() == COLOR_BLACK) ? PLAYER2: PLAYER1 };
+            char c;
+
+            printf("Not Yet\n");
+            scanf("%c");
+            std::cin >> c;
+
+            Move move = this->cpu_opponent.get_best_move(this->game_board->get_board_string());
+
+            printf("Not Yet\n");
+            scanf("%c");
+            std::cin >> c;
+
+            Player *ply { this->game_board->get_player(cpu_num) };
+
+            Captured *ply_captures { this->game_board->get_player_captures(cpu_num) };
+
+            int *plyEP { this->game_board->get_player_EP(cpu_num) },
+                *oppEP { this->game_board->get_player_EP((cpu_num == PLAYER1) ? PLAYER2 : PLAYER1) };
+
+            MoveValidation move_state;
+
+            switch (move.symbol)
+            {
+                case PAWN: 
+                    move_state = movePawn(*board_ptr, ply, move, ply_captures, plyEP, oppEP, false, false);
+                    break;
+                case ROOK: 
+                    move_state = moveRook(*board_ptr, ply, move, ply_captures, false);
+                    break;
+                case KNIGHT: 
+                    move_state = moveKnight(*board_ptr, ply, move, ply_captures, false);
+                    break;
+                case BISHOP: 
+                    move_state = moveBishop(*board_ptr, ply, move, ply_captures, false);
+                    break;
+                case QUEEN: 
+                    move_state = moveQueen(*board_ptr, ply, move, ply_captures, false);
+                    break;
+                case KING: 
+                    move_state = moveKing(*board_ptr, ply, move, ply_captures, false);
+                    break;
+            }
+
+            if (move_state != INVALID_MOVE)
+            {
+                if (move_state == PROMOTION)
+                {
+                    char chosen_piece { (cpu_num == PLAYER1) ? 'q': 'Q' };
+
+                    promotePawn(move, ply, chosen_piece);
+
+                    move.promotedPawn = chosen_piece;
+                    (*board_ptr)[move.rowNext][move.colNext] = chosen_piece;
+                }
+
+                printf("Not Yet\n");
+                scanf(" %c");
+
+                saveMove(move, (this->game_board->get_game_path()).c_str());
+            
+                clearRedo((this->game_board->get_redo_path()).c_str());
+
+                if (ply_captures->newCapture) 
+                    capturePiece(this->game_board->get_player((cpu_num == PLAYER1) ? PLAYER2 : PLAYER1), ply_captures);
+                
+                player_turn = (cpu_num == PLAYER2) ? PLAYER1: PLAYER2;
+
+                printf("Not Yet\n");
+                scanf("%c");
+
+                this->game_board->update_turn(player_turn);
+            }
+        }
+
         if (player_turn == PLAYER1)
         {
             gl->addLayout(ply2_data, 0, 1, 1, 8, Qt::AlignLeft);

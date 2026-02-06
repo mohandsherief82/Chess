@@ -45,4 +45,7 @@ class Minimax
     public:
         Minimax(int depth, PieceColor ai_color);
         Move get_best_move(std::string board_string);
+
+        void set_color(PieceColor color) { this->computer_color = color; }
+        PieceColor get_color() { return this->computer_color; }
 };

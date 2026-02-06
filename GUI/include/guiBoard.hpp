@@ -61,6 +61,7 @@ namespace Chess
             void delete_files();
             
             void game_end(std::string end_state);
+            void get_color();
         public:
             GInterface(std::shared_ptr<Board> game_board);
             
