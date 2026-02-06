@@ -20,6 +20,7 @@
 #include "boardCell.hpp"
 #include "helpers.hpp"
 #include "dialog.hpp"
+#include "minimax.hpp"
 
 #include <filesystem>
 #include <iostream>
@@ -46,7 +47,9 @@ namespace Chess
     {
         private:
             std::shared_ptr<Board> game_board = nullptr;
-            GameMode mode = TwoPlayer;
+            GameMode game_mode { TwoPlayer };
+
+            Minimax cpu_opponent { Minimax(10, COLOR_BLACK) };
 
             void add_captures(QVBoxLayout *ply_data, QLabel *ply_msg, Captured *ply_captures, bool redo_flag);
             void add_redo_undo(QHBoxLayout *box);
@@ -58,14 +61,13 @@ namespace Chess
             void delete_files();
             
             void game_end(std::string end_state);
-        private slots:
-
         public:
             GInterface(std::shared_ptr<Board> game_board);
             
             void update() override;
             void load_game(const std::string file_path);
             
+            void choose_mode();
             void start_game();
         protected:
             void keyPressEvent(QKeyEvent *event) override;

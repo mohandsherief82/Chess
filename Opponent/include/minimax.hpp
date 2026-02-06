@@ -5,6 +5,7 @@
 #include <vector>
 #include <algorithm>
 #include <limits>
+
 #include "parsers.hpp"
 
 extern "C" {
@@ -31,6 +32,7 @@ class Minimax
     private:
         int max_depth;
         PieceColor computer_color;
+
         static const std::unordered_map<char, int> piece_values;
 
         float minimax_core(char** board, Player* ply_white, Player* ply_black, bool is_maximizing, float alpha, float beta, int depth);
