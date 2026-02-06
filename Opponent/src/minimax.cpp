@@ -165,7 +165,7 @@ float Minimax::minimax_core(char** board, Player* white, Player* black, bool is_
     {
         float max_eval = -std::numeric_limits<float>::infinity();
 
-        for (const auto& m : moves) 
+        for (const Move &m : moves) 
         {
             char** next_board = copy_board(board);
         
@@ -175,7 +175,7 @@ float Minimax::minimax_core(char** board, Player* white, Player* black, bool is_
             Player* m_ply = (current_color == COLOR_WHITE) ? &next_white : &next_black;
             Player* o_ply = (current_color == COLOR_WHITE) ? &next_black : &next_white;
             
-            apply_move_to_state(next_board, m_ply, o_ply, m);
+            apply_move(next_board, m_ply, o_ply, m);
         
             float eval = minimax_core(next_board, &next_white, &next_black, false, alpha, beta, depth + 1);
         
@@ -204,7 +204,7 @@ float Minimax::minimax_core(char** board, Player* white, Player* black, bool is_
             Player* m_ply = (current_color == COLOR_WHITE) ? &next_white : &next_black;
             Player* o_ply = (current_color == COLOR_WHITE) ? &next_black : &next_white;
 
-            apply_move_to_state(next_board, m_ply, o_ply, m);
+            apply_move(next_board, m_ply, o_ply, m);
         
             float eval = minimax_core(next_board, &next_white, &next_black, true, alpha, beta, depth + 1);
         
@@ -220,6 +220,33 @@ float Minimax::minimax_core(char** board, Player* white, Player* black, bool is_
         return min_eval;
     }
 }
+
+
+/**
+ * @brief Updates the board and player structures to reflect the result of a move.
+ * @param board The 2D array representing the chess board to be modified.
+ * @param moving_player Pointer to the player structure making the move.
+ * @param opponent Pointer to the player structure receiving the move.
+ * @param move The move structure containing the source and destination coordinates.
+ */
+void Minimax::apply_move(char** board, Player* moving_player, Player* opponent, Move move)
+{
+    Captured ply_captures { initializeCapture(moving_player->color) };
+
+    int ply_ep = -1, opp_ep = -1;
+
+    if (std::tolower(move.symbol) == 'p') movePawn(board, moving_player, move, &ply_captures, &ply_ep, &opp_ep, false, false);
+    else if (std::tolower(move.symbol) == 'r') moveRook(board, moving_player, move, &ply_captures, false);
+    else if (std::tolower(move.symbol) == 'n') moveKnight(board, moving_player, move, &ply_captures, false);
+    else if (std::tolower(move.symbol) == 'b') moveBishop(board, moving_player, move, &ply_captures, false);
+    else if (std::tolower(move.symbol) == 'q') moveQueen(board, moving_player, move, &ply_captures, false);
+    else if (std::tolower(move.symbol) == 'k') moveKing(board, moving_player, move, &ply_captures, false);
+
+    updateBoard(board, moving_player, opponent);
+
+    return;
+}
+
 
 /**
  * @brief Evaluates the board string and returns the Move struct for the best calculated move.
@@ -251,7 +278,7 @@ Move Minimax::get_best_move(std::string board_string)
         Player* m_ply = (computer_color == COLOR_WHITE) ? &next_white : &next_black;
         Player* o_ply = (computer_color == COLOR_WHITE) ? &next_black : &next_white;
 
-        apply_move_to_state(next_board, m_ply, o_ply, m);
+        apply_move(next_board, m_ply, o_ply, m);
     
         float eval = minimax_core(next_board, &next_white, &next_black, false, -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), 1);
     
