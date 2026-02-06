@@ -1,7 +1,11 @@
 #pragma once
 
-#include <QLabel>
+#include <QApplication>
 #include <QMouseEvent>
+#include <QMimeData>
+#include <QLabel>
+#include <QPoint>
+#include <QDrag>
 
 #include <memory>
 
@@ -27,6 +31,8 @@ class DraggablePiece : public QLabel
         PieceType symbol;
     protected:
         void mousePressEvent(QMouseEvent *event) override;
+        void mouseMoveEvent(QMouseEvent *event) override;
     private:
         int col_pos, row_pos;
+        QPoint drag_start_pos;
 };
