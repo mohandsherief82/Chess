@@ -36,9 +36,6 @@ target_sources(
         src/dialog.cpp
 )
 
-# Ensure the compiler can find your headers
-target_include_directories(Gui PRIVATE include ..)
-
 # Link the required libraries
 target_link_libraries(
     Gui 

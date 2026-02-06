@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.28)
 
-add_library(Minimax)
+add_library(Minimax SHARED)
 
 target_sources(
     Minimax
