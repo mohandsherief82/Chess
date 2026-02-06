@@ -5,8 +5,8 @@
 #include <QDragMoveEvent> 
 #include <iostream>
 
-BoardCell::BoardCell(int r, int c, std::shared_ptr<Chess::Board> game_board, QWidget *parent) 
-    : QWidget(parent), row_pos(r), col_pos(c), game_board(game_board)
+BoardCell::BoardCell(int r, int c, std::shared_ptr<Chess::Board> game_board, GameMode game_mode, QWidget *parent) 
+    : QWidget(parent), row_pos(r), col_pos(c), game_board(game_board), game_mode(game_mode)
 {
     setAcceptDrops(true);
     setAttribute(Qt::WA_StyledBackground, true);
@@ -43,19 +43,20 @@ void BoardCell::dropEvent(QDropEvent *event)
 
             .colNext = this->getCol(),
             .rowNext = this->getRow(),
- 
+
             .promotedPawn = 0
         };
 
-        MoveValidation move_state {};
-        
+        MoveValidation move_state = INVALID_MOVE;
+
         Player *ply = this->game_board->get_player(player_turn);
-        
+
         Captured *ply_captures = this->game_board->get_player_captures(player_turn);
 
         char **board = this->game_board->get_board_array();
-        int *plyEP = this->game_board->get_player_EP(player_turn), 
-            *oppEP = this->game_board->get_player_EP((player_turn == PLAYER1) ? PLAYER2 : PLAYER1);
+        
+        int *plyEP = this->game_board->get_player_EP(player_turn);
+        int *oppEP = this->game_board->get_player_EP((player_turn == PLAYER1) ? PLAYER2 : PLAYER1);
 
         switch (piece->symbol)
         {
@@ -90,17 +91,20 @@ void BoardCell::dropEvent(QDropEvent *event)
             if (move_state == PROMOTION)
             {
                 char chosen_piece = helpers::promotion_menu(this, ply->color);
-                               
+
                 promotePawn(move, ply, chosen_piece);
 
                 move.promotedPawn = chosen_piece;
                 board[move.rowNext][move.colNext] = chosen_piece;
             }
 
-            piece->hide(); 
-            event->acceptProposedAction();
+            event->setDropAction(Qt::MoveAction); // Tell Fedora the move succeeded
+            event->accept();                      // Accept the event
+            piece->hide();                        // Visual cleanup
 
-            saveMove(move, (this->game_board->get_game_path()).c_str());
+            if (this->game_mode == TwoPlayer) 
+                saveMove(move, (this->game_board->get_game_path()).c_str());
+            
             clearRedo((this->game_board->get_redo_path()).c_str());
 
             if (ply_captures->newCapture) 
@@ -108,5 +112,6 @@ void BoardCell::dropEvent(QDropEvent *event)
             
             QTimer::singleShot(0, [this](){ this->game_board->update_board(); });
         }
+        else event->ignore();
     }
 }

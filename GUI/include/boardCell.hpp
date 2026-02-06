@@ -1,4 +1,5 @@
 #pragma once
+
 #include "interfaces.hpp"
 
 #include <QWidget>
@@ -16,10 +17,13 @@ extern "C"
 {
     #include "pawnMoves.h"
     #include "rookMoves.h"
+    
     #include "knightMoves.h"
     #include "bishopMoves.h"
+    
     #include "queenMoves.h"
     #include "kingMoves.h"
+
     #include "check.h"
     #include "saveGame.h"
     
@@ -32,12 +36,17 @@ class BoardCell : public QWidget
     private:
         int row_pos, col_pos;
         std::shared_ptr<Chess::Board> game_board = nullptr;
+
+        GameMode game_mode;        
     public:
-        BoardCell(int r, int c, std::shared_ptr<Chess::Board> game_board, QWidget *parent = nullptr);
+        BoardCell(int r, int c, std::shared_ptr<Chess::Board> game_board
+                    , GameMode game_mode, QWidget *parent = nullptr);
+        
         int getRow() { return row_pos; }
         int getCol() { return col_pos; }
     protected:
         void dragEnterEvent(QDragEnterEvent *event) override;
         void dropEvent(QDropEvent *event) override;
+        
         void dragMoveEvent(QDragMoveEvent *event) override;
 };
