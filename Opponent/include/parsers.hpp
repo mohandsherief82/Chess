@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 
+#include <functional>
+
 extern "C" 
 {
     #include "player.h"
