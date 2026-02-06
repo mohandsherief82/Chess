@@ -45,6 +45,7 @@ target_link_libraries(
         Board 
         Moves 
         GameEnd
+        Minimax
         Gui
         Qt6::Widgets
         Qt6::Svg
