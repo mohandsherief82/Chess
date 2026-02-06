@@ -14,11 +14,27 @@ namespace helpers
 
         dialog.setWindowTitle("Load Game");
         dialog.setFixedSize(350, 450);
+        dialog.setStyleSheet("background-color: #0A1118; color: #f8e7bb;");
 
         QVBoxLayout* layout = new QVBoxLayout(&dialog);
-        layout->addWidget(new QLabel("Select a save file to load:"));
+        
+        QLabel* header = new QLabel("Select a save file to load:");
+        header->setStyleSheet("font-weight: bold; font-size: 16px; margin-bottom: 5px; color: #f8e7bb;");
+        layout->addWidget(header);
 
         QListWidget* list_widget = new QListWidget(&dialog);
+        
+        list_widget->setStyleSheet(
+            "QListWidget { "
+            "   background-color: #111c28; "
+            "   border: 1px solid #f8e7bb; "
+            "   color: #f8e7bb; "
+            "   font-size: 14px; "
+            "   outline: none; "
+            "}"
+            "QListWidget::item { padding: 10px; color: #f8e7bb; }"
+            "QListWidget::item:selected { background-color: #1c2b3a; color: #ffffff; }"
+        );
         
         try 
         {
@@ -46,7 +62,11 @@ namespace helpers
 
         bool has_files = list_widget->count() > 0;
         
-        if (!has_files) list_widget->addItem("No other .bin files found.");
+        if (!has_files) 
+        {
+            QListWidgetItem* none_item = new QListWidgetItem("No other .bin files found.");
+            list_widget->addItem(none_item);
+        }
         else
         {
             list_widget->sortItems(Qt::AscendingOrder);
@@ -57,6 +77,11 @@ namespace helpers
 
         QPushButton* load_btn = new QPushButton("Load Selection", &dialog);
         load_btn->setEnabled(has_files);
+        load_btn->setStyleSheet(
+            "QPushButton { color: #f8e7bb; background-color: #1c2b3a; border: 1px solid #f8e7bb; padding: 10px; }"
+            "QPushButton:hover { background-color: #2a3f55; }"
+            "QPushButton:disabled { color: #555555; border-color: #555555; }"
+        );
         layout->addWidget(load_btn);
 
         std::string final_path = "";
@@ -209,6 +234,7 @@ namespace helpers
         pieceLabel->setAlignment(Qt::AlignCenter);
 
         layout->addWidget(pieceLabel);
+        pieceLabel->show();
 
         return;
     }
@@ -238,10 +264,10 @@ namespace helpers
             case 'b': piece_type = BISHOP; break;
             case 'q': piece_type = QUEEN; break;
             case 'k': piece_type = KING; break;
+            default: return;
         }
 
-        DraggablePiece *piece_label = new DraggablePiece(cell, row,
-                                                        col, color, piece_type);
+        DraggablePiece *piece_label = new DraggablePiece(cell, row, col, color, piece_type);
         piece_label->setObjectName(QString(pieceChar));
         
         QIcon icon(iconPath);
@@ -249,10 +275,10 @@ namespace helpers
 
         piece_label->setPixmap(pixmap);
         piece_label->setScaledContents(true);
-        
         piece_label->setAlignment(Qt::AlignCenter);
 
         layout->addWidget(piece_label);
+        piece_label->show();
     }
 
 
@@ -266,7 +292,7 @@ namespace helpers
 
         std::stringstream ss;
         
-        ss << std::put_time(&now_tm, "%Y-%m-%d %H:%M:%S") << ".bin";
+        ss << std::put_time(&now_tm, "%Y-%m-%d %H:%M:%S");
 
         return ss.str();
     }

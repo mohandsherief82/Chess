@@ -98,9 +98,10 @@ void BoardCell::dropEvent(QDropEvent *event)
                 board[move.rowNext][move.colNext] = chosen_piece;
             }
 
-            event->setDropAction(Qt::MoveAction); // Tell Fedora the move succeeded
-            event->accept();                      // Accept the event
-            piece->hide();                        // Visual cleanup
+            event->setDropAction(Qt::MoveAction);
+            event->accept();
+            
+            piece->hide();
 
             if (this->game_mode == TwoPlayer) 
                 saveMove(move, (this->game_board->get_game_path()).c_str());

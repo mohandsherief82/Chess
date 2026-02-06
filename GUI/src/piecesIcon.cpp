@@ -1,4 +1,3 @@
-
 #include "piecesIcon.hpp"
 
 DraggablePiece::DraggablePiece(QWidget *parent, int row_pos, int col_pos, PieceColor color, PieceType symbol) 
@@ -27,11 +26,12 @@ void DraggablePiece::mouseMoveEvent(QMouseEvent *event)
 {
     if (!(event->buttons() & Qt::LeftButton)) return;
 
-    if ((event->pos() - drag_start_pos).manhattanLength() < QApplication::startDragDistance()) {
+    if ((event->pos() - drag_start_pos).manhattanLength() < QApplication::startDragDistance()) 
+    {
         return;
     }
 
-    if (!pixmap().isNull())
+    if (!pixmap(Qt::ReturnByValue).isNull())
     {
         QMimeData *mimeData = new QMimeData;
 
@@ -40,13 +40,19 @@ void DraggablePiece::mouseMoveEvent(QMouseEvent *event)
         QDrag *drag = new QDrag(this);
 
         drag->setMimeData(mimeData);
-        drag->setPixmap(pixmap());
+        drag->setPixmap(pixmap(Qt::ReturnByValue));
         
         drag->setHotSpot(drag_start_pos); 
 
         this->hide();
 
-        if (drag->exec(Qt::MoveAction) != Qt::MoveAction) 
+        if (drag->exec(Qt::MoveAction) == Qt::IgnoreAction) 
+        {
             this->show();
+        }
+        else 
+        {
+            this->deleteLater();
+        }
     }
 }
