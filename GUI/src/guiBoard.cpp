@@ -741,15 +741,11 @@ namespace Chess
             int cpu_num { (this->cpu_opponent.get_color() == COLOR_BLACK) ? PLAYER2: PLAYER1 };
             char c;
 
-            printf("Not Yet\n");
-            scanf("%c");
-            std::cin >> c;
-
-            Move move = this->cpu_opponent.get_best_move(this->game_board->get_board_string());
-
-            printf("Not Yet\n");
-            scanf("%c");
-            std::cin >> c;
+            Move move = this->cpu_opponent.get_best_move(
+                    this->game_board->get_board_array(),
+                    *this->game_board->get_player(PLAYER1),
+                    *this->game_board->get_player(PLAYER2)
+                );
 
             Player *ply { this->game_board->get_player(cpu_num) };
 
@@ -781,6 +777,8 @@ namespace Chess
                     move_state = moveKing(*board_ptr, ply, move, ply_captures, false);
                     break;
             }
+
+            std::cout << move.symbol << move.colNext << move.rowNext << move.colPrev << move.rowPrev << std::endl;
 
             if (move_state != INVALID_MOVE)
             {

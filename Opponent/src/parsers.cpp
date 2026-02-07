@@ -3,25 +3,7 @@
 #include <cstring>
 #include <cstdlib>
 
-
-/**
- * @brief Converts a string representation of the board into a 2D C-style array.
- * @param board_string The 64-character string representing the board.
- * @return A dynamically allocated 2D char array.
- */
-char** board_parser(std::string board_string) 
-{
-    char** board = (char**)malloc(BOARD_SIZE * sizeof(char*));
-
-    for (int i = 0; i < BOARD_SIZE; i++) 
-    {
-        board[i] = (char*)malloc(BOARD_SIZE * sizeof(char));
-
-        for (int j = 0; j < BOARD_SIZE; j++) board[i][j] = board_string[i * BOARD_SIZE + j];
-    }
-
-    return board;
-}
+#include <cctype>
 
 
 /**
@@ -58,21 +40,17 @@ Player player_parser(char **board, PieceColor color)
                         {
                             ply.pawns[pawn_idx].rowPosition = i;
                             ply.pawns[pawn_idx].colPosition = j;
-
                             ply.pawns[pawn_idx].symbol = current_char;
                             ply.pawns[pawn_idx].promoted = false;
-
                             ply.pawns[pawn_idx].firstMove = false;
                             pawn_idx++;
                         }
-                        
                         break;
                     case 'r':
                         if (rook_idx < NUM_PIECES)
                         {
                             ply.rooks[rook_idx].rowPosition = i;
                             ply.rooks[rook_idx].colPosition = j;
-
                             ply.rooks[rook_idx].symbol = current_char;
                             rook_idx++;
                         }
@@ -80,23 +58,18 @@ Player player_parser(char **board, PieceColor color)
                         {
                             ply.pawns[pawn_idx].rowPosition = i;
                             ply.pawns[pawn_idx].colPosition = j;
-
                             ply.pawns[pawn_idx].symbol = current_char; 
                             ply.pawns[pawn_idx].promoted = true;
-
                             ply.pawns[pawn_idx].isActive = true; 
                             ply.pawns[pawn_idx].firstMove = false;
-
                             pawn_idx++;
                         }
-                        
                         break;
                     case 'n':
                         if (knight_idx < NUM_PIECES)
                         {
                             ply.knights[knight_idx].rowPosition = i;
                             ply.knights[knight_idx].colPosition = j;
-
                             ply.knights[knight_idx].symbol = current_char;
                             knight_idx++;
                         }
@@ -104,23 +77,18 @@ Player player_parser(char **board, PieceColor color)
                         {
                             ply.pawns[pawn_idx].rowPosition = i;
                             ply.pawns[pawn_idx].colPosition = j;
-
                             ply.pawns[pawn_idx].symbol = current_char;
                             ply.pawns[pawn_idx].promoted = true;
-
                             ply.pawns[pawn_idx].isActive = true; 
                             ply.pawns[pawn_idx].firstMove = false;
-
                             pawn_idx++;
                         }
-
                         break;
                     case 'b':
                         if (bishop_idx < NUM_PIECES)
                         {
                             ply.bishops[bishop_idx].rowPosition = i;
                             ply.bishops[bishop_idx].colPosition = j;
-
                             ply.bishops[bishop_idx].symbol = current_char;
                             bishop_idx++;
                         }
@@ -128,23 +96,18 @@ Player player_parser(char **board, PieceColor color)
                         {
                             ply.pawns[pawn_idx].rowPosition = i;
                             ply.pawns[pawn_idx].colPosition = j;
-
                             ply.pawns[pawn_idx].symbol = current_char;
                             ply.pawns[pawn_idx].promoted = true;
-
                             ply.pawns[pawn_idx].isActive = true; 
                             ply.pawns[pawn_idx].firstMove = false;
-
                             pawn_idx++;
                         }
-                        
                         break;
                     case 'q':
                         if (queen_idx < 1)
                         {
                             ply.queen[0].rowPosition = i;
                             ply.queen[0].colPosition = j;
-
                             ply.queen[0].symbol = current_char;
                             queen_idx++;
                         }
@@ -152,25 +115,21 @@ Player player_parser(char **board, PieceColor color)
                         {
                             ply.pawns[pawn_idx].rowPosition = i;
                             ply.pawns[pawn_idx].colPosition = j;
-
                             ply.pawns[pawn_idx].symbol = current_char;
                             ply.pawns[pawn_idx].promoted = true;
-                        
                             ply.pawns[pawn_idx].isActive = true; 
                             ply.pawns[pawn_idx].firstMove = false;
-                        
                             pawn_idx++;
                         }
-
                         break;
-
                     case 'k':
-                        ply.king->rowPosition = i;
-                        ply.king->colPosition = j;
-
-                        ply.king->symbol = current_char;
-                        ply.king->firstMove = false;
-
+                        if (ply.king)
+                        {
+                            ply.king->rowPosition = i;
+                            ply.king->colPosition = j;
+                            ply.king->symbol = current_char;
+                            ply.king->firstMove = false;
+                        }
                         break;
                 }
             }
@@ -188,53 +147,95 @@ Player player_parser(char **board, PieceColor color)
  */
 char** copy_board(char** original_board) 
 {
+    if (!original_board) return nullptr;
+
     char** new_board = (char**)malloc(BOARD_SIZE * sizeof(char*));
 
     for (int i = 0; i < BOARD_SIZE; i++) 
     {
         new_board[i] = (char*)malloc(BOARD_SIZE * sizeof(char));
+   
         std::memcpy(new_board[i], original_board[i], BOARD_SIZE * sizeof(char));
     }
 
     return new_board;
 }
 
+/**
+ * @brief Internal helper to allocate and copy memory only if source exists.
+ */
+static void safe_copy_block(void** dest, void* src, size_t size)
+{
+    if (src != nullptr)
+    {
+        *dest = std::malloc(size);
+
+        if (*dest != nullptr)
+            std::memcpy(*dest, src, size);
+    }
+    else *dest = nullptr;
+}
 
 /**
  * @brief Creates a deep copy of a Player structure, including sub-pointers.
- * @param original_player Pointer to the player to be copied.
+ * @param player Pointer to the player to be copied.
  * @return A new Player struct with duplicated piece data.
  */
-Player copy_player(const Player* original_player) 
+Player copy_player(const Player* player) 
 {
-    Player new_player = *original_player;
+    Player cpy;
+    if (!player) 
+    {
+        std::memset(&cpy, 0, sizeof(Player));
+        return cpy;
+    }
 
-    new_player.queen = (Queen*)malloc(sizeof(Queen));
-    *new_player.queen = *original_player->queen;
+    std::memcpy(&cpy, player, sizeof(Player));
+
+    safe_copy_block((void**)&cpy.bishops, player->bishops, NUM_PIECES * sizeof(Bishop));
+    safe_copy_block((void**)&cpy.knights, player->knights, NUM_PIECES * sizeof(Knight));
     
-    new_player.king = (King*)malloc(sizeof(King));
-    *new_player.king = *original_player->king;
+    safe_copy_block((void**)&cpy.rooks,   player->rooks,   NUM_PIECES * sizeof(Rook));
+    safe_copy_block((void**)&cpy.pawns,   player->pawns,   NUM_PAWNS * sizeof(Pawn));
     
-    return new_player;
+    safe_copy_block((void**)&cpy.queen,   player->queen,   sizeof(Queen));
+    safe_copy_block((void**)&cpy.king,    player->king,    sizeof(King));
+
+    return cpy;
 }
 
 
 /**
  * @brief Frees all memory associated with a specific engine state.
- * @param board The 2D board array.
+ * @param board_ptr Pointer to the 2D board array pointer.
  * @param ply1 Pointer to the first player.
  * @param ply2 Pointer to the second player.
  */
-void free_engine_state(char** board, Player* ply1, Player* ply2) 
+void free_engine_state(char*** board_ptr, Player* ply1, Player* ply2) 
 {
-    if (board) 
-    {
-        for (int i = 0; i < BOARD_SIZE; i++) free(board[i]);
-    
-        free(board);
-    }
+    auto clear_player_pointers = [](Player* p) {
+        if (!p) return;
+        // Only free if they were dynamically allocated (copy_player does this)
+        if (p->pawns)   { free(p->pawns);   p->pawns = nullptr;   }
+        if (p->rooks)   { free(p->rooks);   p->rooks = nullptr;   }
+        if (p->knights) { free(p->knights); p->knights = nullptr; }
+        if (p->bishops) { free(p->bishops); p->bishops = nullptr; }
+        if (p->queen)   { free(p->queen);   p->queen = nullptr;   }
+        if (p->king)    { free(p->king);    p->king = nullptr;    }
+    };
 
-    if (ply1) { free(ply1->queen); free(ply1->king); }
+    clear_player_pointers(ply1);
+    clear_player_pointers(ply2);
     
-    if (ply2) { free(ply2->queen); free(ply2->king); }
+    if (board_ptr && *board_ptr) 
+    {
+        char** board = *board_ptr;
+    
+        for (int i = 0; i < BOARD_SIZE; i++) 
+            if (board[i]) free(board[i]);
+
+        free(board);
+
+        *board_ptr = nullptr;
+    }
 }

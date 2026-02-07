@@ -40,9 +40,11 @@ void DraggablePiece::mouseMoveEvent(QMouseEvent *event)
         QDrag *drag = new QDrag(this);
 
         drag->setMimeData(mimeData);
-        drag->setPixmap(pixmap(Qt::ReturnByValue));
         
-        drag->setHotSpot(drag_start_pos); 
+        QPixmap piece_pixmap = pixmap(Qt::ReturnByValue);
+        drag->setPixmap(piece_pixmap);
+        
+        drag->setHotSpot(event->pos());
 
         this->hide();
 

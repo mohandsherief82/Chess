@@ -41,10 +41,10 @@ class Minimax
         bool is_terminal(char** board, Player* white, Player* black, PieceColor current_color);
         std::vector<Move> get_legal_moves(char** board, Player* current_player);
         
-        void apply_move(char** board, Player* moving_player, Player* opponent, Move move);
+        void apply_move(char** board, Player* white, Player* black, Move move, PieceColor moving_color);
     public:
         Minimax(int depth, PieceColor ai_color);
-        Move get_best_move(std::string board_string);
+        Move get_best_move(char** board, Player white, Player black);
 
         void set_color(PieceColor color) { this->computer_color = color; }
         PieceColor get_color() { return this->computer_color; }

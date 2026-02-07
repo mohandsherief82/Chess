@@ -49,7 +49,7 @@ namespace Chess
             std::shared_ptr<Board> game_board = nullptr;
             GameMode game_mode { TwoPlayer };
 
-            Minimax cpu_opponent { Minimax(10, COLOR_BLACK) };
+            Minimax cpu_opponent { Minimax(3, COLOR_BLACK) };
 
             void add_captures(QVBoxLayout *ply_data, QLabel *ply_msg, Captured *ply_captures, bool redo_flag);
             void add_redo_undo(QHBoxLayout *box);

@@ -1,6 +1,7 @@
-
 #include "minimax.hpp"
 
+#include <iostream>
+#include <cctype>
 
 const std::unordered_map<char, int> Minimax::piece_values = {
     {'k', 1000}, {'q', 90}, {'r', 50}, {'b', 30}, {'n', 30}, {'p', 10}
@@ -19,6 +20,9 @@ Minimax::Minimax(int depth, PieceColor ai_color) : max_depth(depth), computer_co
 std::vector<Move> Minimax::get_legal_moves(char** board, Player* player)
 {
     std::vector<Move> move_list;
+    
+    if (!board || !player) return move_list;
+
     PieceColor color = player->color;
 
     auto collect_for_piece = [&](Piece* p, char type) 
@@ -41,7 +45,7 @@ std::vector<Move> Minimax::get_legal_moves(char** board, Player* player)
                 
                 if (!isEmpty(board, r, c))
                 {
-                    PieceColor target_color = (std::islower(board[r][c])) ? COLOR_WHITE : COLOR_BLACK;
+                    PieceColor target_color = (std::islower((unsigned char)board[r][c])) ? COLOR_WHITE : COLOR_BLACK;
 
                     if (target_color == color) continue;
                 }
@@ -68,7 +72,7 @@ std::vector<Move> Minimax::get_legal_moves(char** board, Player* player)
                 if (valid != INVALID_MOVE && !isChecked(cpy_b, &cpy_p, true))
                     move_list.push_back(test_move);
 
-                freeBoard(&cpy_b, NULL, NULL);
+                free_engine_state(&cpy_b, &cpy_p, nullptr);
             }
         }
     };
@@ -83,11 +87,11 @@ std::vector<Move> Minimax::get_legal_moves(char** board, Player* player)
     }
 
     collect_for_piece((Piece*)player->queen, 'q');
+
     collect_for_piece((Piece*)player->king, 'k');
 
     return move_list;
 }
-
 
 /**
  * @brief Evaluates the board material relative to the AI's color.
@@ -96,20 +100,25 @@ std::vector<Move> Minimax::get_legal_moves(char** board, Player* player)
  */
 int Minimax::evaluation_function(char** board) 
 {
+    if (!board) return 0;
+
     int score = 0;
+
     for (int r = 0; r < BOARD_SIZE; r++) 
     {
         for (int c = 0; c < BOARD_SIZE; c++) 
         {
             char piece = board[r][c];
 
-            char lower_p = static_cast<char>(std::tolower(static_cast<unsigned char>(piece)));
+            if (piece == ' ') continue;
+
+            char lower_p = (char)std::tolower((unsigned char)piece);
 
             auto it = piece_values.find(lower_p);
             
             if (it != piece_values.end()) 
             {
-                PieceColor p_color = (std::islower(static_cast<unsigned char>(piece))) ? COLOR_WHITE : COLOR_BLACK;
+                PieceColor p_color = (std::islower((unsigned char)piece)) ? COLOR_WHITE : COLOR_BLACK;
 
                 score += (p_color == computer_color) ? it->second : -it->second;
             }
@@ -130,6 +139,8 @@ int Minimax::evaluation_function(char** board)
  */
 bool Minimax::is_terminal(char** board, Player* white, Player* black, PieceColor current_color) 
 {
+    if (!board || !white || !black) return true;
+
     Player* current = (current_color == COLOR_WHITE) ? white : black;
 
     Player* opponent = (current_color == COLOR_WHITE) ? black : white;
@@ -151,15 +162,16 @@ bool Minimax::is_terminal(char** board, Player* white, Player* black, PieceColor
  */
 float Minimax::minimax_core(char** board, Player* white, Player* black, bool is_maximizing, float alpha, float beta, int depth) 
 {
+    if (!board || !white || !black) return 0.0f;
+
     PieceColor current_color = is_maximizing ? computer_color : (computer_color == COLOR_WHITE ? COLOR_BLACK : COLOR_WHITE);
 
-    if (depth == max_depth || is_terminal(board, white, black, current_color)) 
-        return (float)evaluation_function(board);
+    if (depth > this->max_depth || is_terminal(board, white, black, current_color)) 
+        return (float)this->evaluation_function(board);
 
-    Player* current_player = (current_color == COLOR_WHITE) ? white : black;
-    std::vector<Move> moves = get_legal_moves(board, current_player);
+    std::vector<Move> moves = get_legal_moves(board, (current_color == COLOR_WHITE) ? white : black);
 
-    if (moves.empty()) return (float)evaluation_function(board);
+    if (moves.empty()) return (float)this->evaluation_function(board);
 
     if (is_maximizing) 
     {
@@ -168,16 +180,19 @@ float Minimax::minimax_core(char** board, Player* white, Player* black, bool is_
         for (const Move &m : moves) 
         {
             char** next_board = copy_board(board);
+            if (!next_board) continue;
 
             Player next_white = copy_player(white);
             Player next_black = copy_player(black);
+
+            std::cout << "Depth: " << depth << std::endl;
             
-            apply_move(next_board, &next_white, &next_black, m);
+            apply_move(next_board, &next_white, &next_black, m, current_color);
 
             float eval = minimax_core(next_board, &next_white, &next_black, false, alpha, beta, depth + 1);
             
-            freeBoard(&next_board, NULL, NULL);
-            
+            free_engine_state(&next_board, &next_white, &next_black);
+
             max_eval = std::max(max_eval, eval);
 
             alpha = std::max(alpha, eval);
@@ -190,20 +205,20 @@ float Minimax::minimax_core(char** board, Player* white, Player* black, bool is_
     else 
     {
         float min_eval = std::numeric_limits<float>::infinity();
-
         for (const auto& m : moves) 
         {
             char** next_board = copy_board(board);
+            if (!next_board) continue;
 
             Player next_white = copy_player(white);
             Player next_black = copy_player(black);
 
-            apply_move(next_board, &next_white, &next_black, m);
+            apply_move(next_board, &next_white, &next_black, m, current_color);
 
             float eval = minimax_core(next_board, &next_white, &next_black, true, alpha, beta, depth + 1);
             
-            freeBoard(&next_board, NULL, NULL);
-            
+            free_engine_state(&next_board, &next_white, &next_black);
+
             min_eval = std::min(min_eval, eval);
 
             beta = std::min(beta, eval);
@@ -219,22 +234,30 @@ float Minimax::minimax_core(char** board, Player* white, Player* black, bool is_
 /**
  * @brief Updates the board and player structures to reflect the result of a move.
  * @param board The 2D array representing the chess board to be modified.
- * @param moving_player Pointer to the player structure making the move.
- * @param opponent Pointer to the player structure receiving the move.
+ * @param white Pointer to the white player structure.
+ * @param black Pointer to the black player structure.
  * @param move The move structure containing the source and destination coordinates.
+ * @param moving_color The color of the player making the move.
  */
-void Minimax::apply_move(char** board, Player* moving_player, Player* opponent, Move move)
+void Minimax::apply_move(char** board, Player* white, Player* black, Move move, PieceColor moving_color)
 {
-    Captured ply_captures { initializeCapture(moving_player->color) };
+    if (!board || !white || !black) return;
+
+    Player* moving_player = (moving_color == COLOR_WHITE) ? white : black;
+    Player* opponent = (moving_color == COLOR_WHITE) ? black : white;
+
+    Captured ply_captures = initializeCapture(moving_player->color);
 
     int ply_ep = -1, opp_ep = -1;
 
-    if (std::tolower(move.symbol) == 'p') movePawn(board, moving_player, move, &ply_captures, &ply_ep, &opp_ep, false, false);
-    else if (std::tolower(move.symbol) == 'r') moveRook(board, moving_player, move, &ply_captures, false);
-    else if (std::tolower(move.symbol) == 'n') moveKnight(board, moving_player, move, &ply_captures, false);
-    else if (std::tolower(move.symbol) == 'b') moveBishop(board, moving_player, move, &ply_captures, false);
-    else if (std::tolower(move.symbol) == 'q') moveQueen(board, moving_player, move, &ply_captures, false);
-    else if (std::tolower(move.symbol) == 'k') moveKing(board, moving_player, move, &ply_captures, false);
+    char sym = (char)std::tolower((unsigned char)move.symbol);
+
+    if (sym == 'p') movePawn(board, moving_player, move, &ply_captures, &ply_ep, &opp_ep, false, false);
+    else if (sym == 'r') moveRook(board, moving_player, move, &ply_captures, false);
+    else if (sym == 'n') moveKnight(board, moving_player, move, &ply_captures, false);
+    else if (sym == 'b') moveBishop(board, moving_player, move, &ply_captures, false);
+    else if (sym == 'q') moveQueen(board, moving_player, move, &ply_captures, false);
+    else if (sym == 'k') moveKing(board, moving_player, move, &ply_captures, false);
 
     updateBoard(board, moving_player, opponent);
 }
@@ -242,17 +265,25 @@ void Minimax::apply_move(char** board, Player* moving_player, Player* opponent, 
 
 /**
  * @brief Evaluates the board string and returns the Move struct for the best calculated move.
- * @param board_string The current game board as a string.
+ * @param board The current game board as a 2D array.
+ * @param white The white player state.
+ * @param black The black player state.
  * @return A Move structure representing the AI's choice.
  */
-Move Minimax::get_best_move(std::string board_string) 
+Move Minimax::get_best_move(char** board, Player white, Player black)
 {
-    char** board = board_parser(board_string);
-
-    Player white = player_parser(board, COLOR_WHITE);
-    Player black = player_parser(board, COLOR_BLACK);
-
     Move best_move_found;
+
+    best_move_found.symbol = ' ';
+    best_move_found.rowPrev = -1;
+    
+    best_move_found.colPrev = -1;
+    best_move_found.rowNext = -1;
+    
+    best_move_found.colNext = -1;
+    best_move_found.promotedPawn = ' ';
+
+    if (!board) return best_move_found;
 
     float max_val = -std::numeric_limits<float>::infinity();
 
@@ -263,24 +294,27 @@ Move Minimax::get_best_move(std::string board_string)
     for (const auto& m : moves) 
     {
         char** next_board = copy_board(board);
+        
+        if (!next_board) continue;
 
         Player next_white = copy_player(&white);
         Player next_black = copy_player(&black);
 
-        apply_move(next_board, &next_white, &next_black, m);
+        apply_move(next_board, &next_white, &next_black, m, computer_color);
+
+        std::cout << "Run" << std::endl; 
 
         float eval = minimax_core(next_board, &next_white, &next_black, false, -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), 1);
         
-        freeBoard(&next_board, NULL, NULL);
-
         if (eval > max_val) 
         {
             max_val = eval;
+
             best_move_found = m;
         }
-    }
 
-    freeBoard(&board, &white, &black);
+        free_engine_state(&next_board, &next_white, &next_black);
+    }
 
     return best_move_found;
 }
