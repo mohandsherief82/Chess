@@ -184,8 +184,6 @@ float Minimax::minimax_core(char** board, Player* white, Player* black, bool is_
 
             Player next_white = copy_player(white);
             Player next_black = copy_player(black);
-
-            std::cout << "Depth: " << depth << std::endl;
             
             apply_move(next_board, &next_white, &next_black, m, current_color);
 

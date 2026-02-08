@@ -741,13 +741,14 @@ namespace Chess
             int cpu_num { (this->cpu_opponent.get_color() == COLOR_BLACK) ? PLAYER2: PLAYER1 };
             char c;
 
-            Move move = this->cpu_opponent.get_best_move(
-                    this->game_board->get_board_array(),
-                    *this->game_board->get_player(PLAYER1),
-                    *this->game_board->get_player(PLAYER2)
-                );
+            Player *cpu_ply { this->game_board->get_player(cpu_num) };
+            Player *user_ply { this->game_board->get_player( (cpu_num == PLAYER1) ? PLAYER2 : PLAYER1 ) };
 
-            Player *ply { this->game_board->get_player(cpu_num) };
+            Move move = this->cpu_opponent.get_best_move(
+                this->game_board->get_board_array(),
+                (user_ply->color == COLOR_WHITE) ? *user_ply : *cpu_ply,
+                (user_ply->color == COLOR_BLACK) ? *user_ply : *cpu_ply
+            );
 
             Captured *ply_captures { this->game_board->get_player_captures(cpu_num) };
 
@@ -756,29 +757,29 @@ namespace Chess
 
             MoveValidation move_state;
 
-            switch (move.symbol)
+            switch (std::tolower(move.symbol))
             {
-                case PAWN: 
-                    move_state = movePawn(*board_ptr, ply, move, ply_captures, plyEP, oppEP, false, false);
+                case 'p': 
+                    move_state = movePawn(*board_ptr, cpu_ply, move, ply_captures, plyEP, oppEP, false, false);
                     break;
-                case ROOK: 
-                    move_state = moveRook(*board_ptr, ply, move, ply_captures, false);
+                case 'r': 
+                    move_state = moveRook(*board_ptr, cpu_ply, move, ply_captures, false);
                     break;
-                case KNIGHT: 
-                    move_state = moveKnight(*board_ptr, ply, move, ply_captures, false);
+                case 'n': 
+                    move_state = moveKnight(*board_ptr, cpu_ply, move, ply_captures, false);
                     break;
-                case BISHOP: 
-                    move_state = moveBishop(*board_ptr, ply, move, ply_captures, false);
+                case 'b': 
+                    move_state = moveBishop(*board_ptr, cpu_ply, move, ply_captures, false);
                     break;
-                case QUEEN: 
-                    move_state = moveQueen(*board_ptr, ply, move, ply_captures, false);
+                case 'q': 
+                    move_state = moveQueen(*board_ptr, cpu_ply, move, ply_captures, false);
                     break;
-                case KING: 
-                    move_state = moveKing(*board_ptr, ply, move, ply_captures, false);
+                case 'k': 
+                    move_state = moveKing(*board_ptr, cpu_ply, move, ply_captures, false);
                     break;
             }
 
-            std::cout << move.symbol << move.colNext << move.rowNext << move.colPrev << move.rowPrev << std::endl;
+            std::cout << (move_state == INVALID_MOVE) << std::endl;
 
             if (move_state != INVALID_MOVE)
             {
@@ -786,7 +787,7 @@ namespace Chess
                 {
                     char chosen_piece { (cpu_num == PLAYER1) ? 'q': 'Q' };
 
-                    promotePawn(move, ply, chosen_piece);
+                    promotePawn(move, cpu_ply, chosen_piece);
 
                     move.promotedPawn = chosen_piece;
                     (*board_ptr)[move.rowNext][move.colNext] = chosen_piece;
