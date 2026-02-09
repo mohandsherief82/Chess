@@ -54,7 +54,7 @@ namespace helpers
     QString get_icon_path(char piece);
     std::vector<Move> read_moves(std::string path);
 
-    void clear_items(QLayout *gl);
+    void clear_layout(QLayout *layout);
     void add_piece_to_cell(QWidget *cell, char pieceChar);
 
     void add_piece_to_cell(BoardCell *cell, char pieceChar, int row, int col);

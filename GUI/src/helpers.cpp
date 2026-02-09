@@ -197,14 +197,20 @@ namespace helpers
     }
 
 
-    void clear_items(QLayout *gl)
+    /**
+     * @brief Recursively clears all widgets and layouts from a target layout.
+     * @param layout we want to clear
+     */
+    void clear_layout(QLayout *layout)
     {
-        if (!gl) return;
+        if (!layout) return;
 
-        QLayoutItem *item;
-        while ((item = gl->takeAt(0)) != nullptr)
+        while (QLayoutItem *item = layout->takeAt(0))
         {
-            if (QWidget *widget = item->widget()) widget->deleteLater();
+            if (QWidget *widget = item->widget()) delete widget;
+            
+            else if (QLayout *child_layout = item->layout()) clear_layout(child_layout);
+            
             delete item;
         }
     }
