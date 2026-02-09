@@ -71,7 +71,7 @@ namespace Chess
         QWidget *table_container = sidebar->findChild<QWidget*>("tableContainer");
 
         QGridLayout *grid_view = qobject_cast<QGridLayout*>(table_container->layout());
-        helpers::clear_items(grid_view);
+        helpers::clear_layout(grid_view);
 
         grid_view->setSpacing(2);
         grid_view->setContentsMargins(0, 0, 0, 0);
@@ -779,8 +779,6 @@ namespace Chess
                     break;
             }
 
-            std::cout << (move_state == INVALID_MOVE) << std::endl;
-
             if (move_state != INVALID_MOVE)
             {
                 if (move_state == PROMOTION)
@@ -793,9 +791,6 @@ namespace Chess
                     (*board_ptr)[move.rowNext][move.colNext] = chosen_piece;
                 }
 
-                printf("Not Yet\n");
-                scanf(" %c");
-
                 saveMove(move, (this->game_board->get_game_path()).c_str());
             
                 clearRedo((this->game_board->get_redo_path()).c_str());
@@ -804,9 +799,6 @@ namespace Chess
                     capturePiece(this->game_board->get_player((cpu_num == PLAYER1) ? PLAYER2 : PLAYER1), ply_captures);
                 
                 player_turn = (cpu_num == PLAYER2) ? PLAYER1: PLAYER2;
-
-                printf("Not Yet\n");
-                scanf("%c");
 
                 this->game_board->update_turn(player_turn);
             }

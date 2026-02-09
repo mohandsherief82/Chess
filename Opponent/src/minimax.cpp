@@ -300,8 +300,6 @@ Move Minimax::get_best_move(char** board, Player white, Player black)
 
         apply_move(next_board, &next_white, &next_black, m, computer_color);
 
-        std::cout << "Run" << std::endl; 
-
         float eval = minimax_core(next_board, &next_white, &next_black, false, -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), 1);
         
         if (eval > max_val) 
