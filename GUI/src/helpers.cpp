@@ -7,17 +7,34 @@ namespace helpers
         return fs::path(full_path).stem().string();
     }
 
+
     std::string load_menu(QWidget* parent, const std::string& folder_path, const std::string& exclude_name_no_ext) 
     {
         QDialog dialog(parent);
 
         dialog.setWindowTitle("Load Game");
         dialog.setFixedSize(350, 450);
+        dialog.setStyleSheet("background-color: #0A1118; color: #f8e7bb;");
 
         QVBoxLayout* layout = new QVBoxLayout(&dialog);
-        layout->addWidget(new QLabel("Select a save file to load:"));
+        
+        QLabel* header = new QLabel("Select a save file to load:");
+        header->setStyleSheet("font-weight: bold; font-size: 16px; margin-bottom: 5px; color: #f8e7bb;");
+        layout->addWidget(header);
 
         QListWidget* list_widget = new QListWidget(&dialog);
+        
+        list_widget->setStyleSheet(
+            "QListWidget { "
+            "   background-color: #111c28; "
+            "   border: 1px solid #f8e7bb; "
+            "   color: #f8e7bb; "
+            "   font-size: 14px; "
+            "   outline: none; "
+            "}"
+            "QListWidget::item { padding: 10px; color: #f8e7bb; }"
+            "QListWidget::item:selected { background-color: #1c2b3a; color: #ffffff; }"
+        );
         
         try 
         {
@@ -45,7 +62,11 @@ namespace helpers
 
         bool has_files = list_widget->count() > 0;
         
-        if (!has_files) list_widget->addItem("No other .bin files found.");
+        if (!has_files) 
+        {
+            QListWidgetItem* none_item = new QListWidgetItem("No other .bin files found.");
+            list_widget->addItem(none_item);
+        }
         else
         {
             list_widget->sortItems(Qt::AscendingOrder);
@@ -56,6 +77,11 @@ namespace helpers
 
         QPushButton* load_btn = new QPushButton("Load Selection", &dialog);
         load_btn->setEnabled(has_files);
+        load_btn->setStyleSheet(
+            "QPushButton { color: #f8e7bb; background-color: #1c2b3a; border: 1px solid #f8e7bb; padding: 10px; }"
+            "QPushButton:hover { background-color: #2a3f55; }"
+            "QPushButton:disabled { color: #555555; border-color: #555555; }"
+        );
         layout->addWidget(load_btn);
 
         std::string final_path = "";
@@ -81,7 +107,7 @@ namespace helpers
     }
 
 
-    QString getIconPath(char piece)
+    QString get_icon_path(char piece)
     {
         QString colorStr = (std::islower(piece)) ? "white" : "black";
         QString type_str;
@@ -90,23 +116,31 @@ namespace helpers
         {
             case 'p': type_str = "pawn"; break;
             case 'r': type_str = "rook"; break;
+            
             case 'n': type_str = "knight"; break;
             case 'b': type_str = "bishop"; break;
+            
             case 'q': type_str = "queen"; break;
             case 'k': type_str = "king"; break;
 
-            case 'd': return QString(":/icons/redo.svg");
-            case 'u': return QString(":/icons/undo.svg");
-            case 's': return QString(":/icons/save.svg");
-            case 'l': return QString(":/icons/load.svg");
-            case 'a': return QString(":/icons/start.svg");
-            case 'g': return QString(":/icons/resign.svg");
-            case 'x': return QString(":/icons/exit.svg");
+            case 'd': return QString(":/buttons/icons/redo.svg");
+            case 'u': return QString(":/buttons/icons/undo.svg");
+
+            case 's': return QString(":/buttons/icons/save.svg");
+            case 'l': return QString(":/buttons/icons/load.svg");
+
+            case 'a': return QString(":/buttons/icons/start.svg");
+            case 'g': return QString(":/buttons/icons/resign.svg");
+
+            case 'x': return QString(":/buttons/icons/exit.svg");
+
+            case 'o': return QString(":/buttons/icons/one_player.svg");
+            case 't': return QString(":/buttons/icons/two_player.svg");
 
             default: return QString("");
         }
 
-        return QString(":/icons/%1_%2.svg").arg(colorStr).arg(type_str);
+        return QString(":/pieces/icons/%1_%2.svg").arg(colorStr).arg(type_str);
     }
 
 
@@ -163,14 +197,20 @@ namespace helpers
     }
 
 
-    void clear_items(QLayout *gl)
+    /**
+     * @brief Recursively clears all widgets and layouts from a target layout.
+     * @param layout we want to clear
+     */
+    void clear_layout(QLayout *layout)
     {
-        if (!gl) return;
+        if (!layout) return;
 
-        QLayoutItem *item;
-        while ((item = gl->takeAt(0)) != nullptr)
+        while (QLayoutItem *item = layout->takeAt(0))
         {
-            if (QWidget *widget = item->widget()) widget->deleteLater();
+            if (QWidget *widget = item->widget()) delete widget;
+            
+            else if (QLayout *child_layout = item->layout()) clear_layout(child_layout);
+            
             delete item;
         }
     }
@@ -178,7 +218,7 @@ namespace helpers
 
     void add_piece_to_cell(QWidget *cell, char pieceChar)
     {
-        QString iconPath = getIconPath(pieceChar);
+        QString iconPath = get_icon_path(pieceChar);
         if (iconPath.isEmpty()) return;
     
         QVBoxLayout *layout = qobject_cast<QVBoxLayout*>(cell->layout());
@@ -200,6 +240,7 @@ namespace helpers
         pieceLabel->setAlignment(Qt::AlignCenter);
 
         layout->addWidget(pieceLabel);
+        pieceLabel->show();
 
         return;
     }
@@ -207,7 +248,7 @@ namespace helpers
 
     void add_piece_to_cell(BoardCell *cell, char pieceChar, int row, int col)
     {
-        QString iconPath = getIconPath(pieceChar);
+        QString iconPath = get_icon_path(pieceChar);
         if (iconPath.isEmpty()) return;
     
         QVBoxLayout *layout = qobject_cast<QVBoxLayout*>(cell->layout());
@@ -229,10 +270,10 @@ namespace helpers
             case 'b': piece_type = BISHOP; break;
             case 'q': piece_type = QUEEN; break;
             case 'k': piece_type = KING; break;
+            default: return;
         }
 
-        DraggablePiece *piece_label = new DraggablePiece(cell, row,
-                                                        col, color, piece_type);
+        DraggablePiece *piece_label = new DraggablePiece(cell, row, col, color, piece_type);
         piece_label->setObjectName(QString(pieceChar));
         
         QIcon icon(iconPath);
@@ -240,10 +281,10 @@ namespace helpers
 
         piece_label->setPixmap(pixmap);
         piece_label->setScaledContents(true);
-        
         piece_label->setAlignment(Qt::AlignCenter);
 
         layout->addWidget(piece_label);
+        piece_label->show();
     }
 
 
@@ -257,7 +298,7 @@ namespace helpers
 
         std::stringstream ss;
         
-        ss << std::put_time(&now_tm, "%Y-%m-%d %H:%M:%S") << ".bin";
+        ss << std::put_time(&now_tm, "%Y-%m-%d %H:%M:%S");
 
         return ss.str();
     }
@@ -268,13 +309,15 @@ namespace helpers
         PersistentDialog dialog(parent);
         
         dialog.setWindowTitle("Pawn Promotion");
-        dialog.setStyleSheet("background-color: #0A1118; border: 2px solid #f8e7bb;");
+        dialog.setStyleSheet("background-color: #0A1118; border: none;");
 
         QVBoxLayout* layout = new QVBoxLayout(&dialog);
 
         QLabel *title = new QLabel("Select your promotion piece:");
+        
         title->setAlignment(Qt::AlignCenter);
         title->setStyleSheet("color: #f8e7bb; font-weight: bold; font-size: 18px; margin-top: 10px; border: none;");
+        
         layout->addWidget(title);
 
         QListWidget* list_widget = new QListWidget(&dialog);
@@ -295,7 +338,7 @@ namespace helpers
 
         for (const auto& opt : options)
         {
-            QListWidgetItem* item = new QListWidgetItem(QIcon(getIconPath(opt.symbol)), opt.name);
+            QListWidgetItem* item = new QListWidgetItem(QIcon(get_icon_path(opt.symbol)), opt.name);
             item->setData(Qt::UserRole, QVariant(opt.symbol));
             list_widget->addItem(item);
         }

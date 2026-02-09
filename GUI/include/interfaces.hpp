@@ -17,10 +17,13 @@ extern "C"
 #define PLAYER1 1
 #define PLAYER2 2
 
+enum GameMode
+{
+    TwoPlayer, OnePlayer
+};
+
 namespace Concrete
 {
-    class Subject;
-
     class Observer
     {
         public:
@@ -33,6 +36,7 @@ namespace Concrete
         public:
             virtual ~Subject() = default;
             virtual void addObserver(Observer* observer);
+            
             virtual void removeObserver(Observer* observer);
             virtual void notifyObservers();
         protected:
@@ -43,26 +47,22 @@ namespace Concrete
 
 namespace Chess
 {
-    class GInterface;
-
-    class AIOpponent: public Concrete::Observer
-    {
-        public:
-            void update() override;
-    };
-
     class Board: public Concrete::Subject, public std::enable_shared_from_this<Board>
     {
         private:
             char ***board_ptr = nullptr;
             std::string board_str = "";
+            
             Player *ply1 = nullptr, *ply2 = nullptr;
             Captured *ply1_captures = nullptr, *ply2_captures = nullptr;
+            
             int *ply1EP = new int(-1), *ply2EP = new int(-1);
             int player_turn = 1;
+            
             std::string game_path {}, redo_path {};
         public:
             Board();
+            
             Board(char ***board_ptr, int player_turn);
             ~Board();
             
@@ -88,6 +88,7 @@ namespace Chess
 
             void update_turn(int turn) { this->player_turn = turn; }
             void udpate_game_path(std::string path) { this->game_path = path; }
+            
             void udpate_redo_path(std::string path) { this->redo_path = path; }
     };
 }

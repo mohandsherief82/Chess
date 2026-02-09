@@ -4,3 +4,4 @@
 */testing/
 Pieces/testing
 build/
+*.pyc

@@ -118,7 +118,7 @@ namespace Chess
                     char display_symbol = (col == 0) ? moves[move_idx].symbol : toupper(moves[move_idx].symbol);
                     
                     QLabel *iconLabel = new QLabel();
-                    QPixmap pix = QIcon(helpers::getIconPath(moves[move_idx].symbol)).pixmap(24, 24);
+                    QPixmap pix = QIcon(helpers::get_icon_path(moves[move_idx].symbol)).pixmap(24, 24);
                     
                     iconLabel->setPixmap(pix);
                     cell_layout->addWidget(iconLabel);
@@ -257,7 +257,7 @@ namespace Chess
                 int result = diag.exec();
 
                 if (result == QDialog::Rejected) this->close();
-                else if (result == QDialog::Accepted) this->start_game();
+                else if (result == QDialog::Accepted) this->choose_mode();
             } 
             catch (const fs::filesystem_error& e) 
             {
@@ -267,12 +267,86 @@ namespace Chess
     }
 
 
+    void GInterface::choose_mode()
+    {
+        QDialog dialog(this);
+        
+        dialog.setWindowTitle("Select Game Mode");
+        
+        dialog.setStyleSheet("background-color: #0A1118; border: none;");
+        dialog.setFixedSize(500, 300);
+
+        QVBoxLayout *layout { new QVBoxLayout(&dialog) };
+        QHBoxLayout *hlayout { new QHBoxLayout() };
+
+        QLabel *title { new QLabel("Select New Game Mode:") };
+        QLabel *subtitle { new QLabel("Exiting Starts a Two Player Game Automatically") };
+
+        title->setAlignment(Qt::AlignCenter);
+        title->setStyleSheet("color: #f8e7bb; font-weight: bold; font-size: 18px; margin-top: 10px; border: none;");
+        
+        subtitle->setAlignment(Qt::AlignCenter);
+        subtitle->setStyleSheet("color: #f8e7bb; font-size: 14px; margin-top: 5px;");
+        
+        layout->addWidget(title);
+        layout->addWidget(subtitle);
+
+        QString flat_style =
+                    "QPushButton {"
+                    "   color: #f8e7bb; "
+                    "   border: 2px solid transparent;" 
+                    "   background: transparent;"
+                    "   font-size: 22px;" 
+                    "   padding: 10px;" 
+                    "   text-align: left;"
+                    "}"
+                    "QPushButton:hover {"
+                    "   background-color: #1c2b3a;"
+                    "   border-radius: 5px;"
+                    "}";
+
+        QPushButton *one_player_mode_btn { new QPushButton( QIcon( helpers::get_icon_path('o')), "One Player Mode" ) };
+        QPushButton *two_player_mode_btn { new QPushButton( QIcon( helpers::get_icon_path('t')), "Two Player Mode" ) };
+
+        one_player_mode_btn->setStyleSheet(flat_style);
+        two_player_mode_btn->setStyleSheet(flat_style);
+
+        one_player_mode_btn->setIconSize(QSize(SAVE_BUTTON_SIZE, SAVE_BUTTON_SIZE));
+        two_player_mode_btn->setIconSize(QSize(SAVE_BUTTON_SIZE, SAVE_BUTTON_SIZE));
+
+        one_player_mode_btn->setFixedWidth(250);
+        two_player_mode_btn->setFixedWidth(250);
+
+        hlayout->addWidget(one_player_mode_btn);
+        hlayout->addWidget(two_player_mode_btn);
+
+        layout->addLayout(hlayout);
+
+        this->game_mode = TwoPlayer;
+
+        QObject::connect(one_player_mode_btn, &QPushButton::clicked, [&]() 
+                { 
+                    this->game_mode = OnePlayer;
+                    dialog.accept();
+                }
+            );
+
+        QObject::connect(two_player_mode_btn, &QPushButton::clicked, [&]() 
+                { 
+                    this->game_mode = TwoPlayer; 
+                    dialog.accept();
+                }
+            );
+
+        if (dialog.exec() == QDialog::Accepted) this->start_game();
+    }
+
     void GInterface::start_game() 
     {
         char ***board_ptr = this->game_board->get_board_ptr();
 
-        if (*board_ptr != nullptr) *board_ptr = initializeBoard(); 
-
+        if (*board_ptr == nullptr) *board_ptr = initializeBoard(); 
+        
         Player *ply1 = this->game_board->get_player(PLAYER1);
         Player *ply2 = this->game_board->get_player(PLAYER2);
 
@@ -400,7 +474,7 @@ namespace Chess
         {
             this->delete_files();
 
-            QTimer::singleShot(0, this, [this](){ this->start_game(); });
+            QTimer::singleShot(0, this, [this](){ this->choose_mode(); });
         }
         else if (result == QDialog::Rejected) 
         {
@@ -432,13 +506,13 @@ namespace Chess
                     "   border-radius: 5px;"
                     "}";
 
-        QPushButton *save_button { new QPushButton( QIcon( helpers::getIconPath('s') ), "  Save Game") };
-        QPushButton *load_button { new QPushButton( QIcon( helpers::getIconPath('l') ), "  Load Game") };
+        QPushButton *save_button { new QPushButton( QIcon( helpers::get_icon_path('s') ), "  Save Game") };
+        QPushButton *load_button { new QPushButton( QIcon( helpers::get_icon_path('l') ), "  Load Game") };
         
-        QPushButton *start_button { new QPushButton( QIcon( helpers::getIconPath('a') ), "  Start New Game") };
-        QPushButton *resign_button { new QPushButton( QIcon( helpers::getIconPath('g') ), "  Resign") };
+        QPushButton *start_button { new QPushButton( QIcon( helpers::get_icon_path('a') ), "  Start New Game") };
+        QPushButton *resign_button { new QPushButton( QIcon( helpers::get_icon_path('g') ), "  Resign") };
         
-        QPushButton *exit_button { new QPushButton( QIcon( helpers::getIconPath('x') ), "  Exit") };
+        QPushButton *exit_button { new QPushButton( QIcon( helpers::get_icon_path('x') ), "  Exit") };
 
         save_button->setStyleSheet(flat_style);
         load_button->setStyleSheet(flat_style);
@@ -448,7 +522,7 @@ namespace Chess
         
         exit_button->setStyleSheet(flat_style);
 
-        save_button->setFixedSize(180, 50);
+        save_button->setFixedSize(190, 50);
         load_button->setFixedSize(180, 50);
         
         resign_button->setFixedSize(150, 50);
@@ -462,26 +536,38 @@ namespace Chess
         
         exit_button->setIconSize(QSize(SAVE_BUTTON_SIZE, SAVE_BUTTON_SIZE));
 
-        QObject::connect(save_button, &QPushButton::clicked, [=](){
-            this->save_game_as();
-        });
+        if (this->game_mode == OnePlayer) save_button->hide();
 
-        QObject::connect(load_button, &QPushButton::clicked, [=](){
-            this->load_game( helpers::get_filename_without_ext( this->game_board->get_game_path() ) );
-        });
+        QObject::connect(save_button, &QPushButton::clicked, [=]()
+            {
+                this->save_game_as();
+            }
+        );
 
-        QObject::connect(start_button, &QPushButton::clicked, [=](){
-            this->start_game();
-        });
+        QObject::connect(load_button, &QPushButton::clicked, [=]()
+            {
+                this->load_game( helpers::get_filename_without_ext( this->game_board->get_game_path() ) );
+            }
+        );
 
-        QObject::connect(exit_button, &QPushButton::clicked, [=](){
-            this->delete_files();
-            this->close();
-        });
+        QObject::connect(start_button, &QPushButton::clicked, [=]()
+            {
+                this->choose_mode();
+            }
+        );
 
-        QObject::connect(resign_button, &QPushButton::clicked, [=](){
-            this->game_end("Resigning");
-        });
+        QObject::connect(exit_button, &QPushButton::clicked, [=]()
+            {
+                this->delete_files();
+                this->close();
+            }
+        );
+
+        QObject::connect(resign_button, &QPushButton::clicked, [=]()
+            {
+                this->game_end("Resigning");
+            }
+        );
 
         layout->setSpacing(20);
         layout->setContentsMargins(0, 0, 0, 0);
@@ -502,8 +588,8 @@ namespace Chess
 
     void GInterface::add_redo_undo(QHBoxLayout *box)
     {
-        QString redo_icon_path { helpers::getIconPath('d') };   
-        QString undo_icon_path { helpers::getIconPath('u') };
+        QString redo_icon_path { helpers::get_icon_path('d') };   
+        QString undo_icon_path { helpers::get_icon_path('u') };
 
         QPushButton *undo_button = new QPushButton(QIcon(undo_icon_path), "Undo");
         QPushButton *redo_button = new QPushButton(QIcon(redo_icon_path), "Redo");
@@ -648,6 +734,84 @@ namespace Chess
 
         this->setCentralWidget(master_container);
 
+        bool cpu_turn { ((this->cpu_opponent.get_color() == COLOR_BLACK && player_turn == PLAYER2) || (this->cpu_opponent.get_color() == COLOR_WHITE && player_turn == PLAYER1)) };
+
+        if (this->game_mode == OnePlayer && cpu_turn)
+        {
+            int cpu_num { (this->cpu_opponent.get_color() == COLOR_BLACK) ? PLAYER2: PLAYER1 };
+            char c;
+
+            Player *cpu_ply { this->game_board->get_player(cpu_num) };
+            Player *user_ply { this->game_board->get_player( (cpu_num == PLAYER1) ? PLAYER2 : PLAYER1 ) };
+
+            Move move = this->cpu_opponent.get_best_move(
+                this->game_board->get_board_array(),
+                (user_ply->color == COLOR_WHITE) ? *user_ply : *cpu_ply,
+                (user_ply->color == COLOR_BLACK) ? *user_ply : *cpu_ply
+            );
+
+            Captured *ply_captures { this->game_board->get_player_captures(cpu_num) };
+
+            int *plyEP { this->game_board->get_player_EP(cpu_num) },
+                *oppEP { this->game_board->get_player_EP((cpu_num == PLAYER1) ? PLAYER2 : PLAYER1) };
+
+            MoveValidation move_state;
+
+            switch (std::tolower(move.symbol))
+            {
+                case 'p': 
+                    move_state = movePawn(*board_ptr, cpu_ply, move, ply_captures, plyEP, oppEP, false, false);
+                    break;
+                case 'r': 
+                    move_state = moveRook(*board_ptr, cpu_ply, move, ply_captures, false);
+                    break;
+                case 'n': 
+                    move_state = moveKnight(*board_ptr, cpu_ply, move, ply_captures, false);
+                    break;
+                case 'b': 
+                    move_state = moveBishop(*board_ptr, cpu_ply, move, ply_captures, false);
+                    break;
+                case 'q': 
+                    move_state = moveQueen(*board_ptr, cpu_ply, move, ply_captures, false);
+                    break;
+                case 'k': 
+                    move_state = moveKing(*board_ptr, cpu_ply, move, ply_captures, false);
+                    break;
+            }
+
+            std::cout << (move_state == INVALID_MOVE) << std::endl;
+
+            if (move_state != INVALID_MOVE)
+            {
+                if (move_state == PROMOTION)
+                {
+                    char chosen_piece { (cpu_num == PLAYER1) ? 'q': 'Q' };
+
+                    promotePawn(move, cpu_ply, chosen_piece);
+
+                    move.promotedPawn = chosen_piece;
+                    (*board_ptr)[move.rowNext][move.colNext] = chosen_piece;
+                }
+
+                printf("Not Yet\n");
+                scanf(" %c");
+
+                saveMove(move, (this->game_board->get_game_path()).c_str());
+            
+                clearRedo((this->game_board->get_redo_path()).c_str());
+
+                if (ply_captures->newCapture) 
+                    capturePiece(this->game_board->get_player((cpu_num == PLAYER1) ? PLAYER2 : PLAYER1), ply_captures);
+                
+                player_turn = (cpu_num == PLAYER2) ? PLAYER1: PLAYER2;
+
+                printf("Not Yet\n");
+                scanf("%c");
+
+                this->game_board->update_turn(player_turn);
+            }
+        }
+
         if (player_turn == PLAYER1)
         {
             gl->addLayout(ply2_data, 0, 1, 1, 8, Qt::AlignLeft);
@@ -701,7 +865,7 @@ namespace Chess
                     gl->addWidget(bottom_file, 10, j + 1);
                 }
 
-                BoardCell *cell = new BoardCell(actual_row, actual_col, this->game_board);
+                BoardCell *cell = new BoardCell(actual_row, actual_col, this->game_board, this->game_mode);
 
                 QString color = ((actual_row + actual_col) % 2 == 0) ? "#f8e7bb" : "#004474";
                 cell->setStyleSheet(QString("background-color: %1; border: none; margin: 0px;").arg(color));
@@ -735,11 +899,12 @@ namespace Chess
         master_layout->addStretch(1);
 
         Player *current_ply = this->game_board->get_player(player_turn);
+        Player *opponent_ply = this->game_board->get_player((player_turn == PLAYER1) ? PLAYER2: PLAYER1);
 
         if (board_ptr && *board_ptr && current_ply)
         {
             if (checkMate(*board_ptr, current_ply)) this->game_end("Checkmate");
-            else if (checkStalemate(*board_ptr, current_ply)) this->game_end("Stalemate");
+            else if (checkStalemate(*board_ptr, current_ply, opponent_ply)) this->game_end("Stalemate");
         }
 
         return;

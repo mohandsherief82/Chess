@@ -8,7 +8,7 @@
 char** copyBoard(char** board);
 Player copyPlayer(Player* player);
 void freeCopy(Player copyPlayer, char** copyBoard);
-bool checkStalemate(char** board, Player* player);
+bool checkStalemate(char** board, Player* player, Player* opponent);
 bool legalMove(char** board, Player* player);
 bool inSufficientMaterial(Player player1, Player player2);
 

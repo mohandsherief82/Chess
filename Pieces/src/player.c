@@ -6,7 +6,6 @@
 #include <string.h>
 #include <ctype.h>
 
-#define BUFFER 5
 
 Player createPlayer(PieceColor color)
 {
@@ -76,6 +75,8 @@ bool isValidMove(int coordinate)
 
 void freePlayer(Player *player)
 {
+    if (player == NULL) return;
+
     free(player->pawns);
     player->pawns = NULL;
     

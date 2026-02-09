@@ -20,6 +20,7 @@
 #include "boardCell.hpp"
 #include "helpers.hpp"
 #include "dialog.hpp"
+#include "minimax.hpp"
 
 #include <filesystem>
 #include <iostream>
@@ -42,24 +43,32 @@ namespace fs = std::filesystem;
 
 namespace Chess
 {
-    class Board;
-
 	class GInterface: public Concrete::Observer, public QMainWindow
     {
         private:
             std::shared_ptr<Board> game_board = nullptr;
+            GameMode game_mode { TwoPlayer };
+
+            Minimax cpu_opponent { Minimax(3, COLOR_BLACK) };
 
             void add_captures(QVBoxLayout *ply_data, QLabel *ply_msg, Captured *ply_captures, bool redo_flag);
             void add_redo_undo(QHBoxLayout *box);
+            
             void add_left_menu(QWidget *container);
             void add_moves_view();
+            
             void save_game_as();
             void delete_files();
+            
             void game_end(std::string end_state);
+            void get_color();
         public:
             GInterface(std::shared_ptr<Board> game_board);
+            
             void update() override;
             void load_game(const std::string file_path);
+            
+            void choose_mode();
             void start_game();
         protected:
             void keyPressEvent(QKeyEvent *event) override;

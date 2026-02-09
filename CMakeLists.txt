@@ -33,6 +33,7 @@ add_subdirectory(Pieces)
 add_subdirectory(Board)
 add_subdirectory(Moves)
 add_subdirectory(GameEnd)
+add_subdirectory(Opponent)
 add_subdirectory(GUI)
 
 # Link all libraries
@@ -43,6 +44,7 @@ target_link_libraries(
         Board 
         Moves 
         GameEnd
+        Minimax
         Gui
         Qt6::Widgets
         Qt6::Svg

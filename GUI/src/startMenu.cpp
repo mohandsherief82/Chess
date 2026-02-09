@@ -66,7 +66,7 @@ void display_start_window(std::unique_ptr<Chess::GInterface> &main_window, std::
 
     QObject::connect(start_button, &QPushButton::clicked, [&]() 
             {
-                main_window->start_game();
+                main_window->choose_mode();
             }
     );
 
