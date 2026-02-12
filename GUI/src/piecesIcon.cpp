@@ -25,36 +25,25 @@ void DraggablePiece::mousePressEvent(QMouseEvent *event)
 void DraggablePiece::mouseMoveEvent(QMouseEvent *event)
 {
     if (!(event->buttons() & Qt::LeftButton)) return;
+    if ((event->pos() - drag_start_pos).manhattanLength() < QApplication::startDragDistance()) return;
 
-    if ((event->pos() - drag_start_pos).manhattanLength() < QApplication::startDragDistance()) 
+    QPixmap pix = pixmap(Qt::ReturnByValue);
+    if (!pix.isNull())
     {
-        return;
-    }
+        // FORCE the pixmap to respect the High-DPI scaling of your ZBook
+        pix.setDevicePixelRatio(this->devicePixelRatioF());
 
-    if (!pixmap(Qt::ReturnByValue).isNull())
-    {
-        QMimeData *mimeData = new QMimeData;
-
-        mimeData->setText(this->objectName()); 
+        QMimeData *mime_data = new QMimeData;
+        mime_data->setText(this->objectName()); 
 
         QDrag *drag = new QDrag(this);
-
-        drag->setMimeData(mimeData);
+        drag->setMimeData(mime_data);
+        drag->setPixmap(pix);
         
-        QPixmap piece_pixmap = pixmap(Qt::ReturnByValue);
-        drag->setPixmap(piece_pixmap);
-        
-        drag->setHotSpot(event->pos());
+        drag->setHotSpot(drag_start_pos);
 
         this->hide();
-
-        if (drag->exec(Qt::MoveAction) == Qt::IgnoreAction) 
-        {
-            this->show();
-        }
-        else 
-        {
-            this->deleteLater();
-        }
+        if (drag->exec(Qt::MoveAction) == Qt::IgnoreAction) this->show();
+        else this->deleteLater();
     }
 }

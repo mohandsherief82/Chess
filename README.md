@@ -245,6 +245,7 @@ To ensure games can be resumed, validated moves are appended to a binary file fo
 * The UI maintains board integrity by only accepting validated moves from the engine.
 * The player with the current turn labels appears in the lower half of the screen with draggable piece, while the other player's labels is in the top half with undraggable pieces.
 * On the right of the screen the list of moves appear with the last 32 player moves, 16 white and 16 black.
+* IMPORTANT NOTE: if using Fedora Linux with Wayland as the window manager, you need to run QT_QPA_PLATFORM=xcb ./Game after building usign CMake, in order to be able to run everything as intended(the pieces when dragged won't appear if this isn't done when running the program)
 
 <a name="snapshots"></a>
 10. Snapshots of the Game

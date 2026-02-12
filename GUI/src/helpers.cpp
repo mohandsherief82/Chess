@@ -322,8 +322,8 @@ namespace helpers
 
         QListWidget* list_widget = new QListWidget(&dialog);
         
-        QString list_style = "QListWidget { background-color: #111c28; border: 1px solid #f8e7bb; color: #f8e7bb; font-size: 16px; outline: none; }"
-                             "QListWidget::item { padding: 15px; border-bottom: 1px solid #2a3f55; }"
+        QString list_style = "QListWidget { background-color: #111c28; border: 1px solid #f8e7bb; color: #f8e7bb; font-size: 13px; outline: none; }"
+                             "QListWidget::item { padding: 8px; border-bottom: 1px solid #2a3f55; }"
                              "QListWidget::item:selected { background-color: #1c2b3a; color: #ffffff; }";
         
         list_widget->setStyleSheet(list_style);

@@ -187,16 +187,32 @@ namespace Chess
     void GInterface::save_game_as()
     {
         bool ok = false;
-        QString text = QInputDialog::getText(this, tr("Save Game"),
-                                            tr("Enter save file name:"), QLineEdit::Normal,
-                                            tr("MyChessGame"), &ok);
+        
+        QInputDialog input_diag(this);
+        input_diag.setWindowTitle(tr("Save Game"));
+        input_diag.setLabelText(tr("Enter save file name:"));
+
+        input_diag.setTextValue(tr("my_chess_save"));
+        input_diag.setFixedSize(500, 250);
+        
+        input_diag.setStyleSheet(
+            "QWidget { background-color: #0f1a24; color: #f8e7bb; font-family: 'Segoe UI', sans-serif; }"
+            "QLabel { qproperty-alignment: 'AlignLeft | AlignVCenter'; font-weight: bold; }"
+            "QLineEdit { background-color: #1c2b3a; border: 1px solid #f8e7bb; color: #f8e7bb; padding: 8px; border-radius: 4px; qproperty-alignment: 'AlignLeft'; }"
+            "QPushButton { background-color: #1c2b3a; color: #f8e7bb; border: 1px solid #f8e7bb; padding: 6px 15px; border-radius: 4px; min-width: 80px; }"
+            "QPushButton:hover { background-color: #2a3f55; }"
+        );
+        
+        ok = input_diag.exec();
+
+        QString text = input_diag.textValue();
         
         if (ok && !text.isEmpty())
         {
             try 
             {
                 std::string filename = text.toStdString();
-            
+                
                 if (filename.length() < 4 || filename.substr(filename.length() - 4) != ".bin") 
                     filename += ".bin";
 
@@ -207,7 +223,9 @@ namespace Chess
                 {
                     QMessageBox::warning(this, tr("Duplicate Name"), 
                         tr("A file named %1 already exists. Please choose a different name.").arg(QString::fromStdString(filename)));
+
                     this->save_game_as();
+
                     return;
                 }
 
@@ -216,6 +234,7 @@ namespace Chess
                 if (fs::exists(current_game_path)) 
                 {
                     fs::rename(current_game_path, g_new);
+
                     this->game_board->udpate_game_path(g_new.string());
                 }
 
@@ -224,35 +243,54 @@ namespace Chess
                 if (fs::exists(current_redo_path)) 
                 {
                     fs::rename(current_redo_path, r_new);
+
                     this->game_board->udpate_redo_path(r_new.string());
                 }
 
                 PersistentDialog diag(this);
 
-                diag.setWindowTitle("Game Saved");
-                
+                diag.setWindowTitle(tr("Game Saved"));
+                diag.setFixedSize(500, 320);
+
                 QVBoxLayout *layout = new QVBoxLayout(&diag);
 
-                QLabel *msg_label = new QLabel(tr("Game successfully saved as %1\nWhat would you like to do next?").arg(QString::fromStdString(filename)));
+                layout->setContentsMargins(40, 40, 40, 40); 
+                layout->setSpacing(20);
+
+                QLabel *msg_label = new QLabel(tr("Game successfully saved as:\n%1\n\nWhat would you like to do next?").arg(QString::fromStdString(filename)));
+
                 msg_label->setStyleSheet("color: #f8e7bb; font-size: 16px; font-weight: bold;");
                 msg_label->setAlignment(Qt::AlignCenter);
-                
+
+                msg_label->setWordWrap(true);
                 layout->addWidget(msg_label);
 
-                QPushButton *continue_btn = new QPushButton(tr("Start New Game"), &diag);
-                QPushButton *menu_btn = new QPushButton(tr("Exit Game"), &diag);
-                
-                QString btn_style = "QPushButton { color: #f8e7bb; background-color: #1c2b3a; border: 1px solid #f8e7bb; padding: 10px; font-size: 14px; }"
-                                    "QPushButton:hover { background-color: #2a3f55; }";
+                QString btn_style = 
+                    "QPushButton { "
+                    "  color: #f8e7bb; "
+                    "  background-color: #1c2b3a; "
+                    "  border: 1px solid #f8e7bb; "
+                    "  padding: 14px; "
+                    "  font-size: 14px; "
+                    "  font-weight: bold; "
+                    "  border-radius: 6px; "
+                    "}"
+                    "QPushButton:hover { "
+                    "  background-color: #2a3f55; "
+                    "  border: 1px solid #ffffff; "
+                    "}";
 
+                QPushButton *continue_btn = new QPushButton(tr("START NEW MATCH"), &diag);
+                QPushButton *exit_btn = new QPushButton(tr("EXIT TO DESKTOP"), &diag);
+                
                 continue_btn->setStyleSheet(btn_style);
-                menu_btn->setStyleSheet(btn_style);
+                exit_btn->setStyleSheet(btn_style);
 
                 layout->addWidget(continue_btn);
-                layout->addWidget(menu_btn);
+                layout->addWidget(exit_btn);
 
                 QObject::connect(continue_btn, &QPushButton::clicked, &diag, &QDialog::accept);
-                QObject::connect(menu_btn, &QPushButton::clicked, &diag, &QDialog::reject);
+                QObject::connect(exit_btn, &QPushButton::clicked, &diag, &QDialog::reject);
 
                 int result = diag.exec();
 
@@ -261,7 +299,8 @@ namespace Chess
             } 
             catch (const fs::filesystem_error& e) 
             {
-                QMessageBox::critical(this, "File Error", "Could not rename files: " + QString::fromStdString(e.what()));
+                QMessageBox::critical(this, tr("File Error"), 
+                    tr("System error while renaming files: %1").arg(e.what()));
             }
         }
     }
@@ -340,6 +379,7 @@ namespace Chess
 
         if (dialog.exec() == QDialog::Accepted) this->start_game();
     }
+
 
     void GInterface::start_game() 
     {
@@ -523,7 +563,7 @@ namespace Chess
         exit_button->setStyleSheet(flat_style);
 
         save_button->setFixedSize(190, 50);
-        load_button->setFixedSize(180, 50);
+        load_button->setFixedSize(200, 50);
         
         resign_button->setFixedSize(150, 50);
         exit_button->setFixedSize(150, 50);
@@ -588,6 +628,13 @@ namespace Chess
 
     void GInterface::add_redo_undo(QHBoxLayout *box)
     {
+        int player_turn = this->game_board->get_player_turn();
+        bool cpu_turn { this->game_mode == OnePlayer 
+                        && ((this->cpu_opponent.get_color() == COLOR_BLACK && player_turn == PLAYER2) 
+                            || (this->cpu_opponent.get_color() == COLOR_WHITE && player_turn == PLAYER1)) };
+
+        if (cpu_turn) return;
+
         QString redo_icon_path { helpers::get_icon_path('d') };   
         QString undo_icon_path { helpers::get_icon_path('u') };
 
@@ -620,6 +667,20 @@ namespace Chess
         QObject::connect(undo_button, &QPushButton::clicked, [=]()
             {
                 undoLastMove(
+                    this->game_board->get_board_ptr(),
+                    this->game_board->get_player(PLAYER1),
+                    this->game_board->get_player(PLAYER2),
+                    this->game_board->get_player_captures(PLAYER1),
+                    this->game_board->get_player_captures(PLAYER2),
+                    this->game_board->get_player_EP(PLAYER1),
+                    this->game_board->get_player_EP(PLAYER2),
+                    (this->game_board->get_game_path()).c_str(),
+                    (this->game_board->get_redo_path()).c_str()
+                );
+
+                if (this->game_mode == OnePlayer)
+                {
+                    undoLastMove(
                         this->game_board->get_board_ptr(),
                         this->game_board->get_player(PLAYER1),
                         this->game_board->get_player(PLAYER2),
@@ -630,6 +691,7 @@ namespace Chess
                         (this->game_board->get_game_path()).c_str(),
                         (this->game_board->get_redo_path()).c_str()
                     );
+                }
 
                 this->game_board->update_board();
             }
@@ -638,6 +700,20 @@ namespace Chess
         QObject::connect(redo_button, &QPushButton::clicked, [=]()
             {
                 redoLastMove(
+                    this->game_board->get_board_ptr(),
+                    this->game_board->get_player(PLAYER1),
+                    this->game_board->get_player(PLAYER2),
+                    this->game_board->get_player_captures(PLAYER1),
+                    this->game_board->get_player_captures(PLAYER2),
+                    this->game_board->get_player_EP(PLAYER1),
+                    this->game_board->get_player_EP(PLAYER2),
+                    (this->game_board->get_game_path()).c_str(),
+                    (this->game_board->get_redo_path()).c_str()
+                );
+
+                if (game_mode == OnePlayer)
+                {
+                    redoLastMove(
                         this->game_board->get_board_ptr(),
                         this->game_board->get_player(PLAYER1),
                         this->game_board->get_player(PLAYER2),
@@ -648,6 +724,7 @@ namespace Chess
                         (this->game_board->get_game_path()).c_str(),
                         (this->game_board->get_redo_path()).c_str()
                     );
+                }
 
                 this->game_board->update_board();
             }
@@ -713,14 +790,34 @@ namespace Chess
         
         QGridLayout *gl { new QGridLayout(container_central) };
 
-        QString label_style = "font-weight: bold; color: #f8e7bb; font-size: 20px; margin-bottom: 5px; padding-bottom: 2px;";
+        QString active_style = "font-weight: bold; color: #ffffff; font-size: 20px; background-color: #004474; padding: 5px; border-radius: 4px;";
+        
+        QString inactive_style = "font-weight: bold; color: #f8e7bb; font-size: 20px; padding: 5px;";
         QString edge_label_style = "color: #f8e7bb; font-weight: bold; font-size: 14px; min-width: 25px; min-height: 25px;";
 
-        QLabel *player2_msg { new QLabel("Player 2 (Black)") };
-        QLabel *player1_msg { new QLabel("Player 1 (White)") };
+        int player_turn = this->game_board->get_player_turn();
 
-        player2_msg->setStyleSheet(label_style);
-        player1_msg->setStyleSheet(label_style);
+        bool cpu_turn { this->game_mode == OnePlayer && ((this->cpu_opponent.get_color() == COLOR_BLACK && player_turn == PLAYER2) 
+                            || (this->cpu_opponent.get_color() == COLOR_WHITE && player_turn == PLAYER1)) };
+
+        QString p1_text, p2_text;
+
+        if (this->game_mode == OnePlayer)
+        {
+            p1_text = (!cpu_turn) ? "User (White) ◄" : "User (White)";
+            p2_text = (cpu_turn) ? "Computer (Black)    (Thinking...) ◄" : "Computer (Black)";
+        }
+        else
+        {
+            p1_text = (player_turn == PLAYER1) ? "Player 1 (White) ◄" : "Player 1 (White)";
+            p2_text = (player_turn == PLAYER2) ? "Player 2 (Black) ◄" : "Player 2 (Black)";
+        }
+
+        QLabel *player1_msg { new QLabel(p1_text) };
+        QLabel *player2_msg { new QLabel(p2_text) };
+
+        player1_msg->setStyleSheet(player_turn == PLAYER1 ? active_style : inactive_style);
+        player2_msg->setStyleSheet(player_turn == PLAYER2 ? active_style : inactive_style);
 
         QVBoxLayout *ply2_data { new QVBoxLayout() };
         QVBoxLayout *ply1_data { new QVBoxLayout() };
@@ -728,103 +825,20 @@ namespace Chess
         gl->setSpacing(0);
         gl->setContentsMargins(10, 10, 10, 10);
 
-        int player_turn = this->game_board->get_player_turn();
-
         char ***board_ptr = this->game_board->get_board_ptr();
 
         this->setCentralWidget(master_container);
 
-        bool cpu_turn { ((this->cpu_opponent.get_color() == COLOR_BLACK && player_turn == PLAYER2) || (this->cpu_opponent.get_color() == COLOR_WHITE && player_turn == PLAYER1)) };
+        gl->addLayout(ply2_data, 0, 1, 1, 8, Qt::AlignLeft);
+        gl->addLayout(ply1_data, 11, 1, 1, 8, Qt::AlignLeft);
 
-        if (this->game_mode == OnePlayer && cpu_turn)
-        {
-            int cpu_num { (this->cpu_opponent.get_color() == COLOR_BLACK) ? PLAYER2: PLAYER1 };
-            char c;
-
-            Player *cpu_ply { this->game_board->get_player(cpu_num) };
-            Player *user_ply { this->game_board->get_player( (cpu_num == PLAYER1) ? PLAYER2 : PLAYER1 ) };
-
-            Move move = this->cpu_opponent.get_best_move(
-                this->game_board->get_board_array(),
-                (user_ply->color == COLOR_WHITE) ? *user_ply : *cpu_ply,
-                (user_ply->color == COLOR_BLACK) ? *user_ply : *cpu_ply
-            );
-
-            Captured *ply_captures { this->game_board->get_player_captures(cpu_num) };
-
-            int *plyEP { this->game_board->get_player_EP(cpu_num) },
-                *oppEP { this->game_board->get_player_EP((cpu_num == PLAYER1) ? PLAYER2 : PLAYER1) };
-
-            MoveValidation move_state;
-
-            switch (std::tolower(move.symbol))
-            {
-                case 'p': 
-                    move_state = movePawn(*board_ptr, cpu_ply, move, ply_captures, plyEP, oppEP, false, false);
-                    break;
-                case 'r': 
-                    move_state = moveRook(*board_ptr, cpu_ply, move, ply_captures, false);
-                    break;
-                case 'n': 
-                    move_state = moveKnight(*board_ptr, cpu_ply, move, ply_captures, false);
-                    break;
-                case 'b': 
-                    move_state = moveBishop(*board_ptr, cpu_ply, move, ply_captures, false);
-                    break;
-                case 'q': 
-                    move_state = moveQueen(*board_ptr, cpu_ply, move, ply_captures, false);
-                    break;
-                case 'k': 
-                    move_state = moveKing(*board_ptr, cpu_ply, move, ply_captures, false);
-                    break;
-            }
-
-            if (move_state != INVALID_MOVE)
-            {
-                if (move_state == PROMOTION)
-                {
-                    char chosen_piece { (cpu_num == PLAYER1) ? 'q': 'Q' };
-
-                    promotePawn(move, cpu_ply, chosen_piece);
-
-                    move.promotedPawn = chosen_piece;
-                    (*board_ptr)[move.rowNext][move.colNext] = chosen_piece;
-                }
-
-                saveMove(move, (this->game_board->get_game_path()).c_str());
-            
-                clearRedo((this->game_board->get_redo_path()).c_str());
-
-                if (ply_captures->newCapture) 
-                    capturePiece(this->game_board->get_player((cpu_num == PLAYER1) ? PLAYER2 : PLAYER1), ply_captures);
-                
-                player_turn = (cpu_num == PLAYER2) ? PLAYER1: PLAYER2;
-
-                this->game_board->update_turn(player_turn);
-            }
-        }
-
-        if (player_turn == PLAYER1)
-        {
-            gl->addLayout(ply2_data, 0, 1, 1, 8, Qt::AlignLeft);
-            gl->addLayout(ply1_data, 11, 1, 1, 8, Qt::AlignLeft);
-
-            this->add_captures(ply1_data, player1_msg, this->game_board->get_player_captures(PLAYER1), true);
-            this->add_captures(ply2_data, player2_msg, this->game_board->get_player_captures(PLAYER2), false);
-        }
-        else
-        {
-            gl->addLayout(ply1_data, 0, 1, 1, 8, Qt::AlignLeft);
-            gl->addLayout(ply2_data, 11, 1, 1, 8, Qt::AlignLeft);
-
-            this->add_captures(ply2_data, player2_msg, this->game_board->get_player_captures(PLAYER2), true);
-            this->add_captures(ply1_data, player1_msg, this->game_board->get_player_captures(PLAYER1), false);
-        }
+        this->add_captures(ply1_data, player1_msg, this->game_board->get_player_captures(PLAYER1), player_turn == PLAYER1);
+        this->add_captures(ply2_data, player2_msg, this->game_board->get_player_captures(PLAYER2), player_turn == PLAYER2);
 
         for (int i = 0; i < 8; i++)
         {
-            int actual_row = (player_turn == PLAYER1) ? i : (7 - i);
-            int rank_num = (player_turn == PLAYER1) ? (8 - i) : (i + 1);
+            int actual_row = i;
+            int rank_num = 8 - i;
 
             QLabel *left_rank { new QLabel(QString::number(rank_num)) };
             QLabel *right_rank { new QLabel(QString::number(rank_num)) };
@@ -840,16 +854,18 @@ namespace Chess
 
             for (int j = 0; j < 8; j++)
             {
-                int actual_col = (player_turn == PLAYER1) ? j : (7 - j);
+                int actual_col = j;
 
                 if (i == 0)
                 {
-                    char fileChar = (player_turn == PLAYER1) ? ('a' + j) : ('h' - j);
+                    char fileChar = 'a' + j;
+
                     QLabel *top_file { new QLabel(QString(fileChar)) };
                     QLabel *bottom_file { new QLabel(QString(fileChar)) };
-                    
+
                     top_file->setStyleSheet(edge_label_style);
                     bottom_file->setStyleSheet(edge_label_style);
+
                     top_file->setAlignment(Qt::AlignCenter);
                     bottom_file->setAlignment(Qt::AlignCenter);
 
@@ -860,15 +876,14 @@ namespace Chess
                 BoardCell *cell = new BoardCell(actual_row, actual_col, this->game_board, this->game_mode);
 
                 QString color = ((actual_row + actual_col) % 2 == 0) ? "#f8e7bb" : "#004474";
+
                 cell->setStyleSheet(QString("background-color: %1; border: none; margin: 0px;").arg(color));
 
-                bool isCurrentPlayerPiece = (player_turn == PLAYER1) ?
-                                            std::islower((*board_ptr)[actual_row][actual_col]) :
-                                            std::isupper((*board_ptr)[actual_row][actual_col]);
+                bool is_current_piece = (player_turn == PLAYER1) ? std::islower((*board_ptr)[actual_row][actual_col]) : std::isupper((*board_ptr)[actual_row][actual_col]);
 
                 if (!isEmpty(*board_ptr, actual_row, actual_col))
                 {
-                    if (isCurrentPlayerPiece) helpers::add_piece_to_cell(cell, (*board_ptr)[actual_row][actual_col], actual_row, actual_col);
+                    if (is_current_piece && !cpu_turn) helpers::add_piece_to_cell(cell, (*board_ptr)[actual_row][actual_col], actual_row, actual_col);
                     else helpers::add_piece_to_cell(cell, (*board_ptr)[actual_row][actual_col]);
                 }
 
@@ -880,15 +895,67 @@ namespace Chess
         master_layout->setSpacing(0);
 
         master_layout->addStretch(1);
-
         this->add_left_menu(container_left);
+
         master_layout->addWidget(container_left, 0, Qt::AlignLeft);
+        master_layout->addStretch(1);
+
+        master_layout->addWidget(container_central, 0, Qt::AlignCenter);
+        this->add_moves_view();
 
         master_layout->addStretch(1);
-        master_layout->addWidget(container_central, 0, Qt::AlignCenter);
-        
-        this->add_moves_view();
-        master_layout->addStretch(1);
+
+        qApp->processEvents();
+
+        if (this->game_mode == OnePlayer && cpu_turn)
+        {
+            int cpu_num { (this->cpu_opponent.get_color() == COLOR_BLACK) ? PLAYER2: PLAYER1 };
+
+            Player *cpu_ply { this->game_board->get_player(cpu_num) };
+            Player *user_ply { this->game_board->get_player( (cpu_num == PLAYER1) ? PLAYER2 : PLAYER1 ) };
+
+            Move move = this->cpu_opponent.get_best_move(
+                this->game_board->get_board_array(),
+                (user_ply->color == COLOR_WHITE) ? *user_ply : *cpu_ply,
+                (user_ply->color == COLOR_BLACK) ? *user_ply : *cpu_ply
+            );
+
+            Captured *ply_captures { this->game_board->get_player_captures(cpu_num) };
+
+            int *ply_ep { this->game_board->get_player_EP(cpu_num) },
+                *opp_ep { this->game_board->get_player_EP((cpu_num == PLAYER1) ? PLAYER2 : PLAYER1) };
+
+            MoveValidation move_state;
+
+            switch (std::tolower(move.symbol))
+            {
+                case 'p': move_state = movePawn(*board_ptr, cpu_ply, move, ply_captures, ply_ep, opp_ep, false, false); break;
+                case 'r': move_state = moveRook(*board_ptr, cpu_ply, move, ply_captures, false); break;
+                case 'n': move_state = moveKnight(*board_ptr, cpu_ply, move, ply_captures, false); break;
+                case 'b': move_state = moveBishop(*board_ptr, cpu_ply, move, ply_captures, false); break;
+                case 'q': move_state = moveQueen(*board_ptr, cpu_ply, move, ply_captures, false); break;
+                case 'k': move_state = moveKing(*board_ptr, cpu_ply, move, ply_captures, false); break;
+            }
+
+            if (move_state != INVALID_MOVE)
+            {
+                if (move_state == PROMOTION)
+                {
+                    char chosen_piece { (cpu_num == PLAYER1) ? 'q': 'Q' };
+                    promotePawn(move, cpu_ply, chosen_piece);
+                    move.promotedPawn = chosen_piece;
+                    (*board_ptr)[move.rowNext][move.colNext] = chosen_piece;
+                }
+
+                saveMove(move, (this->game_board->get_game_path()).c_str());
+                clearRedo((this->game_board->get_redo_path()).c_str());
+
+                if (ply_captures->newCapture) capturePiece(this->game_board->get_player((cpu_num == PLAYER1) ? PLAYER2 : PLAYER1), ply_captures);
+
+                this->game_board->update_turn((cpu_num == PLAYER2) ? PLAYER1: PLAYER2);
+                return this->update();
+            }
+        }
 
         Player *current_ply = this->game_board->get_player(player_turn);
         Player *opponent_ply = this->game_board->get_player((player_turn == PLAYER1) ? PLAYER2: PLAYER1);
