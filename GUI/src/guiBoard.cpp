@@ -187,16 +187,32 @@ namespace Chess
     void GInterface::save_game_as()
     {
         bool ok = false;
-        QString text = QInputDialog::getText(this, tr("Save Game"),
-                                            tr("Enter save file name:"), QLineEdit::Normal,
-                                            tr("MyChessGame"), &ok);
+        
+        QInputDialog input_diag(this);
+        input_diag.setWindowTitle(tr("Save Game"));
+        input_diag.setLabelText(tr("Enter save file name:"));
+
+        input_diag.setTextValue(tr("my_chess_save"));
+        input_diag.setFixedSize(500, 250);
+        
+        input_diag.setStyleSheet(
+            "QWidget { background-color: #0f1a24; color: #f8e7bb; font-family: 'Segoe UI', sans-serif; }"
+            "QLabel { qproperty-alignment: 'AlignLeft | AlignVCenter'; font-weight: bold; }"
+            "QLineEdit { background-color: #1c2b3a; border: 1px solid #f8e7bb; color: #f8e7bb; padding: 8px; border-radius: 4px; qproperty-alignment: 'AlignLeft'; }"
+            "QPushButton { background-color: #1c2b3a; color: #f8e7bb; border: 1px solid #f8e7bb; padding: 6px 15px; border-radius: 4px; min-width: 80px; }"
+            "QPushButton:hover { background-color: #2a3f55; }"
+        );
+        
+        ok = input_diag.exec();
+
+        QString text = input_diag.textValue();
         
         if (ok && !text.isEmpty())
         {
             try 
             {
                 std::string filename = text.toStdString();
-            
+                
                 if (filename.length() < 4 || filename.substr(filename.length() - 4) != ".bin") 
                     filename += ".bin";
 
@@ -207,7 +223,9 @@ namespace Chess
                 {
                     QMessageBox::warning(this, tr("Duplicate Name"), 
                         tr("A file named %1 already exists. Please choose a different name.").arg(QString::fromStdString(filename)));
+
                     this->save_game_as();
+
                     return;
                 }
 
@@ -216,6 +234,7 @@ namespace Chess
                 if (fs::exists(current_game_path)) 
                 {
                     fs::rename(current_game_path, g_new);
+
                     this->game_board->udpate_game_path(g_new.string());
                 }
 
@@ -224,35 +243,54 @@ namespace Chess
                 if (fs::exists(current_redo_path)) 
                 {
                     fs::rename(current_redo_path, r_new);
+
                     this->game_board->udpate_redo_path(r_new.string());
                 }
 
                 PersistentDialog diag(this);
 
-                diag.setWindowTitle("Game Saved");
-                
+                diag.setWindowTitle(tr("Game Saved"));
+                diag.setFixedSize(500, 320);
+
                 QVBoxLayout *layout = new QVBoxLayout(&diag);
 
-                QLabel *msg_label = new QLabel(tr("Game successfully saved as %1\nWhat would you like to do next?").arg(QString::fromStdString(filename)));
+                layout->setContentsMargins(40, 40, 40, 40); 
+                layout->setSpacing(20);
+
+                QLabel *msg_label = new QLabel(tr("Game successfully saved as:\n%1\n\nWhat would you like to do next?").arg(QString::fromStdString(filename)));
+
                 msg_label->setStyleSheet("color: #f8e7bb; font-size: 16px; font-weight: bold;");
                 msg_label->setAlignment(Qt::AlignCenter);
-                
+
+                msg_label->setWordWrap(true);
                 layout->addWidget(msg_label);
 
-                QPushButton *continue_btn = new QPushButton(tr("Start New Game"), &diag);
-                QPushButton *menu_btn = new QPushButton(tr("Exit Game"), &diag);
-                
-                QString btn_style = "QPushButton { color: #f8e7bb; background-color: #1c2b3a; border: 1px solid #f8e7bb; padding: 10px; font-size: 14px; }"
-                                    "QPushButton:hover { background-color: #2a3f55; }";
+                QString btn_style = 
+                    "QPushButton { "
+                    "  color: #f8e7bb; "
+                    "  background-color: #1c2b3a; "
+                    "  border: 1px solid #f8e7bb; "
+                    "  padding: 14px; "
+                    "  font-size: 14px; "
+                    "  font-weight: bold; "
+                    "  border-radius: 6px; "
+                    "}"
+                    "QPushButton:hover { "
+                    "  background-color: #2a3f55; "
+                    "  border: 1px solid #ffffff; "
+                    "}";
 
+                QPushButton *continue_btn = new QPushButton(tr("START NEW MATCH"), &diag);
+                QPushButton *exit_btn = new QPushButton(tr("EXIT TO DESKTOP"), &diag);
+                
                 continue_btn->setStyleSheet(btn_style);
-                menu_btn->setStyleSheet(btn_style);
+                exit_btn->setStyleSheet(btn_style);
 
                 layout->addWidget(continue_btn);
-                layout->addWidget(menu_btn);
+                layout->addWidget(exit_btn);
 
                 QObject::connect(continue_btn, &QPushButton::clicked, &diag, &QDialog::accept);
-                QObject::connect(menu_btn, &QPushButton::clicked, &diag, &QDialog::reject);
+                QObject::connect(exit_btn, &QPushButton::clicked, &diag, &QDialog::reject);
 
                 int result = diag.exec();
 
@@ -261,7 +299,8 @@ namespace Chess
             } 
             catch (const fs::filesystem_error& e) 
             {
-                QMessageBox::critical(this, "File Error", "Could not rename files: " + QString::fromStdString(e.what()));
+                QMessageBox::critical(this, tr("File Error"), 
+                    tr("System error while renaming files: %1").arg(e.what()));
             }
         }
     }
@@ -340,6 +379,7 @@ namespace Chess
 
         if (dialog.exec() == QDialog::Accepted) this->start_game();
     }
+
 
     void GInterface::start_game() 
     {
@@ -523,7 +563,7 @@ namespace Chess
         exit_button->setStyleSheet(flat_style);
 
         save_button->setFixedSize(190, 50);
-        load_button->setFixedSize(180, 50);
+        load_button->setFixedSize(200, 50);
         
         resign_button->setFixedSize(150, 50);
         exit_button->setFixedSize(150, 50);
