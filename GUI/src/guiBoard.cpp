@@ -628,6 +628,13 @@ namespace Chess
 
     void GInterface::add_redo_undo(QHBoxLayout *box)
     {
+        int player_turn = this->game_board->get_player_turn();
+        bool cpu_turn { this->game_mode == OnePlayer 
+                        && ((this->cpu_opponent.get_color() == COLOR_BLACK && player_turn == PLAYER2) 
+                            || (this->cpu_opponent.get_color() == COLOR_WHITE && player_turn == PLAYER1)) };
+
+        if (cpu_turn) return;
+
         QString redo_icon_path { helpers::get_icon_path('d') };   
         QString undo_icon_path { helpers::get_icon_path('u') };
 
@@ -660,6 +667,20 @@ namespace Chess
         QObject::connect(undo_button, &QPushButton::clicked, [=]()
             {
                 undoLastMove(
+                    this->game_board->get_board_ptr(),
+                    this->game_board->get_player(PLAYER1),
+                    this->game_board->get_player(PLAYER2),
+                    this->game_board->get_player_captures(PLAYER1),
+                    this->game_board->get_player_captures(PLAYER2),
+                    this->game_board->get_player_EP(PLAYER1),
+                    this->game_board->get_player_EP(PLAYER2),
+                    (this->game_board->get_game_path()).c_str(),
+                    (this->game_board->get_redo_path()).c_str()
+                );
+
+                if (this->game_mode == OnePlayer)
+                {
+                    undoLastMove(
                         this->game_board->get_board_ptr(),
                         this->game_board->get_player(PLAYER1),
                         this->game_board->get_player(PLAYER2),
@@ -670,6 +691,7 @@ namespace Chess
                         (this->game_board->get_game_path()).c_str(),
                         (this->game_board->get_redo_path()).c_str()
                     );
+                }
 
                 this->game_board->update_board();
             }
@@ -678,6 +700,20 @@ namespace Chess
         QObject::connect(redo_button, &QPushButton::clicked, [=]()
             {
                 redoLastMove(
+                    this->game_board->get_board_ptr(),
+                    this->game_board->get_player(PLAYER1),
+                    this->game_board->get_player(PLAYER2),
+                    this->game_board->get_player_captures(PLAYER1),
+                    this->game_board->get_player_captures(PLAYER2),
+                    this->game_board->get_player_EP(PLAYER1),
+                    this->game_board->get_player_EP(PLAYER2),
+                    (this->game_board->get_game_path()).c_str(),
+                    (this->game_board->get_redo_path()).c_str()
+                );
+
+                if (game_mode == OnePlayer)
+                {
+                    redoLastMove(
                         this->game_board->get_board_ptr(),
                         this->game_board->get_player(PLAYER1),
                         this->game_board->get_player(PLAYER2),
@@ -688,6 +724,7 @@ namespace Chess
                         (this->game_board->get_game_path()).c_str(),
                         (this->game_board->get_redo_path()).c_str()
                     );
+                }
 
                 this->game_board->update_board();
             }
@@ -760,7 +797,7 @@ namespace Chess
 
         int player_turn = this->game_board->get_player_turn();
 
-        bool cpu_turn { ((this->cpu_opponent.get_color() == COLOR_BLACK && player_turn == PLAYER2) 
+        bool cpu_turn { this->game_mode == OnePlayer && ((this->cpu_opponent.get_color() == COLOR_BLACK && player_turn == PLAYER2) 
                             || (this->cpu_opponent.get_color() == COLOR_WHITE && player_turn == PLAYER1)) };
 
         QString p1_text, p2_text;
@@ -791,77 +828,6 @@ namespace Chess
         char ***board_ptr = this->game_board->get_board_ptr();
 
         this->setCentralWidget(master_container);
-
-        if (this->game_mode == OnePlayer && cpu_turn)
-        {
-            QProgressDialog thinking_diag("CPU is thinking...", nullptr, 0, 0, this);
-
-            thinking_diag.setWindowFlags(Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
-            thinking_diag.setCancelButton(nullptr);
-
-            thinking_diag.setMinimumDuration(0);
-            thinking_diag.setWindowTitle("Please Wait");
-
-            thinking_diag.setStyleSheet("background-color: #0A1118; color: #f8e7bb; border: 1px solid #f8e7bb;");
-            thinking_diag.show();
-
-            qApp->processEvents();
-
-            int cpu_num { (this->cpu_opponent.get_color() == COLOR_BLACK) ? PLAYER2: PLAYER1 };
-
-            Player *cpu_ply { this->game_board->get_player(cpu_num) };
-            Player *user_ply { this->game_board->get_player( (cpu_num == PLAYER1) ? PLAYER2 : PLAYER1 ) };
-
-            Move move = this->cpu_opponent.get_best_move(
-                this->game_board->get_board_array(),
-                (user_ply->color == COLOR_WHITE) ? *user_ply : *cpu_ply,
-                (user_ply->color == COLOR_BLACK) ? *user_ply : *cpu_ply
-            );
-
-            Captured *ply_captures { this->game_board->get_player_captures(cpu_num) };
-
-            int *plyEP { this->game_board->get_player_EP(cpu_num) },
-                *oppEP { this->game_board->get_player_EP((cpu_num == PLAYER1) ? PLAYER2 : PLAYER1) };
-
-            MoveValidation move_state;
-
-            switch (std::tolower(move.symbol))
-            {
-                case 'p': move_state = movePawn(*board_ptr, cpu_ply, move, ply_captures, plyEP, oppEP, false, false); break;
-                case 'r': move_state = moveRook(*board_ptr, cpu_ply, move, ply_captures, false); break;
-                case 'n': move_state = moveKnight(*board_ptr, cpu_ply, move, ply_captures, false); break;
-                case 'b': move_state = moveBishop(*board_ptr, cpu_ply, move, ply_captures, false); break;
-                case 'q': move_state = moveQueen(*board_ptr, cpu_ply, move, ply_captures, false); break;
-                case 'k': move_state = moveKing(*board_ptr, cpu_ply, move, ply_captures, false); break;
-            }
-
-            if (move_state != INVALID_MOVE)
-            {
-                if (move_state == PROMOTION)
-                {
-                    char chosen_piece { (cpu_num == PLAYER1) ? 'q': 'Q' };
-
-                    promotePawn(move, cpu_ply, chosen_piece);
-
-                    move.promotedPawn = chosen_piece;
-                    (*board_ptr)[move.rowNext][move.colNext] = chosen_piece;
-                }
-
-                saveMove(move, (this->game_board->get_game_path()).c_str());
-
-                clearRedo((this->game_board->get_redo_path()).c_str());
-
-                if (ply_captures->newCapture) 
-
-                capturePiece(this->game_board->get_player((cpu_num == PLAYER1) ? PLAYER2 : PLAYER1), ply_captures);
-
-                player_turn = (cpu_num == PLAYER2) ? PLAYER1: PLAYER2;
-
-                this->game_board->update_turn(player_turn);
-            }
-
-            thinking_diag.close();
-        }
 
         gl->addLayout(ply2_data, 0, 1, 1, 8, Qt::AlignLeft);
         gl->addLayout(ply1_data, 11, 1, 1, 8, Qt::AlignLeft);
@@ -913,14 +879,11 @@ namespace Chess
 
                 cell->setStyleSheet(QString("background-color: %1; border: none; margin: 0px;").arg(color));
 
-                bool isCurrentPlayerPiece = (player_turn == PLAYER1) ?
-                                            std::islower((*board_ptr)[actual_row][actual_col]) :
-                                            std::isupper((*board_ptr)[actual_row][actual_col]);
+                bool is_current_piece = (player_turn == PLAYER1) ? std::islower((*board_ptr)[actual_row][actual_col]) : std::isupper((*board_ptr)[actual_row][actual_col]);
 
                 if (!isEmpty(*board_ptr, actual_row, actual_col))
                 {
-                    if (isCurrentPlayerPiece) helpers::add_piece_to_cell(cell, (*board_ptr)[actual_row][actual_col], actual_row, actual_col);
-
+                    if (is_current_piece && !cpu_turn) helpers::add_piece_to_cell(cell, (*board_ptr)[actual_row][actual_col], actual_row, actual_col);
                     else helpers::add_piece_to_cell(cell, (*board_ptr)[actual_row][actual_col]);
                 }
 
@@ -941,6 +904,58 @@ namespace Chess
         this->add_moves_view();
 
         master_layout->addStretch(1);
+
+        qApp->processEvents();
+
+        if (this->game_mode == OnePlayer && cpu_turn)
+        {
+            int cpu_num { (this->cpu_opponent.get_color() == COLOR_BLACK) ? PLAYER2: PLAYER1 };
+
+            Player *cpu_ply { this->game_board->get_player(cpu_num) };
+            Player *user_ply { this->game_board->get_player( (cpu_num == PLAYER1) ? PLAYER2 : PLAYER1 ) };
+
+            Move move = this->cpu_opponent.get_best_move(
+                this->game_board->get_board_array(),
+                (user_ply->color == COLOR_WHITE) ? *user_ply : *cpu_ply,
+                (user_ply->color == COLOR_BLACK) ? *user_ply : *cpu_ply
+            );
+
+            Captured *ply_captures { this->game_board->get_player_captures(cpu_num) };
+
+            int *ply_ep { this->game_board->get_player_EP(cpu_num) },
+                *opp_ep { this->game_board->get_player_EP((cpu_num == PLAYER1) ? PLAYER2 : PLAYER1) };
+
+            MoveValidation move_state;
+
+            switch (std::tolower(move.symbol))
+            {
+                case 'p': move_state = movePawn(*board_ptr, cpu_ply, move, ply_captures, ply_ep, opp_ep, false, false); break;
+                case 'r': move_state = moveRook(*board_ptr, cpu_ply, move, ply_captures, false); break;
+                case 'n': move_state = moveKnight(*board_ptr, cpu_ply, move, ply_captures, false); break;
+                case 'b': move_state = moveBishop(*board_ptr, cpu_ply, move, ply_captures, false); break;
+                case 'q': move_state = moveQueen(*board_ptr, cpu_ply, move, ply_captures, false); break;
+                case 'k': move_state = moveKing(*board_ptr, cpu_ply, move, ply_captures, false); break;
+            }
+
+            if (move_state != INVALID_MOVE)
+            {
+                if (move_state == PROMOTION)
+                {
+                    char chosen_piece { (cpu_num == PLAYER1) ? 'q': 'Q' };
+                    promotePawn(move, cpu_ply, chosen_piece);
+                    move.promotedPawn = chosen_piece;
+                    (*board_ptr)[move.rowNext][move.colNext] = chosen_piece;
+                }
+
+                saveMove(move, (this->game_board->get_game_path()).c_str());
+                clearRedo((this->game_board->get_redo_path()).c_str());
+
+                if (ply_captures->newCapture) capturePiece(this->game_board->get_player((cpu_num == PLAYER1) ? PLAYER2 : PLAYER1), ply_captures);
+
+                this->game_board->update_turn((cpu_num == PLAYER2) ? PLAYER1: PLAYER2);
+                return this->update();
+            }
+        }
 
         Player *current_ply = this->game_board->get_player(player_turn);
         Player *opponent_ply = this->game_board->get_player((player_turn == PLAYER1) ? PLAYER2: PLAYER1);
