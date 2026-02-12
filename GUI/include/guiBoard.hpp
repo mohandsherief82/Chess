@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QProgressDialog>
 #include <QGuiApplication>
 #include <QGridLayout>
 #include <QMessageBox>
