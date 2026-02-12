@@ -760,8 +760,21 @@ namespace Chess
 
         int player_turn = this->game_board->get_player_turn();
 
-        QString p1_text = (player_turn == PLAYER1) ? "Player 1 (White) ◄" : "Player 1 (White)";
-        QString p2_text = (player_turn == PLAYER2) ? "Player 2 (Black) ◄" : "Player 2 (Black)";
+        bool cpu_turn { ((this->cpu_opponent.get_color() == COLOR_BLACK && player_turn == PLAYER2) 
+                            || (this->cpu_opponent.get_color() == COLOR_WHITE && player_turn == PLAYER1)) };
+
+        QString p1_text, p2_text;
+
+        if (this->game_mode == OnePlayer)
+        {
+            p1_text = (!cpu_turn) ? "User (White) ◄" : "User (White)";
+            p2_text = (cpu_turn) ? "Computer (Black)    (Thinking...) ◄" : "Computer (Black)";
+        }
+        else
+        {
+            p1_text = (player_turn == PLAYER1) ? "Player 1 (White) ◄" : "Player 1 (White)";
+            p2_text = (player_turn == PLAYER2) ? "Player 2 (Black) ◄" : "Player 2 (Black)";
+        }
 
         QLabel *player1_msg { new QLabel(p1_text) };
         QLabel *player2_msg { new QLabel(p2_text) };
@@ -778,8 +791,6 @@ namespace Chess
         char ***board_ptr = this->game_board->get_board_ptr();
 
         this->setCentralWidget(master_container);
-
-        bool cpu_turn { ((this->cpu_opponent.get_color() == COLOR_BLACK && player_turn == PLAYER2) || (this->cpu_opponent.get_color() == COLOR_WHITE && player_turn == PLAYER1)) };
 
         if (this->game_mode == OnePlayer && cpu_turn)
         {

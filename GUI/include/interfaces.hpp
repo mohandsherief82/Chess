@@ -8,8 +8,10 @@ extern "C"
 {
     #include "board.h"
     #include "staleMate.h"
+
     #include "checkMate.h"
     #include "player.h"
+    
     #include "captures.h"
     #include "chessTypes.h"
 }
@@ -65,14 +67,11 @@ namespace Chess
             
             Board(char ***board_ptr, int player_turn);
             ~Board();
-            
-            // Prevent copying to avoid double-free issues
+           
             Board(const Board&) = delete;
             Board& operator=(const Board&) = delete;
             
             void update_board();
-            
-            std::string get_board_string();
             
             char **get_board_array() const { return *board_ptr; }
             char ***get_board_ptr() const { return board_ptr; }
