@@ -21,7 +21,7 @@ Table of Contents
 1. Overview
 ------------
 
-The **Terminal Chess Engine** is a comprehensive board game application implemented in C and C++. It translates the high-level complexity of Chess into a modular, command-line interface. The engine supports full rules, including specialized movements like castling, en passant, and pawn promotion.
+The **Chess Engine** is a comprehensive board game application implemented in C and C++. It translates the high-level complexity of Chess into a modular, command-line interface. The engine supports full rules, including specialized movements like castling, en passant, and pawn promotion.
 
 Key technical highlights include a recursive-style move validation system, binary file persistence for saving and loading game states, and a robust "Undo" feature that uses file truncation to safely revert moves back to the starting position.
 
@@ -77,7 +77,7 @@ The board is the most important aspect of the chess game that is needed for the 
 * **Representation**: The board is represented as a dynamic 2D char array of size 8 x 8.
 * **Visual Styling:** White squares are rendered using "-" and black squares using ".".
 * **Updating**: The `addPiece` function serves as the primary interface for updating the board array based on the current state of the Player structures.
-* **UI/UX**: The `displayBoard` function handles the complex task of centered rendering. It utilizes terminal escape codes to clear the screen, providing a seamless "animation-like" feel. The interface is split into three zones: the Move Log (left), the Active Board (center), and Captured Pieces (right).
+* **UI/UX**: The `displayBoard` function handles the complex task of filling in the board.
 
 Also the board has its own initialization function and free function.
 
